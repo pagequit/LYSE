@@ -5,51 +5,46 @@ type Node = {
   y: number;
 };
 
-type Link = {
-  a: Node;
-  b: Node;
-};
-
-type Network = Array<Link>;
-
-function getDistance(link: Link): number {
-  return Math.sqrt(
-    Math.pow(link.a.x - link.b.x, 2) + Math.pow(link.a.x - link.b.x, 2),
-  );
-}
-
-function appendToNetwork(network: Network, link: Link): Network {
-  network.push(link);
-
-  return network;
-}
-
 const nodeA: Node = {
-  x: -1,
-  y: 0,
+  x: 100,
+  y: 100,
 };
 
 const nodeB: Node = {
-  x: 1,
-  y: 2,
+  x: 300,
+  y: 200,
 };
 
-const nodeC: Node = {
-  x: 0,
-  y: 3,
+type Renderable = {
+  render: (ctx: CanvasRenderingContext2D) => void;
 };
 
-const link1: Link = {
-  a: nodeA,
-  b: nodeB,
-};
+function makeRenderable<T extends {}>(
+  entity: T,
+  render: Renderable["render"],
+): T & Renderable {
+  return {
+    ...entity,
+    render,
+  };
+}
 
-const link2: Link = {
-  a: nodeB,
-  b: nodeC,
-};
+function draw(ctx: CanvasRenderingContext2D): (entity: Renderable) => void {
+  return (entity: Renderable) => entity.render.call(entity, ctx);
+}
 
-const network: Network = [link1, link2];
+function renderNode(this: Node, ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = "#c9d1d9";
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, 4, 0, 2 * Math.PI);
+  ctx.stroke();
+}
+
+function makeRenderableNode(node: Node): Node & Renderable {
+  return makeRenderable(node, renderNode);
+}
+
+const nodes = [nodeA, nodeB].map(makeRenderableNode);
 
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
@@ -62,6 +57,10 @@ let now = Date.now();
 let then = Date.now();
 (function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (const node of nodes) {
+    draw(ctx)(node);
+  }
 
   then = now;
   now = Date.now();
