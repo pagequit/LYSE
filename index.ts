@@ -29,14 +29,15 @@ function makeRenderable<T extends {}>(
   };
 }
 
-function draw(ctx: CanvasRenderingContext2D): (entity: Renderable) => void {
-  return (entity: Renderable) => entity.render.call(entity, ctx);
+// todo: turn the arguments around
+function draw(this: Renderable, ctx: CanvasRenderingContext2D): void {
+  this.render.call(this, ctx);
 }
 
 function renderNode(this: Node, ctx: CanvasRenderingContext2D) {
-  ctx.strokeStyle = "#c9d1d9";
   ctx.beginPath();
   ctx.arc(this.x, this.y, 4, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#c9d1d9";
   ctx.stroke();
 }
 
@@ -45,6 +46,17 @@ function makeRenderableNode(node: Node): Node & Renderable {
 }
 
 const nodes = [nodeA, nodeB].map(makeRenderableNode);
+
+type Link = [Node, Node];
+
+const link: Link = [nodeA, nodeB];
+
+function renderLink(this: Link, ctx: CanvasRenderingContext2D) {
+  ctx.moveTo(this[0].x, this[0].y);
+  ctx.lineTo(this[1].x, this[1].y);
+  ctx.strokeStyle = "#c9d1d9";
+  ctx.stroke();
+}
 
 const canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
@@ -59,13 +71,15 @@ let then = Date.now();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const node of nodes) {
-    draw(ctx)(node);
+    draw.call(node, ctx);
   }
+
+  renderLink.call(link, ctx);
 
   then = now;
   now = Date.now();
   const delta = now - then;
   ctx.fillStyle = "#c9d1d9";
-  ctx.fillText("FPS: " + Math.round(1000 / delta), 10, 10);
+  ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 10);
   requestAnimationFrame(animate);
 })();
