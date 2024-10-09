@@ -1,0 +1,14 @@
+:root {
+  --bg-color: #0d1117;
+  --fg-color: #c9d1d9;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
