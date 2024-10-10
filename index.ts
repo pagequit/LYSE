@@ -75,6 +75,12 @@ document.addEventListener("mousedown", (event: MouseEvent) => {
       node.y <= event.clientY + 4 &&
       node.y >= event.clientY - 4
     ) {
+      if (activeNode === node) {
+        activeNode = null;
+        nextLink.length = 0;
+        break;
+      }
+
       activeNode = node;
       break;
     }
@@ -84,8 +90,7 @@ document.addEventListener("mousedown", (event: MouseEvent) => {
     nextLink.push(activeNode);
 
     if (nextLink.length === 2) {
-      const link: Link = [nextLink[0], nextLink[1]];
-      links.push(makeRenderableLink(link));
+      links.push(makeRenderableLink([nextLink[0], nextLink[1]]));
       nextLink.shift();
     }
   }
