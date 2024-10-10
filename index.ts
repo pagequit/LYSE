@@ -33,6 +33,17 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
+document.addEventListener("mousedown", (event: MouseEvent) => {
+  if (event) {
+    nodes.push(
+      makeRenderableNode({
+        x: event.clientX,
+        y: event.clientY,
+      }),
+    );
+  }
+});
+
 let now: number = Date.now();
 let then: number = Date.now();
 (function animate() {
