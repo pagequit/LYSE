@@ -56,7 +56,6 @@ const nodes: Array<Node & Renderable> = [
   { x: 805, y: 734 },
   { x: 179, y: 808 },
 ].map(makeRenderableNode);
-
 const links: Array<Link & Renderable> = [];
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
@@ -68,35 +67,11 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
-let activeNode: Node | null = null;
 const nextLink: Array<Node> = [];
+let activeNode: Node | null = null;
 let isMouseDown: boolean = false;
-
-document.addEventListener("mousedown", (event: MouseEvent) => {
-  isMouseDown = true;
-
-  const node = getHoverNode(nodes, event);
-  if (node === null) {
-    return;
-  }
-
-  if (node === activeNode) {
-    activeNode = null;
-    nextLink.length = 0;
-    return;
-  }
-
-  activeNode = node;
-  nextLink.push(activeNode);
-
-  if (nextLink.length === 2) {
-    links.push(makeRenderableLink([nextLink[0], nextLink[1]]));
-    nextLink.shift();
-  }
-});
-
 let hoverNode: Node | null = null;
-let mouseNode: Node = { x: 0, y: 0 };
+let mouseNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
 
 function renderMouseLink(ctx: CanvasRenderingContext2D) {
   ctx.strokeStyle = foregroundColor;
@@ -106,14 +81,43 @@ function renderMouseLink(ctx: CanvasRenderingContext2D) {
   ctx.stroke();
 }
 
-document.addEventListener("mousemove", (event: MouseEvent) => {
-  hoverNode = getHoverNode(nodes, event);
+document.addEventListener("mousedown", (event: MouseEvent) => {
+  isMouseDown = true;
+
   mouseNode.x = event.clientX;
   mouseNode.y = event.clientY;
+
+  const node = getHoverNode(nodes, event);
+  if (node === null) {
+    return;
+  }
+
+  activeNode = node;
+  nextLink.push(node);
 });
 
-document.addEventListener("mouseup", (event: MouseEvent) => {
+document.addEventListener("mousemove", (event: MouseEvent) => {
+  mouseNode.x = event.clientX;
+  mouseNode.y = event.clientY;
+  hoverNode = getHoverNode(nodes, event);
+
+  if (!isMouseDown || hoverNode === null) {
+    return;
+  }
+
+  activeNode = hoverNode;
+  nextLink.push(activeNode);
+
+  if (nextLink.length === 2) {
+    links.push(makeRenderableLink([nextLink[0], nextLink[1]]));
+    nextLink.shift();
+  }
+});
+
+document.addEventListener("mouseup", () => {
   isMouseDown = false;
+  activeNode = null;
+  nextLink.length = 0;
 });
 
 let now: number = Date.now();
@@ -134,6 +138,7 @@ let then: number = Date.now();
 
     if (isMouseDown) {
       renderMouseLink(ctx);
+      render.call(mouseNode, ctx);
     }
   }
 
