@@ -8,6 +8,8 @@ import {
   makeRenderableLink,
   makeRenderableNode,
   render,
+  backgroundColor,
+  foregroundColor,
 } from "./lib";
 
 const nodes: Array<Node & Renderable> = [
@@ -61,15 +63,18 @@ const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.body.appendChild(canvas);
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
-canvas.style.backgroundColor = "#0d1117";
+canvas.style.backgroundColor = backgroundColor;
 const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
 let activeNode: Node | null = null;
 const nextLink: Array<Node> = [];
+let isMouseDown: boolean = false;
 
 document.addEventListener("mousedown", (event: MouseEvent) => {
+  isMouseDown = true;
+
   const node = getHoverNode(nodes, event);
   if (node === null) {
     return;
@@ -91,9 +96,24 @@ document.addEventListener("mousedown", (event: MouseEvent) => {
 });
 
 let hoverNode: Node | null = null;
+let mouseNode: Node = { x: 0, y: 0 };
+
+function renderMouseLink(ctx: CanvasRenderingContext2D) {
+  ctx.strokeStyle = foregroundColor;
+  ctx.beginPath();
+  ctx.moveTo(activeNode!.x, activeNode!.y);
+  ctx.lineTo(mouseNode.x, mouseNode.y);
+  ctx.stroke();
+}
 
 document.addEventListener("mousemove", (event: MouseEvent) => {
   hoverNode = getHoverNode(nodes, event);
+  mouseNode.x = event.clientX;
+  mouseNode.y = event.clientY;
+});
+
+document.addEventListener("mouseup", (event: MouseEvent) => {
+  isMouseDown = false;
 });
 
 let now: number = Date.now();
@@ -111,6 +131,10 @@ let then: number = Date.now();
 
   if (activeNode) {
     highlightNode(activeNode, ctx);
+
+    if (isMouseDown) {
+      renderMouseLink(ctx);
+    }
   }
 
   then = now;
