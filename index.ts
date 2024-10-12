@@ -1,11 +1,13 @@
 import "./index.css";
 import {
-  type Renderable,
-  type Node,
   type Link,
-  render,
-  makeRenderableNode,
+  type Node,
+  type Renderable,
+  getHoverNode,
+  highlightNode,
   makeRenderableLink,
+  makeRenderableNode,
+  render,
 } from "./lib";
 
 const nodes: Array<Node & Renderable> = [
@@ -64,38 +66,34 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
-let activeNode: (Node & Renderable) | null = null;
+let activeNode: Node | null = null;
 const nextLink: Array<Node> = [];
 
 document.addEventListener("mousedown", (event: MouseEvent) => {
-  for (const node of nodes) {
-    if (
-      node.x <= event.clientX + 4 &&
-      node.x >= event.clientX - 4 &&
-      node.y <= event.clientY + 4 &&
-      node.y >= event.clientY - 4
-    ) {
-      if (activeNode === node) {
-        activeNode = null;
-        nextLink.length = 0;
-        break;
-      }
-
-      activeNode = node;
-      break;
-    }
+  const node = getHoverNode(nodes, event);
+  if (node === null) {
+    return;
   }
 
-  if (activeNode) {
-    nextLink.push(activeNode);
-
-    if (nextLink.length === 2) {
-      links.push(makeRenderableLink([nextLink[0], nextLink[1]]));
-      nextLink.shift();
-    }
+  if (node === activeNode) {
+    activeNode = null;
+    nextLink.length = 0;
+    return;
   }
 
-  console.log(activeNode);
+  activeNode = node;
+  nextLink.push(activeNode);
+
+  if (nextLink.length === 2) {
+    links.push(makeRenderableLink([nextLink[0], nextLink[1]]));
+    nextLink.shift();
+  }
+});
+
+let hoverNode: Node | null = null;
+
+document.addEventListener("mousemove", (event: MouseEvent) => {
+  hoverNode = getHoverNode(nodes, event);
 });
 
 let now: number = Date.now();
@@ -105,6 +103,14 @@ let then: number = Date.now();
 
   for (const renderable of [...nodes, ...links] as Array<Renderable>) {
     render.call(renderable, ctx);
+  }
+
+  if (hoverNode) {
+    highlightNode(hoverNode, ctx);
+  }
+
+  if (activeNode) {
+    highlightNode(activeNode, ctx);
   }
 
   then = now;
