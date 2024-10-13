@@ -3,7 +3,7 @@ import {
   type Link,
   type Node,
   type Renderable,
-  getHoverNode,
+  getNodeByPosition,
   highlightNode,
   makeRenderableLink,
   makeRenderableNode,
@@ -13,7 +13,7 @@ import {
 } from "./lib";
 
 const nodes: Array<Node & Renderable> = [
-  { x: 536.5, y: 542 },
+  { x: 536, y: 542 },
   { x: 70, y: 65 },
   { x: 242, y: 73 },
   { x: 147, y: 242 },
@@ -69,39 +69,50 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
 
 const nextLink: Array<Node> = [];
 let activeNode: Node | null = null;
-let isMouseDown: boolean = false;
+let isPointerDown: boolean = false;
 let hoverNode: Node | null = null;
-let mouseNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
+let pointerNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
 
 function renderMouseLink(ctx: CanvasRenderingContext2D) {
   ctx.strokeStyle = foregroundColor;
   ctx.beginPath();
   ctx.moveTo(activeNode!.x, activeNode!.y);
-  ctx.lineTo(mouseNode.x, mouseNode.y);
+  ctx.lineTo(pointerNode.x, pointerNode.y);
   ctx.stroke();
 }
 
-document.addEventListener("mousedown", (event: MouseEvent) => {
-  isMouseDown = true;
+function onPointerDown(event: MouseEvent | TouchEvent) {
+  isPointerDown = true;
+  const position = event instanceof MouseEvent ? event : event.touches[0];
 
-  mouseNode.x = event.clientX;
-  mouseNode.y = event.clientY;
+  pointerNode.x = position.clientX;
+  pointerNode.y = position.clientY;
 
-  const node = getHoverNode(nodes, event);
+  const node = getNodeByPosition(nodes, {
+    x: position.clientX,
+    y: position.clientY,
+  });
+
   if (node === null) {
     return;
   }
 
   activeNode = node;
   nextLink.push(node);
-});
+}
 
-document.addEventListener("mousemove", (event: MouseEvent) => {
-  mouseNode.x = event.clientX;
-  mouseNode.y = event.clientY;
-  hoverNode = getHoverNode(nodes, event);
+function onPointerMove(event: MouseEvent | TouchEvent) {
+  const position = event instanceof MouseEvent ? event : event.touches[0];
 
-  if (!isMouseDown || hoverNode === null) {
+  pointerNode.x = position.clientX;
+  pointerNode.y = position.clientY;
+
+  hoverNode = getNodeByPosition(nodes, {
+    x: position.clientX,
+    y: position.clientY,
+  });
+
+  if (!isPointerDown || hoverNode === null) {
     return;
   }
 
@@ -112,13 +123,22 @@ document.addEventListener("mousemove", (event: MouseEvent) => {
     links.push(makeRenderableLink([nextLink[0], nextLink[1]]));
     nextLink.shift();
   }
-});
+}
 
-document.addEventListener("mouseup", () => {
-  isMouseDown = false;
+function onPointerUp() {
+  isPointerDown = false;
   activeNode = null;
   nextLink.length = 0;
-});
+}
+
+document.addEventListener("mousedown", onPointerDown);
+document.addEventListener("touchstart", onPointerDown);
+
+document.addEventListener("mousemove", onPointerMove);
+document.addEventListener("touchmove", onPointerMove);
+
+document.addEventListener("mouseup", onPointerUp);
+document.addEventListener("touchend", onPointerUp);
 
 let now: number = Date.now();
 let then: number = Date.now();
@@ -136,9 +156,9 @@ let then: number = Date.now();
   if (activeNode) {
     highlightNode(activeNode, ctx);
 
-    if (isMouseDown) {
+    if (isPointerDown) {
       renderMouseLink(ctx);
-      render.call(mouseNode, ctx);
+      render.call(pointerNode, ctx);
     }
   }
 

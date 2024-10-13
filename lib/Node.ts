@@ -28,16 +28,16 @@ export function makeRenderableNode(node: Node): Node & Renderable {
   return makeRenderable(node, renderNode);
 }
 
-export function getHoverNode(
+export function getNodeByPosition(
   nodes: Array<Node>,
-  event: MouseEvent,
+  position: { x: number; y: number },
 ): Node | null {
   for (const node of nodes) {
     if (
-      node.x <= event.clientX + 8 &&
-      node.x >= event.clientX - 8 &&
-      node.y <= event.clientY + 8 &&
-      node.y >= event.clientY - 8
+      node.x <= position.x + 8 &&
+      node.x >= position.x - 8 &&
+      node.y <= position.y + 8 &&
+      node.y >= position.y - 8
     ) {
       return node;
     }
