@@ -67,10 +67,10 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
-const nextLink: Array<Node> = [];
-let activeNode: Node | null = null;
+const nextLink: Array<Node & Renderable> = [];
+let activeNode: (Node & Renderable) | null = null;
 let isPointerDown: boolean = false;
-let hoverNode: Node | null = null;
+let hoverNode: (Node & Renderable) | null = null;
 let pointerNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
 
 function renderMouseLink(ctx: CanvasRenderingContext2D) {
@@ -97,8 +97,8 @@ function onPointerDown(event: MouseEvent | TouchEvent) {
     return;
   }
 
-  activeNode = node;
-  nextLink.push(node);
+  activeNode = node as Node & Renderable;
+  nextLink.push(activeNode);
 }
 
 function onPointerMove(event: MouseEvent | TouchEvent) {
@@ -110,17 +110,33 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
   hoverNode = getNodeByPosition(nodes, {
     x: position.clientX,
     y: position.clientY,
-  });
+  }) as Node & Renderable;
 
-  if (!isPointerDown || hoverNode === null) {
+  if (!isPointerDown || hoverNode === null || hoverNode === activeNode) {
     return;
   }
 
-  activeNode = hoverNode;
+  activeNode = hoverNode as Node & Renderable;
   nextLink.push(activeNode);
 
   if (nextLink.length === 2) {
-    links.push(makeRenderableLink([nextLink[0], nextLink[1]]));
+    const maybeNextLink: Link & Renderable = makeRenderableLink([
+      nextLink[0],
+      nextLink[1],
+    ]);
+
+    const existingLink: (Link & Renderable) | undefined = links.find(
+      (link) =>
+        (link[0] === nextLink[0] && link[1] === nextLink[1]) ||
+        (link[0] === nextLink[1] && link[1] === nextLink[0]), // links could bi-directional drawed
+    );
+
+    if (existingLink !== undefined) {
+      links.splice(links.indexOf(existingLink), 1);
+    } else {
+      links.push(maybeNextLink);
+    }
+
     nextLink.shift();
   }
 }
