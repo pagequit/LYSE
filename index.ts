@@ -1,3 +1,4 @@
+import { InternalSymbolName } from "typescript";
 import "./index.css";
 import {
   type Edge,
@@ -73,6 +74,41 @@ let isPointerDown: boolean = false;
 let hoverNode: (Node & Renderable) | null = null;
 let pointerNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
 
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+type Intersection = {
+  x: number;
+  y: number;
+  offset: number;
+};
+
+function getIntersection(a: Node, b: Node, c: Node, d: Node): Intersection {
+  const intersection = {
+    x: 0,
+    y: 0,
+    offset: 0,
+  };
+
+  const tTop = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
+  const uTop = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
+  const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
+
+  if (bottom !== 0) {
+    const t = tTop / bottom;
+    const u = uTop / bottom;
+
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+      intersection.x = lerp(a.x, b.x, t);
+      intersection.y = lerp(a.y, b.y, t);
+      intersection.offset = t;
+    }
+  }
+
+  return intersection;
+}
+
 function renderMouseLink(ctx: CanvasRenderingContext2D) {
   ctx.strokeStyle = foregroundColor;
   ctx.beginPath();
@@ -101,6 +137,12 @@ function onPointerDown(event: MouseEvent | TouchEvent) {
   nextEdge.push(activeNode);
 }
 
+let intersection: Intersection = {
+  x: 0,
+  y: 0,
+  offset: 0,
+};
+
 function onPointerMove(event: MouseEvent | TouchEvent) {
   const position = event instanceof MouseEvent ? event : event.touches[0];
 
@@ -111,6 +153,24 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
     x: position.clientX,
     y: position.clientY,
   }) as Node & Renderable;
+
+  if (activeNode !== null) {
+    for (const edge of edges.filter(
+      (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
+    )) {
+      const maybeIntersection = getIntersection(
+        edge[0],
+        edge[1],
+        activeNode,
+        pointerNode,
+      );
+
+      if (maybeIntersection.offset > 0 && maybeIntersection.offset < 1) {
+        intersection = maybeIntersection;
+        break;
+      }
+    }
+  }
 
   if (!isPointerDown || hoverNode === null || hoverNode === activeNode) {
     return;
@@ -182,6 +242,11 @@ let then: number = Date.now();
       render.call(pointerNode, ctx);
     }
   }
+
+  ctx.strokeStyle = "red";
+  ctx.beginPath();
+  ctx.arc(intersection.x, intersection.y, 8, 0, 2 * Math.PI);
+  ctx.stroke();
 
   then = now;
   now = Date.now();
