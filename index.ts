@@ -11,6 +11,7 @@ import {
   render,
   backgroundColor,
   foregroundColor,
+  errorColor,
 } from "./lib";
 
 const nodes: Array<Node & Renderable> = [
@@ -176,7 +177,12 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
     }
   }
 
-  if (!isPointerDown || hoverNode === null || hoverNode === activeNode) {
+  if (
+    !isPointerDown ||
+    hoverNode === null ||
+    hoverNode === activeNode ||
+    isIntersecting
+  ) {
     return;
   }
 
@@ -212,13 +218,9 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
 
 function onPointerUp() {
   isPointerDown = false;
+  isIntersecting = false;
   activeNode = null;
   nextEdge.length = 0;
-  intersection = {
-    x: 0,
-    y: 0,
-    offset: 0,
-  };
 }
 
 document.addEventListener("mousedown", onPointerDown);
@@ -239,7 +241,7 @@ let then: number = Date.now();
     render.call(renderable, ctx);
   }
 
-  if (hoverNode) {
+  if (hoverNode && !isIntersecting) {
     highlightNode(hoverNode, ctx);
   }
 
@@ -253,10 +255,10 @@ let then: number = Date.now();
   }
 
   if (isIntersecting) {
-    ctx.strokeStyle = "red";
-    ctx.beginPath();
-    ctx.arc(intersection.x, intersection.y, 8, 0, 2 * Math.PI);
-    ctx.stroke();
+    // TODO:
+    // there is an edgecase where the intersectio is rendered on the wrong edge if two edges are intersecting
+    // (the order in the array determines instead of the edge closest to the active node)
+    highlightNode(intersection, ctx, errorColor);
   }
 
   then = now;

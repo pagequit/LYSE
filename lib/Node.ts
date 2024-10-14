@@ -2,7 +2,7 @@ import {
   type Renderable,
   makeRenderable,
   foregroundColor,
-  highlightColor,
+  infoColor,
 } from "./index.ts";
 
 export type Node = {
@@ -17,8 +17,12 @@ export function renderNode(this: Node, ctx: CanvasRenderingContext2D): void {
   ctx.stroke();
 }
 
-export function highlightNode(node: Node, ctx: CanvasRenderingContext2D): void {
-  ctx.strokeStyle = highlightColor;
+export function highlightNode(
+  node: Node,
+  ctx: CanvasRenderingContext2D,
+  color: string = infoColor, // usually I hate default properties but I'm f*ing lazy
+): void {
+  ctx.strokeStyle = color;
   ctx.beginPath();
   ctx.arc(node.x, node.y, 8, 0, 2 * Math.PI);
   ctx.stroke();
