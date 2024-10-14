@@ -92,7 +92,7 @@ function getIntersection(a: Node, b: Node, c: Node, d: Node): Intersection {
   };
 
   const tTop = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
-  const uTop = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
+  const uTop = (c.y - a.y) * (a.x - b.x) - (c.x - a.x) * (a.y - b.y);
   const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
 
   if (bottom !== 0) {
@@ -137,6 +137,7 @@ function onPointerDown(event: MouseEvent | TouchEvent) {
   nextEdge.push(activeNode);
 }
 
+let isIntersecting: boolean = false;
 let intersection: Intersection = {
   x: 0,
   y: 0,
@@ -159,15 +160,18 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
       (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
     )) {
       const maybeIntersection = getIntersection(
-        edge[0],
-        edge[1],
         activeNode,
         pointerNode,
+        edge[0],
+        edge[1],
       );
 
       if (maybeIntersection.offset > 0 && maybeIntersection.offset < 1) {
         intersection = maybeIntersection;
+        isIntersecting = true;
         break;
+      } else {
+        isIntersecting = false;
       }
     }
   }
@@ -210,6 +214,11 @@ function onPointerUp() {
   isPointerDown = false;
   activeNode = null;
   nextEdge.length = 0;
+  intersection = {
+    x: 0,
+    y: 0,
+    offset: 0,
+  };
 }
 
 document.addEventListener("mousedown", onPointerDown);
@@ -243,10 +252,12 @@ let then: number = Date.now();
     }
   }
 
-  ctx.strokeStyle = "red";
-  ctx.beginPath();
-  ctx.arc(intersection.x, intersection.y, 8, 0, 2 * Math.PI);
-  ctx.stroke();
+  if (isIntersecting) {
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.arc(intersection.x, intersection.y, 8, 0, 2 * Math.PI);
+    ctx.stroke();
+  }
 
   then = now;
   now = Date.now();
