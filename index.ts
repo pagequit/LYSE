@@ -1,6 +1,6 @@
 import "./index.css";
 import {
-  type Link,
+  type Edge,
   type Node,
   type Renderable,
   getNodeByPosition,
@@ -56,7 +56,7 @@ const nodes: Array<Node & Renderable> = [
   { x: 805, y: 734 },
   { x: 179, y: 808 },
 ].map(makeRenderableNode);
-const links: Array<Link & Renderable> = [];
+const edges: Array<Edge & Renderable> = [];
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.body.appendChild(canvas);
@@ -67,7 +67,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
-const nextLink: Array<Node & Renderable> = [];
+const nextEdge: Array<Node & Renderable> = [];
 let activeNode: (Node & Renderable) | null = null;
 let isPointerDown: boolean = false;
 let hoverNode: (Node & Renderable) | null = null;
@@ -98,7 +98,7 @@ function onPointerDown(event: MouseEvent | TouchEvent) {
   }
 
   activeNode = node as Node & Renderable;
-  nextLink.push(activeNode);
+  nextEdge.push(activeNode);
 }
 
 function onPointerMove(event: MouseEvent | TouchEvent) {
@@ -117,34 +117,39 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
   }
 
   activeNode = hoverNode as Node & Renderable;
-  nextLink.push(activeNode);
+  nextEdge.push(activeNode);
 
-  if (nextLink.length === 2) {
-    const maybeNextLink: Link & Renderable = makeRenderableLink([
-      nextLink[0],
-      nextLink[1],
+  if (nextEdge.length === 2) {
+    const maybeEdge: Edge & Renderable = makeRenderableLink([
+      nextEdge[0],
+      nextEdge[1],
     ]);
 
-    const existingLink: (Link & Renderable) | undefined = links.find(
-      (link) =>
-        (link[0] === nextLink[0] && link[1] === nextLink[1]) ||
-        (link[0] === nextLink[1] && link[1] === nextLink[0]), // links could bi-directional drawed
+    let existingIndex = 0;
+    const existingEdge: (Edge & Renderable) | undefined = edges.find(
+      (edge, index) => {
+        existingIndex = index;
+        return (
+          (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
+          (edge[0] === nextEdge[1] && edge[1] === nextEdge[0])
+        );
+      },
     );
 
-    if (existingLink !== undefined) {
-      links.splice(links.indexOf(existingLink), 1);
+    if (existingEdge !== undefined) {
+      edges.splice(existingIndex, 1);
     } else {
-      links.push(maybeNextLink);
+      edges.push(maybeEdge);
     }
 
-    nextLink.shift();
+    nextEdge.shift();
   }
 }
 
 function onPointerUp() {
   isPointerDown = false;
   activeNode = null;
-  nextLink.length = 0;
+  nextEdge.length = 0;
 }
 
 document.addEventListener("mousedown", onPointerDown);
@@ -161,7 +166,7 @@ let then: number = Date.now();
 (function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  for (const renderable of [...nodes, ...links] as Array<Renderable>) {
+  for (const renderable of [...nodes, ...edges] as Array<Renderable>) {
     render.call(renderable, ctx);
   }
 
