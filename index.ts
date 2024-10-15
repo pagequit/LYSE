@@ -1,4 +1,3 @@
-import { InternalSymbolName } from "typescript";
 import "./index.css";
 import {
   type Edge,
@@ -12,10 +11,12 @@ import {
   backgroundColor,
   foregroundColor,
   errorColor,
+  warningColor,
+  infoColor,
+  highlightEdge,
 } from "./lib";
 
 const nodes: Array<Node & Renderable> = [
-  { x: 536, y: 542 },
   { x: 70, y: 65 },
   { x: 242, y: 73 },
   { x: 147, y: 242 },
@@ -69,11 +70,19 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
+const origin: Node & Renderable = makeRenderableNode({
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+});
+
+nodes.push(origin);
+
 const nextEdge: Array<Node & Renderable> = [];
 let activeNode: (Node & Renderable) | null = null;
 let isPointerDown: boolean = false;
 let hoverNode: (Node & Renderable) | null = null;
 let pointerNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
+let isIntersecting: boolean = false;
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
@@ -138,13 +147,6 @@ function onPointerDown(event: MouseEvent | TouchEvent) {
   nextEdge.push(activeNode);
 }
 
-let isIntersecting: boolean = false;
-let intersection: Intersection = {
-  x: 0,
-  y: 0,
-  offset: 0,
-};
-
 function onPointerMove(event: MouseEvent | TouchEvent) {
   const position = event instanceof MouseEvent ? event : event.touches[0];
 
@@ -168,7 +170,6 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
       );
 
       if (maybeIntersection.offset > 0 && maybeIntersection.offset < 1) {
-        intersection = maybeIntersection;
         isIntersecting = true;
         break;
       } else {
@@ -241,12 +242,14 @@ let then: number = Date.now();
     render.call(renderable, ctx);
   }
 
+  highlightNode(origin, ctx, warningColor);
+
   if (hoverNode && !isIntersecting) {
-    highlightNode(hoverNode, ctx);
+    highlightNode(hoverNode, ctx, infoColor);
   }
 
   if (activeNode) {
-    highlightNode(activeNode, ctx);
+    highlightNode(activeNode, ctx, infoColor);
 
     if (isPointerDown) {
       renderMouseLink(ctx);
@@ -255,10 +258,7 @@ let then: number = Date.now();
   }
 
   if (isIntersecting) {
-    // TODO:
-    // there is an edgecase where the intersectio is rendered on the wrong edge if two edges are intersecting
-    // (the order in the array determines instead of the edge closest to the active node)
-    highlightNode(intersection, ctx, errorColor);
+    highlightEdge([activeNode!, pointerNode], ctx, errorColor);
   }
 
   then = now;

@@ -20,7 +20,7 @@ export function renderNode(this: Node, ctx: CanvasRenderingContext2D): void {
 export function highlightNode(
   node: Node,
   ctx: CanvasRenderingContext2D,
-  color: string = infoColor, // usually I hate default properties but I'm f*ing lazy
+  color: string,
 ): void {
   ctx.strokeStyle = color;
   ctx.beginPath();
