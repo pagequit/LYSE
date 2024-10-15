@@ -84,6 +84,59 @@ let isPointerDown: boolean = false;
 let hoverNode: (Node & Renderable) | null = null;
 let pointerNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
 let isIntersecting: boolean = false;
+let graph: Graph = new Map();
+let mainGraphNodes: Array<Node> = [];
+
+type Graph = Map<Node, Array<Node>>;
+
+function makeGraph(nodes: Array<Node>, edges: Array<Edge>): Graph {
+  const graph: Graph = new Map();
+
+  for (const node of nodes) {
+    const neighbours = edges.reduce((acc, edge) => {
+      if (edge[0] === node) {
+        acc.push(edge[1]);
+        return acc;
+      }
+
+      if (edge[1] === node) {
+        acc.push(edge[0]);
+        return acc;
+      }
+
+      return acc;
+    }, [] as Array<Node>);
+
+    if (neighbours.length > 0) {
+      graph.set(node, neighbours);
+    }
+  }
+
+  return graph;
+}
+
+function originDFS(origin: Node, graph: Graph): Array<Node> {
+  const visited: Array<Node> = [origin];
+
+  if (!graph.has(origin)) {
+    return visited;
+  }
+
+  function innerDFS(node: Node, graph: Graph) {
+    const neighbours = graph.get(node)!;
+    for (const node of neighbours) {
+      if (visited.includes(node)) {
+        continue;
+      }
+
+      visited.push(node);
+      innerDFS(node, graph);
+    }
+  }
+  innerDFS(origin, graph);
+
+  return visited;
+}
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
@@ -207,6 +260,9 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
     }
 
     nextEdge.shift();
+
+    graph = makeGraph(nodes, edges);
+    mainGraphNodes = originDFS(origin, graph);
   }
 }
 
@@ -235,11 +291,15 @@ let then: number = Date.now();
     render.call(renderable, ctx);
   }
 
-  paintNode(origin, ctx, warningColor);
-
-  if (hoverNode && !isIntersecting) {
-    paintNode(hoverNode, ctx, infoColor);
+  for (const node of graph.keys()) {
+    paintNode(node, ctx, errorColor);
   }
+
+  for (const node of mainGraphNodes) {
+    paintNode(node, ctx, warningColor);
+  }
+
+  paintNode(origin, ctx, warningColor);
 
   if (activeNode) {
     paintNode(activeNode, ctx, infoColor);
@@ -252,6 +312,10 @@ let then: number = Date.now();
 
   if (isIntersecting) {
     paintEdge([activeNode!, pointerNode], ctx, errorColor);
+  }
+
+  if (hoverNode && !isIntersecting) {
+    paintNode(hoverNode, ctx, infoColor);
   }
 
   then = now;
