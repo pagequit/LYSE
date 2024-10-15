@@ -84,8 +84,8 @@ let isPointerDown: boolean = false;
 let hoverNode: (Node & Renderable) | null = null;
 let pointerNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
 let isIntersecting: boolean = false;
+let mainGraphNodes: Array<Node> = [origin];
 let graph: Graph = new Map();
-let mainGraphNodes: Array<Node> = [];
 
 type Graph = Map<Node, Array<Node>>;
 
@@ -299,8 +299,6 @@ let then: number = Date.now();
     paintNode(node, ctx, warningColor);
   }
 
-  paintNode(origin, ctx, warningColor);
-
   if (activeNode) {
     paintNode(activeNode, ctx, infoColor);
 
@@ -323,5 +321,8 @@ let then: number = Date.now();
   const delta = now - then;
   ctx.fillStyle = foregroundColor;
   ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 10);
+  ctx.fillText(`Edges: ${edges.length}`, 10, 20);
+  ctx.fillText(`GraphNodes: ${graph.size}`, 10, 30);
+  ctx.fillText(`MainNodes: ${mainGraphNodes.length}`, 10, 40);
   requestAnimationFrame(animate);
 })();
