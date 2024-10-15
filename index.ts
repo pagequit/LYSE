@@ -4,7 +4,7 @@ import {
   type Node,
   type Renderable,
   getNodeByPosition,
-  highlightNode,
+  paintNode,
   makeRenderableLink,
   makeRenderableNode,
   render,
@@ -12,7 +12,7 @@ import {
   errorColor,
   warningColor,
   infoColor,
-  highlightEdge,
+  paintEdge,
 } from "./lib";
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
@@ -234,23 +234,23 @@ let then: number = Date.now();
     render.call(renderable, ctx);
   }
 
-  highlightNode(origin, ctx, warningColor);
+  paintNode(origin, ctx, warningColor);
 
   if (hoverNode && !isIntersecting) {
-    highlightNode(hoverNode, ctx, infoColor);
+    paintNode(hoverNode, ctx, infoColor);
   }
 
   if (activeNode) {
-    highlightNode(activeNode, ctx, infoColor);
+    paintNode(activeNode, ctx, infoColor);
 
     if (isPointerDown) {
-      highlightEdge([activeNode!, pointerNode], ctx, infoColor);
+      paintEdge([activeNode!, pointerNode], ctx, infoColor);
       render.call(pointerNode, ctx);
     }
   }
 
   if (isIntersecting) {
-    highlightEdge([activeNode!, pointerNode], ctx, errorColor);
+    paintEdge([activeNode!, pointerNode], ctx, errorColor);
   }
 
   then = now;

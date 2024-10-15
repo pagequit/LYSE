@@ -5,21 +5,23 @@ export type Node = {
   y: number;
 };
 
-export function renderNode(this: Node, ctx: CanvasRenderingContext2D): void {
-  ctx.beginPath();
-  ctx.arc(this.x, this.y, 4, 0, 2 * Math.PI);
-  ctx.strokeStyle = foregroundColor;
-  ctx.stroke();
-}
-
-export function highlightNode(
+export function paintNode(
   node: Node,
   ctx: CanvasRenderingContext2D,
   color: string,
 ): void {
+  ctx.lineWidth = 2;
   ctx.strokeStyle = color;
   ctx.beginPath();
   ctx.arc(node.x, node.y, 8, 0, 2 * Math.PI);
+  ctx.stroke();
+}
+
+export function renderNode(this: Node, ctx: CanvasRenderingContext2D): void {
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = foregroundColor;
+  ctx.beginPath();
+  ctx.arc(this.x, this.y, 4, 0, 2 * Math.PI);
   ctx.stroke();
 }
 

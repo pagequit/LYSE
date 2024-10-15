@@ -7,11 +7,12 @@ import {
 
 export type Edge = [Node, Node];
 
-export function highlightEdge(
+export function paintEdge(
   edge: Edge,
   ctx: CanvasRenderingContext2D,
   color: string,
 ): void {
+  ctx.lineWidth = 2;
   ctx.strokeStyle = color;
   ctx.beginPath();
   ctx.moveTo(edge[0].x, edge[0].y);
@@ -20,9 +21,10 @@ export function highlightEdge(
 }
 
 export function renderLink(this: Edge, ctx: CanvasRenderingContext2D) {
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = foregroundColor;
   ctx.moveTo(this[0].x, this[0].y);
   ctx.lineTo(this[1].x, this[1].y);
-  ctx.strokeStyle = foregroundColor;
   ctx.stroke();
 }
 
