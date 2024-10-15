@@ -13,6 +13,7 @@ import {
   warningColor,
   infoColor,
   paintEdge,
+  foregroundColor,
 } from "./lib";
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
@@ -256,7 +257,7 @@ let then: number = Date.now();
   then = now;
   now = Date.now();
   const delta = now - then;
-  ctx.fillStyle = "#c9d1d9";
+  ctx.fillStyle = foregroundColor;
   ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 10);
   requestAnimationFrame(animate);
 })();
