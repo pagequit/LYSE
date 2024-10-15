@@ -9,12 +9,20 @@ import {
   makeRenderableNode,
   render,
   backgroundColor,
-  foregroundColor,
   errorColor,
   warningColor,
   infoColor,
   highlightEdge,
 } from "./lib";
+
+const canvas: HTMLCanvasElement = document.createElement("canvas");
+document.body.appendChild(canvas);
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+canvas.style.backgroundColor = backgroundColor;
+const ctx: CanvasRenderingContext2D = canvas.getContext(
+  "2d",
+) as CanvasRenderingContext2D;
 
 const nodes: Array<Node & Renderable> = [
   { x: 70, y: 65 },
@@ -59,16 +67,6 @@ const nodes: Array<Node & Renderable> = [
   { x: 805, y: 734 },
   { x: 179, y: 808 },
 ].map(makeRenderableNode);
-const edges: Array<Edge & Renderable> = [];
-
-const canvas: HTMLCanvasElement = document.createElement("canvas");
-document.body.appendChild(canvas);
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
-canvas.style.backgroundColor = backgroundColor;
-const ctx: CanvasRenderingContext2D = canvas.getContext(
-  "2d",
-) as CanvasRenderingContext2D;
 
 const origin: Node & Renderable = makeRenderableNode({
   x: canvas.width / 2,
@@ -76,6 +74,8 @@ const origin: Node & Renderable = makeRenderableNode({
 });
 
 nodes.push(origin);
+
+const edges: Array<Edge & Renderable> = [];
 
 const nextEdge: Array<Node & Renderable> = [];
 let activeNode: (Node & Renderable) | null = null;
@@ -117,14 +117,6 @@ function getIntersection(a: Node, b: Node, c: Node, d: Node): Intersection {
   }
 
   return intersection;
-}
-
-function renderMouseLink(ctx: CanvasRenderingContext2D) {
-  ctx.strokeStyle = foregroundColor;
-  ctx.beginPath();
-  ctx.moveTo(activeNode!.x, activeNode!.y);
-  ctx.lineTo(pointerNode.x, pointerNode.y);
-  ctx.stroke();
 }
 
 function onPointerDown(event: MouseEvent | TouchEvent) {
@@ -252,7 +244,7 @@ let then: number = Date.now();
     highlightNode(activeNode, ctx, infoColor);
 
     if (isPointerDown) {
-      renderMouseLink(ctx);
+      highlightEdge([activeNode!, pointerNode], ctx, infoColor);
       render.call(pointerNode, ctx);
     }
   }

@@ -1,9 +1,4 @@
-import {
-  type Renderable,
-  makeRenderable,
-  foregroundColor,
-  infoColor,
-} from "./index.ts";
+import { type Renderable, makeRenderable, foregroundColor } from "./index.ts";
 
 export type Node = {
   x: number;
