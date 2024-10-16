@@ -1,4 +1,4 @@
-import "./index.css";
+import "./style.css";
 import {
   type Edge,
   type Node,
@@ -18,61 +18,85 @@ import {
 } from "./lib";
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
-document.body.appendChild(canvas);
-canvas.height = window.innerHeight;
-canvas.width = window.innerWidth;
+document.getElementById("view")!.appendChild(canvas);
 canvas.style.backgroundColor = colors.backgroundColor;
 const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
 
+type View = {
+  width: number;
+  height: number;
+};
+
+const view: View = {
+  width: 1200,
+  height: 780,
+};
+
+canvas.width = Math.min(window.innerWidth, view.width);
+canvas.height = Math.min(window.innerHeight, view.height);
+const viewOffset = {
+  x:
+    window.innerWidth < view.width ? 0 : (view.width - window.innerWidth) * 0.5,
+  y:
+    window.innerHeight < view.height
+      ? 0
+      : (view.height - window.innerHeight) * 0.5,
+};
+
+window.addEventListener("resize", () => {
+  canvas.width = Math.min(window.innerWidth, view.width);
+  canvas.height = Math.min(window.innerHeight, view.height);
+
+  viewOffset.x =
+    window.innerWidth < view.width ? 0 : (view.width - window.innerWidth) * 0.5;
+  viewOffset.y =
+    window.innerHeight < view.height
+      ? 0
+      : (view.height - window.innerHeight) * 0.5;
+});
+
 const nodes: Array<Node & Renderable> = [
-  { x: 70, y: 65 },
-  { x: 242, y: 73 },
-  { x: 147, y: 242 },
-  { x: 299, y: 247 },
-  { x: 85, y: 467 },
-  { x: 417, y: 386 },
-  { x: 262, y: 702 },
-  { x: 274, y: 511 },
-  { x: 93, y: 660 },
-  { x: 155, y: 927 },
-  { x: 533, y: 905 },
-  { x: 396, y: 725 },
-  { x: 855, y: 1019 },
-  { x: 924, y: 889 },
-  { x: 696, y: 768 },
-  { x: 959, y: 350 },
-  { x: 957, y: 481 },
-  { x: 730, y: 397 },
-  { x: 812, y: 493 },
-  { x: 850, y: 162 },
-  { x: 973, y: 141 },
-  { x: 588, y: 68 },
-  { x: 588, y: 273 },
-  { x: 471, y: 185 },
-  { x: 819, y: 302 },
-  { x: 680, y: 188 },
-  { x: 886, y: 677 },
-  { x: 659, y: 639 },
-  { x: 514, y: 674 },
-  { x: 411, y: 557 },
-  { x: 552, y: 408 },
-  { x: 634, y: 490 },
-  { x: 730, y: 576 },
-  { x: 579, y: 731 },
-  { x: 311, y: 910 },
-  { x: 317, y: 374 },
-  { x: 81, y: 347 },
-  { x: 190, y: 592 },
-  { x: 688, y: 971 },
-  { x: 805, y: 734 },
-  { x: 179, y: 808 },
+  { x: 60, y: 221 },
+  { x: 100, y: 139 },
+  { x: 100, y: 495 },
+  { x: 127, y: 349 },
+  { x: 145, y: 687 },
+  { x: 188, y: 57 },
+  { x: 216, y: 217 },
+  { x: 288, y: 374 },
+  { x: 304, y: 553 },
+  { x: 307, y: 212 },
+  { x: 324, y: 670 },
+  { x: 359, y: 116 },
+  { x: 392, y: 303 },
+  { x: 495, y: 175 },
+  { x: 500, y: 615 },
+  { x: 487, y: 82 },
+  { x: 534, y: 476 },
+  { x: 560, y: 282 },
+  { x: 617, y: 54 },
+  { x: 623, y: 542 },
+  { x: 632, y: 198 },
+  { x: 655, y: 664 },
+  { x: 735, y: 271 },
+  { x: 782, y: 446 },
+  { x: 800, y: 700 },
+  { x: 803, y: 128 },
+  { x: 906, y: 287 },
+  { x: 954, y: 684 },
+  { x: 982, y: 429 },
+  { x: 985, y: 106 },
+  { x: 1065, y: 533 },
+  { x: 1088, y: 315 },
+  { x: 1098, y: 179 },
+  { x: 1108, y: 650 },
 ].map(makeRenderableNode);
 
 const origin: Node & Renderable = makeRenderableNode({
-  x: canvas.width / 2,
-  y: canvas.height / 2,
+  x: view.width / 2,
+  y: view.height / 2,
 });
 
 nodes.push(origin);
@@ -93,12 +117,12 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
   isPointerDown = true;
   const position = event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerNode.x = position.clientX;
-  pointerNode.y = position.clientY;
+  pointerNode.x = position.clientX + viewOffset.x;
+  pointerNode.y = position.clientY + viewOffset.y;
 
   const node = getNodeByPosition(nodes, {
-    x: position.clientX,
-    y: position.clientY,
+    x: pointerNode.x,
+    y: pointerNode.y,
   });
 
   if (node === null) {
@@ -113,12 +137,12 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   const position: { clientX: number; clientY: number } =
     event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerNode.x = position.clientX;
-  pointerNode.y = position.clientY;
+  pointerNode.x = position.clientX + viewOffset.x;
+  pointerNode.y = position.clientY + viewOffset.y;
 
   hoverNode = getNodeByPosition(nodes, {
-    x: position.clientX,
-    y: position.clientY,
+    x: pointerNode.x,
+    y: pointerNode.y,
   }) as Node & Renderable;
 
   if (activeNode !== null) {
@@ -233,6 +257,8 @@ let then: number = Date.now();
   if (hoverNode && !isIntersecting) {
     paintNode(hoverNode, ctx, colors.infoColor);
   }
+
+  paintNode(pointerNode, ctx, colors.infoColor);
 
   then = now;
   now = Date.now();
