@@ -112,6 +112,8 @@ let pointerNode: Node = { x: 0, y: 0 };
 let isIntersecting: boolean = false;
 let mainGraphNodes: Array<Node> = [origin];
 let graph: Graph = new Map();
+let isScrolling: boolean = false;
+let scrollOffset: { x: number; y: number } = { x: 0, y: 0 };
 
 function onPointerDown(event: MouseEvent | TouchEvent): void {
   isPointerDown = true;
@@ -126,6 +128,7 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
   });
 
   if (node === null) {
+    isScrolling = true;
     return;
   }
 
@@ -134,6 +137,12 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
 }
 
 function onPointerMove(event: MouseEvent | TouchEvent): void {
+  if (isScrolling) {
+    scrollOffset.x += (event as MouseEvent).movementX * 0.1;
+    scrollOffset.y += (event as MouseEvent).movementY * 0.1;
+    return;
+  }
+
   const position: { clientX: number; clientY: number } =
     event instanceof MouseEvent ? event : event.touches[0];
 
@@ -209,6 +218,9 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
 
 function onPointerUp(): void {
   isPointerDown = false;
+  isScrolling = false;
+  scrollOffset.x = 0;
+  scrollOffset.y = 0;
   isIntersecting = false;
   activeNode = null;
   nextEdge.length = 0;
@@ -226,6 +238,7 @@ document.addEventListener("touchend", onPointerUp);
 let now: number = Date.now();
 let then: number = Date.now();
 (function animate() {
+  ctx.translate(scrollOffset.x, scrollOffset.y);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const renderable of [...nodes, ...edges] as Array<Renderable>) {
