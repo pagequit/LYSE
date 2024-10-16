@@ -1,4 +1,4 @@
-import { type Renderable, makeRenderable, foregroundColor } from "./index.ts";
+import { type Renderable, makeRenderable, colors } from "./index.ts";
 
 export type Node = {
   x: number;
@@ -19,7 +19,7 @@ export function paintNode(
 
 export function renderNode(this: Node, ctx: CanvasRenderingContext2D): void {
   ctx.lineWidth = 2;
-  ctx.strokeStyle = foregroundColor;
+  ctx.strokeStyle = colors.foregroundColor;
   ctx.beginPath();
   ctx.arc(this.x, this.y, 4, 0, 2 * Math.PI);
   ctx.stroke();

@@ -3,24 +3,25 @@ import {
   type Edge,
   type Node,
   type Renderable,
+  type Graph,
+  type Intersection,
+  getIntersection,
+  originDFS,
   getNodeByPosition,
   paintNode,
+  makeGraph,
   makeRenderableLink,
   makeRenderableNode,
   render,
-  backgroundColor,
-  errorColor,
-  warningColor,
-  infoColor,
+  colors,
   paintEdge,
-  foregroundColor,
 } from "./lib";
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.body.appendChild(canvas);
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
-canvas.style.backgroundColor = backgroundColor;
+canvas.style.backgroundColor = colors.backgroundColor;
 const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d",
 ) as CanvasRenderingContext2D;
@@ -79,101 +80,16 @@ nodes.push(origin);
 const edges: Array<Edge & Renderable> = [];
 
 const nextEdge: Array<Node & Renderable> = [];
+
 let activeNode: (Node & Renderable) | null = null;
 let isPointerDown: boolean = false;
 let hoverNode: (Node & Renderable) | null = null;
-let pointerNode: Node & Renderable = makeRenderableNode({ x: 0, y: 0 });
+let pointerNode: Node = { x: 0, y: 0 };
 let isIntersecting: boolean = false;
 let mainGraphNodes: Array<Node> = [origin];
 let graph: Graph = new Map();
 
-type Graph = Map<Node, Array<Node>>;
-
-function makeGraph(nodes: Array<Node>, edges: Array<Edge>): Graph {
-  const graph: Graph = new Map();
-
-  for (const node of nodes) {
-    const neighbours = edges.reduce((acc, edge) => {
-      if (edge[0] === node) {
-        acc.push(edge[1]);
-        return acc;
-      }
-
-      if (edge[1] === node) {
-        acc.push(edge[0]);
-        return acc;
-      }
-
-      return acc;
-    }, [] as Array<Node>);
-
-    if (neighbours.length > 0) {
-      graph.set(node, neighbours);
-    }
-  }
-
-  return graph;
-}
-
-function originDFS(origin: Node, graph: Graph): Array<Node> {
-  const visited: Array<Node> = [origin];
-
-  if (!graph.has(origin)) {
-    return visited;
-  }
-
-  function innerDFS(node: Node, graph: Graph) {
-    const neighbours = graph.get(node)!;
-    for (const node of neighbours) {
-      if (visited.includes(node)) {
-        continue;
-      }
-
-      visited.push(node);
-      innerDFS(node, graph);
-    }
-  }
-  innerDFS(origin, graph);
-
-  return visited;
-}
-
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t;
-}
-
-type Intersection = {
-  x: number;
-  y: number;
-  offset: number;
-};
-
-function getIntersection(a: Node, b: Node, c: Node, d: Node): Intersection {
-  const intersection = {
-    x: 0,
-    y: 0,
-    offset: 0,
-  };
-
-  const tTop = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
-  const uTop = (c.y - a.y) * (a.x - b.x) - (c.x - a.x) * (a.y - b.y);
-  const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
-
-  if (bottom !== 0) {
-    const t = tTop / bottom;
-    const u = uTop / bottom;
-
-    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-      intersection.x = lerp(a.x, b.x, t);
-      intersection.y = lerp(a.y, b.y, t);
-      intersection.offset = t;
-    }
-  }
-
-  return intersection;
-}
-
-function onPointerDown(event: MouseEvent | TouchEvent) {
+function onPointerDown(event: MouseEvent | TouchEvent): void {
   isPointerDown = true;
   const position = event instanceof MouseEvent ? event : event.touches[0];
 
@@ -193,8 +109,9 @@ function onPointerDown(event: MouseEvent | TouchEvent) {
   nextEdge.push(activeNode);
 }
 
-function onPointerMove(event: MouseEvent | TouchEvent) {
-  const position = event instanceof MouseEvent ? event : event.touches[0];
+function onPointerMove(event: MouseEvent | TouchEvent): void {
+  const position: { clientX: number; clientY: number } =
+    event instanceof MouseEvent ? event : event.touches[0];
 
   pointerNode.x = position.clientX;
   pointerNode.y = position.clientY;
@@ -208,7 +125,7 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
     for (const edge of edges.filter(
       (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
     )) {
-      const maybeIntersection = getIntersection(
+      const maybeIntersection: Intersection = getIntersection(
         activeNode,
         pointerNode,
         edge[0],
@@ -242,7 +159,7 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
       nextEdge[1],
     ]);
 
-    let existingIndex = 0;
+    let existingIndex: number = 0;
     const existingEdge: (Edge & Renderable) | undefined = edges.find(
       (edge, index) => {
         existingIndex = index;
@@ -266,7 +183,7 @@ function onPointerMove(event: MouseEvent | TouchEvent) {
   }
 }
 
-function onPointerUp() {
+function onPointerUp(): void {
   isPointerDown = false;
   isIntersecting = false;
   activeNode = null;
@@ -292,34 +209,35 @@ let then: number = Date.now();
   }
 
   for (const node of graph.keys()) {
-    paintNode(node, ctx, errorColor);
+    paintNode(node, ctx, colors.errorColor);
   }
 
   for (const node of mainGraphNodes) {
-    paintNode(node, ctx, warningColor);
+    paintNode(node, ctx, colors.warningColor);
   }
 
   if (activeNode) {
-    paintNode(activeNode, ctx, infoColor);
+    paintNode(activeNode, ctx, colors.infoColor);
 
     if (isPointerDown) {
-      paintEdge([activeNode!, pointerNode], ctx, infoColor);
-      render.call(pointerNode, ctx);
+      paintEdge([activeNode!, pointerNode], ctx, colors.infoColor);
+      paintNode(pointerNode, ctx, colors.infoColor);
     }
   }
 
   if (isIntersecting) {
-    paintEdge([activeNode!, pointerNode], ctx, errorColor);
+    paintEdge([activeNode!, pointerNode], ctx, colors.errorColor);
+    paintNode(pointerNode, ctx, colors.errorColor);
   }
 
   if (hoverNode && !isIntersecting) {
-    paintNode(hoverNode, ctx, infoColor);
+    paintNode(hoverNode, ctx, colors.infoColor);
   }
 
   then = now;
   now = Date.now();
-  const delta = now - then;
-  ctx.fillStyle = foregroundColor;
+  const delta: number = now - then;
+  ctx.fillStyle = colors.foregroundColor;
   ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 10);
   ctx.fillText(`Edges: ${edges.length}`, 10, 20);
   ctx.fillText(`GraphNodes: ${graph.size}`, 10, 30);
