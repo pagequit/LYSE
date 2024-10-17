@@ -112,15 +112,20 @@ let pointerNode: Node = { x: 0, y: 0 };
 let isIntersecting: boolean = false;
 let mainGraphNodes: Array<Node> = [origin];
 let graph: Graph = new Map();
-let isScrolling: boolean = false;
-let scrollOffset: { x: number; y: number } = { x: 0, y: 0 };
+let isDragging: boolean = false;
+const dragOffset: { x: number; y: number } = { x: 0, y: 0 };
+const dragVector: { x: number; y: number } = { x: 0, y: 0 };
+const pointerOffset: { x: number; y: number } = {
+  x: viewOffset.x,
+  y: viewOffset.y,
+};
 
 function onPointerDown(event: MouseEvent | TouchEvent): void {
   isPointerDown = true;
   const position = event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerNode.x = position.clientX + viewOffset.x;
-  pointerNode.y = position.clientY + viewOffset.y;
+  pointerNode.x = position.clientX + pointerOffset.x;
+  pointerNode.y = position.clientY + pointerOffset.y;
 
   const node = getNodeByPosition(nodes, {
     x: pointerNode.x,
@@ -128,7 +133,9 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
   });
 
   if (node === null) {
-    isScrolling = true;
+    isDragging = true;
+    dragVector.x = position.clientX - dragOffset.x;
+    dragVector.y = position.clientY - dragOffset.y;
     return;
   }
 
@@ -137,17 +144,21 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
 }
 
 function onPointerMove(event: MouseEvent | TouchEvent): void {
-  if (isScrolling) {
-    scrollOffset.x += (event as MouseEvent).movementX * 0.1;
-    scrollOffset.y += (event as MouseEvent).movementY * 0.1;
-    return;
-  }
-
   const position: { clientX: number; clientY: number } =
     event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerNode.x = position.clientX + viewOffset.x;
-  pointerNode.y = position.clientY + viewOffset.y;
+  pointerNode.x = position.clientX + pointerOffset.x;
+  pointerNode.y = position.clientY + pointerOffset.y;
+
+  if (isDragging) {
+    dragOffset.x = position.clientX - dragVector.x;
+    dragOffset.y = position.clientY - dragVector.y;
+
+    pointerOffset.x = viewOffset.x - dragOffset.x;
+    pointerOffset.y = viewOffset.y - dragOffset.y;
+
+    return;
+  }
 
   hoverNode = getNodeByPosition(nodes, {
     x: pointerNode.x,
@@ -218,9 +229,7 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
 
 function onPointerUp(): void {
   isPointerDown = false;
-  isScrolling = false;
-  scrollOffset.x = 0;
-  scrollOffset.y = 0;
+  isDragging = false;
   isIntersecting = false;
   activeNode = null;
   nextEdge.length = 0;
@@ -238,8 +247,9 @@ document.addEventListener("touchend", onPointerUp);
 let now: number = Date.now();
 let then: number = Date.now();
 (function animate() {
-  ctx.translate(scrollOffset.x, scrollOffset.y);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(dragOffset.x, dragOffset.y);
 
   for (const renderable of [...nodes, ...edges] as Array<Renderable>) {
     render.call(renderable, ctx);
@@ -278,8 +288,7 @@ let then: number = Date.now();
   const delta: number = now - then;
   ctx.fillStyle = colors.foregroundColor;
   ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 10);
-  ctx.fillText(`Edges: ${edges.length}`, 10, 20);
-  ctx.fillText(`GraphNodes: ${graph.size}`, 10, 30);
-  ctx.fillText(`MainNodes: ${mainGraphNodes.length}`, 10, 40);
+
+  ctx.restore();
   requestAnimationFrame(animate);
 })();
