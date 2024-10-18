@@ -1,20 +1,20 @@
 import "./style.css";
 import {
   type Edge,
-  type Node,
-  type Renderable,
   type Graph,
   type Intersection,
+  type Node,
+  type Renderable,
+  colors,
   getIntersection,
-  originDFS,
   getNodeByPosition,
-  paintNode,
   makeGraph,
   makeRenderableLink,
   makeRenderableNode,
-  render,
-  colors,
+  originDFS,
   paintEdge,
+  paintNode,
+  render,
 } from "./lib";
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
@@ -105,19 +105,22 @@ const edges: Array<Edge & Renderable> = [];
 
 const nextEdge: Array<Node & Renderable> = [];
 
-let activeNode: (Node & Renderable) | null = null;
-let isPointerDown: boolean = false;
-let hoverNode: (Node & Renderable) | null = null;
-let pointerNode: Node = { x: 0, y: 0 };
 let isIntersecting: boolean = false;
+let activeNode: (Node & Renderable) | null = null;
+let hoverNode: (Node & Renderable) | null = null;
 let mainGraphNodes: Array<Node> = [origin];
 let graph: Graph = new Map();
 let isDragging: boolean = false;
-const dragOffset: { x: number; y: number } = { x: 0, y: 0 };
+let isPointerDown: boolean = false;
 const dragVector: { x: number; y: number } = { x: 0, y: 0 };
+const dragOffset: { x: number; y: number } = {
+  x: Math.min(0, (canvas.width - view.width) * 0.5),
+  y: Math.min(0, (canvas.height - view.height) * 0.5),
+};
+const pointerNode: Node = { x: 0, y: 0 };
 const pointerOffset: { x: number; y: number } = {
-  x: viewOffset.x,
-  y: viewOffset.y,
+  x: viewOffset.x - dragOffset.x,
+  y: viewOffset.y - dragOffset.y,
 };
 
 function onPointerDown(event: MouseEvent | TouchEvent): void {
@@ -151,8 +154,15 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   pointerNode.y = position.clientY + pointerOffset.y;
 
   if (isDragging) {
-    dragOffset.x = position.clientX - dragVector.x;
-    dragOffset.y = position.clientY - dragVector.y;
+    dragOffset.x = Math.min(
+      0,
+      Math.max(canvas.width - view.width, position.clientX - dragVector.x),
+    );
+
+    dragOffset.y = Math.min(
+      0,
+      Math.max(canvas.height - view.height, position.clientY - dragVector.y),
+    );
 
     pointerOffset.x = viewOffset.x - dragOffset.x;
     pointerOffset.y = viewOffset.y - dragOffset.y;
@@ -176,12 +186,8 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
         edge[1],
       );
 
-      if (maybeIntersection.offset > 0 && maybeIntersection.offset < 1) {
-        isIntersecting = true;
-        break;
-      } else {
-        isIntersecting = false;
-      }
+      isIntersecting =
+        maybeIntersection.offset > 0 && maybeIntersection.offset < 1;
     }
   }
 
@@ -203,7 +209,7 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
       nextEdge[1],
     ]);
 
-    let existingIndex: number = 0;
+    let existingIndex = 0;
     const existingEdge: (Edge & Renderable) | undefined = edges.find(
       (edge, index) => {
         existingIndex = index;
@@ -287,7 +293,11 @@ let then: number = Date.now();
   now = Date.now();
   const delta: number = now - then;
   ctx.fillStyle = colors.foregroundColor;
-  ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 10);
+  ctx.fillText(
+    `FPS: ${Math.round(1000 / delta)}`,
+    -dragOffset.x + 10,
+    -dragOffset.y + 20,
+  );
 
   ctx.restore();
   requestAnimationFrame(animate);
