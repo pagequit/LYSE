@@ -1,23 +1,15 @@
-import { type Node } from "./index.ts";
+import { type Vector } from "./index.ts";
 
 export type Intersection = {
-  x: number;
-  y: number;
   offset: number;
-};
+} & Vector;
 
 export function getIntersection(
-  a: Node,
-  b: Node,
-  c: Node,
-  d: Node,
-): Intersection {
-  const intersection = {
-    x: 0,
-    y: 0,
-    offset: 0,
-  };
-
+  a: Vector,
+  b: Vector,
+  c: Vector,
+  d: Vector,
+): Intersection | null {
   const tTop = (d.x - c.x) * (a.y - c.y) - (d.y - c.y) * (a.x - c.x);
   const uTop = (c.y - a.y) * (a.x - b.x) - (c.x - a.x) * (a.y - b.y);
   const bottom = (d.y - c.y) * (b.x - a.x) - (d.x - c.x) * (b.y - a.y);
@@ -27,13 +19,15 @@ export function getIntersection(
     const u = uTop / bottom;
 
     if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-      intersection.x = lerp(a.x, b.x, t);
-      intersection.y = lerp(a.y, b.y, t);
-      intersection.offset = t;
+      return {
+        x: lerp(a.x, b.x, t),
+        y: lerp(a.y, b.y, t),
+        offset: t,
+      };
     }
   }
 
-  return intersection;
+  return null;
 }
 
 function lerp(a: number, b: number, t: number): number {

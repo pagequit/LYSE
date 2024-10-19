@@ -1,21 +1,23 @@
 import "./style.css";
+import { colors } from "./style.ts";
 import {
-  type Edge,
-  type Graph,
-  type Intersection,
-  type Node,
-  type Renderable,
-  colors,
-  getIntersection,
   getNodeByPosition,
-  makeGraph,
-  makeRenderableLink,
-  makeRenderableNode,
-  originDFS,
-  paintEdge,
+  createNode,
   paintNode,
-  render,
-} from "./lib";
+  type Node,
+} from "./renderable/Node.ts";
+import { createEdge, paintEdge, type Edge } from "./renderable/Edge.ts";
+import { type Renderable, render } from "./renderable/Renderable.ts";
+import {
+  createGraph,
+  getIntersection,
+  originDFS,
+  type Graph,
+  type Vector,
+} from "./lib/index.ts";
+import { wasm } from "./zig/wasm.ts";
+
+wasm.add(1, 2);
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.getElementById("view")!.appendChild(canvas);
@@ -57,7 +59,7 @@ window.addEventListener("resize", () => {
       : (view.height - window.innerHeight) * 0.5;
 });
 
-const nodes: Array<Node & Renderable> = [
+const nodes: Array<Node> = [
   { x: 60, y: 221 },
   { x: 100, y: 139 },
   { x: 100, y: 495 },
@@ -92,33 +94,34 @@ const nodes: Array<Node & Renderable> = [
   { x: 1088, y: 315 },
   { x: 1098, y: 179 },
   { x: 1108, y: 650 },
-].map(makeRenderableNode);
+].map(createNode);
 
-const origin: Node & Renderable = makeRenderableNode({
+const origin: Node = createNode({
   x: view.width / 2,
   y: view.height / 2,
 });
 
 nodes.push(origin);
 
-const edges: Array<Edge & Renderable> = [];
+const edges: Array<Edge> = [];
 
-const nextEdge: Array<Node & Renderable> = [];
+const nextEdge: Array<Node> = [];
 
 let isIntersecting: boolean = false;
-let activeNode: (Node & Renderable) | null = null;
-let hoverNode: (Node & Renderable) | null = null;
+let activeNode: Node | null = null;
+let hoverNode: Node | null = null;
 let mainGraphNodes: Array<Node> = [origin];
 let graph: Graph = new Map();
 let isDragging: boolean = false;
 let isPointerDown: boolean = false;
-const dragVector: { x: number; y: number } = { x: 0, y: 0 };
-const dragOffset: { x: number; y: number } = {
+const dragVector: Vector = { x: 0, y: 0 };
+const dragOffset: Vector = {
   x: Math.min(0, (canvas.width - view.width) * 0.5),
   y: Math.min(0, (canvas.height - view.height) * 0.5),
 };
-const pointerNode: Node = { x: 0, y: 0 };
-const pointerOffset: { x: number; y: number } = {
+const pointerPosition: Vector = { x: 0, y: 0 };
+const pointerNode: Node = createNode(pointerPosition);
+const pointerOffset: Vector = {
   x: viewOffset.x - dragOffset.x,
   y: viewOffset.y - dragOffset.y,
 };
@@ -127,12 +130,12 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
   isPointerDown = true;
   const position = event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerNode.x = position.clientX + pointerOffset.x;
-  pointerNode.y = position.clientY + pointerOffset.y;
+  pointerPosition.x = position.clientX + pointerOffset.x;
+  pointerPosition.y = position.clientY + pointerOffset.y;
 
   const node = getNodeByPosition(nodes, {
-    x: pointerNode.x,
-    y: pointerNode.y,
+    x: pointerPosition.x,
+    y: pointerPosition.y,
   });
 
   if (node === null) {
@@ -142,7 +145,7 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
     return;
   }
 
-  activeNode = node as Node & Renderable;
+  activeNode = node;
   nextEdge.push(activeNode);
 }
 
@@ -150,8 +153,8 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   const position: { clientX: number; clientY: number } =
     event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerNode.x = position.clientX + pointerOffset.x;
-  pointerNode.y = position.clientY + pointerOffset.y;
+  pointerPosition.x = position.clientX + pointerOffset.x;
+  pointerPosition.y = position.clientY + pointerOffset.y;
 
   if (isDragging) {
     dragOffset.x = Math.min(
@@ -171,23 +174,24 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   }
 
   hoverNode = getNodeByPosition(nodes, {
-    x: pointerNode.x,
-    y: pointerNode.y,
-  }) as Node & Renderable;
+    x: pointerPosition.x,
+    y: pointerPosition.y,
+  });
 
   if (activeNode !== null) {
     for (const edge of edges.filter(
       (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
     )) {
-      const maybeIntersection: Intersection = getIntersection(
-        activeNode,
-        pointerNode,
-        edge[0],
-        edge[1],
+      isIntersecting = !!getIntersection(
+        activeNode.position,
+        pointerPosition,
+        edge[0].position,
+        edge[1].position,
       );
 
-      isIntersecting =
-        maybeIntersection.offset > 0 && maybeIntersection.offset < 1;
+      if (isIntersecting) {
+        break;
+      }
     }
   }
 
@@ -200,25 +204,20 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
     return;
   }
 
-  activeNode = hoverNode as Node & Renderable;
+  activeNode = hoverNode as Node;
   nextEdge.push(activeNode);
 
   if (nextEdge.length === 2) {
-    const maybeEdge: Edge & Renderable = makeRenderableLink([
-      nextEdge[0],
-      nextEdge[1],
-    ]);
+    const maybeEdge: Edge = createEdge([nextEdge[0], nextEdge[1]]);
 
     let existingIndex = 0;
-    const existingEdge: (Edge & Renderable) | undefined = edges.find(
-      (edge, index) => {
-        existingIndex = index;
-        return (
-          (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
-          (edge[0] === nextEdge[1] && edge[1] === nextEdge[0])
-        );
-      },
-    );
+    const existingEdge: Edge | undefined = edges.find((edge, index) => {
+      existingIndex = index;
+      return (
+        (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
+        (edge[0] === nextEdge[1] && edge[1] === nextEdge[0])
+      );
+    });
 
     if (existingEdge !== undefined) {
       edges.splice(existingIndex, 1);
@@ -228,7 +227,7 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
 
     nextEdge.shift();
 
-    graph = makeGraph(nodes, edges);
+    graph = createGraph(nodes, edges);
     mainGraphNodes = originDFS(origin, graph);
   }
 }
@@ -273,21 +272,21 @@ let then: number = Date.now();
     paintNode(activeNode, ctx, colors.infoColor);
 
     if (isPointerDown) {
-      paintEdge([activeNode!, pointerNode], ctx, colors.infoColor);
+      paintEdge(createEdge([activeNode!, pointerNode]), ctx, colors.infoColor);
       paintNode(pointerNode, ctx, colors.infoColor);
     }
   }
 
+  paintNode(pointerNode, ctx, colors.infoColor);
+
   if (isIntersecting) {
-    paintEdge([activeNode!, pointerNode], ctx, colors.errorColor);
+    paintEdge(createEdge([activeNode!, pointerNode]), ctx, colors.errorColor);
     paintNode(pointerNode, ctx, colors.errorColor);
   }
 
   if (hoverNode && !isIntersecting) {
     paintNode(hoverNode, ctx, colors.infoColor);
   }
-
-  paintNode(pointerNode, ctx, colors.infoColor);
 
   then = now;
   now = Date.now();

@@ -1,8 +1,9 @@
-import { type Node, type Edge } from "./index.ts";
+import { type Node } from "../renderable/Node.ts";
+import { type Edge } from "../renderable/Edge.ts";
 
 export type Graph = Map<Node, Array<Node>>;
 
-export function makeGraph(nodes: Array<Node>, edges: Array<Edge>): Graph {
+export function createGraph(nodes: Array<Node>, edges: Array<Edge>): Graph {
   const graph: Graph = new Map();
 
   for (const node of nodes) {
