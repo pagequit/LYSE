@@ -3,6 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
+    "wasm": "wasm-pack build ./wasm --target web",
     "dev": "bunx --bun vite",
     "build": "bunx --bun vite build",
     "preview": "bunx --bun vite preview",
@@ -12,6 +13,7 @@
     "@types/bun": "latest",
     "prettier": "^3.3.3",
     "vite": "^5.4.8",
+    "vite-plugin-watch-and-run": "^1.7.1",
     "vitest": "^2.1.2"
   },
   "peerDependencies": {

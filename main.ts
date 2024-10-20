@@ -15,9 +15,12 @@ import {
   type Graph,
   type Vector,
 } from "./lib/index.ts";
-import { wasm } from "./zig/wasm.ts";
+import init, { Vector as RVector } from "./wasm/pkg/lyse.js";
 
-wasm.add(1, 2);
+await init();
+
+const vec = new RVector(1, 2);
+vec.log();
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.getElementById("view")!.appendChild(canvas);
