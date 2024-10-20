@@ -20,7 +20,7 @@ import init, { Vector as RVector } from "./wasm/pkg/lyse.js";
 await init();
 
 const vec = new RVector(1, 2);
-vec.log();
+console.log(vec.x, vec.y);
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.getElementById("view")!.appendChild(canvas);
