@@ -15,12 +15,24 @@ import {
   type Graph,
   type Vector,
 } from "./lib/index.ts";
-import init, { Vector as RVector } from "./wasm/pkg/lyse.js";
+import init, { Vector as Vec, Intersection } from "./wasm/pkg/lyse.js";
 
 await init();
 
-const vec = new RVector(1, 2);
-console.log(vec.x, vec.y);
+const intersection = Intersection.get_intersection(
+  new Vec(1, 0),
+  new Vec(1, 2),
+  new Vec(0, 1),
+  new Vec(2, 1),
+);
+
+if (intersection !== undefined) {
+  const {
+    vector: { x, y },
+    offset,
+  } = intersection;
+  console.log(x, y, offset);
+}
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.getElementById("view")!.appendChild(canvas);
