@@ -19,7 +19,7 @@ import init, { Vector as Vec, Intersection } from "./wasm/pkg/lyse.js";
 
 await init();
 
-const intersection = Intersection.get_intersection(
+const intersection = Intersection.find(
   new Vec(1, 0),
   new Vec(1, 2),
   new Vec(0, 1),
@@ -33,6 +33,11 @@ if (intersection !== undefined) {
   } = intersection;
   console.log(x, y, offset);
 }
+
+type Scene = {
+  view: View;
+  layers: Array<Array<Renderable>>;
+};
 
 const canvas: HTMLCanvasElement = document.createElement("canvas");
 document.getElementById("view")!.appendChild(canvas);
@@ -49,6 +54,11 @@ type View = {
 const view: View = {
   width: 1200,
   height: 780,
+};
+
+const scene: Scene = {
+  view,
+  layers: [],
 };
 
 canvas.width = Math.min(window.innerWidth, view.width);
@@ -240,6 +250,7 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
       edges.push(maybeEdge);
     }
 
+    scene.layers[0] = [...nodes, ...edges];
     nextEdge.shift();
 
     graph = createGraph(nodes, edges);
@@ -264,6 +275,8 @@ document.addEventListener("touchmove", onPointerMove);
 document.addEventListener("mouseup", onPointerUp);
 document.addEventListener("touchend", onPointerUp);
 
+scene.layers.push([...nodes, ...edges]);
+
 let now: number = Date.now();
 let then: number = Date.now();
 (function animate() {
@@ -271,8 +284,10 @@ let then: number = Date.now();
   ctx.save();
   ctx.translate(dragOffset.x, dragOffset.y);
 
-  for (const renderable of [...nodes, ...edges] as Array<Renderable>) {
-    render.call(renderable, ctx);
+  for (const layer of scene.layers) {
+    for (const renderable of layer) {
+      render.call(renderable, ctx);
+    }
   }
 
   for (const node of graph.keys()) {
