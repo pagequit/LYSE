@@ -15,23 +15,44 @@ import {
   type Graph,
   type Vector,
 } from "./lib/index.ts";
-import init, { Vector as Vec, Intersection } from "./wasm/pkg/lyse.js";
+import init, {
+  Vector as Vec,
+  Edge as E,
+  Node as N,
+  Intersection,
+  createGraph as cG,
+} from "./wasm/pkg/lyse.js";
 
 await init();
 
-const intersection = Intersection.find(
-  new Vec(1, 0),
-  new Vec(1, 2),
-  new Vec(0, 1),
-  new Vec(2, 1),
-);
+const vec1 = new Vec(1, 0);
+const vec2 = new Vec(1, 2);
+const vec3 = new Vec(0, 1);
+const vec4 = new Vec(2, 1);
+
+const intersection = Intersection.find(vec1, vec2, vec3, vec4);
 
 if (intersection !== undefined) {
   const {
-    vector: { x, y },
+    position: { x, y },
     offset,
   } = intersection;
+
   console.log(x, y, offset);
+}
+
+const n1 = new N(vec1);
+const n2 = new N(vec2);
+const n3 = new N(vec3);
+const n4 = new N(vec4);
+
+const e1 = new E(n1, n2);
+const e2 = new E(n3, n4);
+
+const g = cG([n1, n2, n4, n3], [e1, e2]) as Record<string, Array<N>>;
+
+for (const [key, value] of Object.entries(g)) {
+  console.log(key, value);
 }
 
 type Scene = {
