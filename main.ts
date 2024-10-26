@@ -21,6 +21,7 @@ import init, {
   Node as N,
   Intersection,
   createGraph as cG,
+  type Graph as G,
 } from "./wasm/pkg/lyse.js";
 
 await init();
@@ -49,10 +50,12 @@ const n4 = new N(vec4);
 const e1 = new E(n1, n2);
 const e2 = new E(n3, n4);
 
-const g = cG([n1, n2, n4, n3], [e1, e2]) as Record<string, Array<N>>;
+const g: G = cG([n1, n2, n4, n3], [e1, e2]);
 
-for (const [key, value] of Object.entries(g)) {
-  console.log(key, value);
+for (const neighbors of g.values()) {
+  for (const neighbor of neighbors) {
+    console.log(neighbor.position.x, neighbor.position.y);
+  }
 }
 
 type Scene = {

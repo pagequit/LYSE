@@ -1,17 +1,16 @@
 use crate::edge::Edge;
 use crate::node::Node;
 use wasm_bindgen::prelude::*;
-use web_sys::js_sys::{Object, Reflect};
+use web_sys::js_sys::Map;
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    pub fn log(s: &str);
-}
+#[wasm_bindgen(typescript_custom_section)]
+const GRAPH: &'static str = r#"
+type Graph = Map<Node, Array<Node>>;
+"#;
 
 #[wasm_bindgen(js_name = createGraph)]
-pub fn create_graph(nodes: Vec<Node>, edges: Vec<Edge>) -> Object {
-    let graph = Object::new();
+pub fn create_graph(nodes: Vec<Node>, edges: Vec<Edge>) -> Map {
+    let graph = Map::new();
     for node in nodes {
         let neighbors: Vec<Node> = edges
             .iter()
@@ -29,9 +28,7 @@ pub fn create_graph(nodes: Vec<Node>, edges: Vec<Edge>) -> Object {
             .collect();
 
         if !neighbors.is_empty() {
-            // FIXME
-            // &node.into() results always in [object Object] as key
-            let _ = Reflect::set(&graph, &node.into(), &neighbors.into());
+            graph.set(&node.into(), &neighbors.into());
         }
     }
 
