@@ -12,7 +12,7 @@ body {
   background: black;
 }
 
-#view {
+#app {
   display: flex;
   justify-content: center;
   align-items: center;
