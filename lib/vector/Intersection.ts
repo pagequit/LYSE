@@ -1,4 +1,4 @@
-import { type Vector } from "./index.ts";
+import type { Vector } from "./Vector.ts";
 
 export type Intersection = {
   offset: number;

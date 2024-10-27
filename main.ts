@@ -1,62 +1,19 @@
 import "./style.css";
-import { colors } from "./style.ts";
+import { type Renderable, render } from "./lib";
 import {
-  getNodeByPosition,
-  createNode,
-  paintNode,
-  type Node,
-} from "./renderable/Node.ts";
-import { createEdge, paintEdge, type Edge } from "./renderable/Edge.ts";
-import { type Renderable, render } from "./renderable/Renderable.ts";
-import {
-  createGraph,
-  getIntersection,
-  originDFS,
+  type Edge,
   type Graph,
-  type Vector,
-} from "./lib/index.ts";
-import init, {
-  Vector as Vec,
-  Edge as E,
-  Node as N,
-  Intersection,
-  createGraph as cG,
-  type Graph as G,
-} from "./wasm/pkg/lyse.js";
-
-await init();
-
-const vec1 = new Vec(1, 0);
-const vec2 = new Vec(1, 2);
-const vec3 = new Vec(0, 1);
-const vec4 = new Vec(2, 1);
-
-const intersection = Intersection.find(vec1, vec2, vec3, vec4);
-
-if (intersection !== undefined) {
-  const {
-    position: { x, y },
-    offset,
-  } = intersection;
-
-  console.log(x, y, offset);
-}
-
-const n1 = new N(vec1);
-const n2 = new N(vec2);
-const n3 = new N(vec3);
-const n4 = new N(vec4);
-
-const e1 = new E(n1, n2);
-const e2 = new E(n3, n4);
-
-const g: G = cG([n1, n2, n4, n3], [e1, e2]);
-
-for (const neighbors of g.values()) {
-  for (const neighbor of neighbors) {
-    console.log(neighbor.position.x, neighbor.position.y);
-  }
-}
+  type Node,
+  createEdge,
+  createGraph,
+  createNode,
+  getNodeByPosition,
+  originDFS,
+  paintEdge,
+  paintNode,
+} from "./lib/graph";
+import { type Vector, getIntersection } from "./lib/vector";
+import { colors } from "./style.ts";
 
 type Scene = {
   view: View;
@@ -156,13 +113,13 @@ const edges: Array<Edge> = [];
 
 const nextEdge: Array<Node> = [];
 
-let isIntersecting: boolean = false;
+let isIntersecting = false;
 let activeNode: Node | null = null;
 let hoverNode: Node | null = null;
 let mainGraphNodes: Array<Node> = [origin];
 let graph: Graph = new Map();
-let isDragging: boolean = false;
-let isPointerDown: boolean = false;
+let isDragging = false;
+let isPointerDown = false;
 const dragVector: Vector = { x: 0, y: 0 };
 const dragOffset: Vector = {
   x: Math.min(0, (canvas.width - view.width) * 0.5),

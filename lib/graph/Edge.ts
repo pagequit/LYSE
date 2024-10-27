@@ -1,6 +1,6 @@
-import { type Renderable, createRenderable } from "./Renderable.ts";
-import { type Node } from "./Node.ts";
-import { colors } from "../style.ts";
+import { colors } from "../../style.ts";
+import { type Renderable, createRenderable } from "../Renderable.ts";
+import type { Node } from "../graph/Node.ts";
 
 export type Edge = [Node, Node] & Renderable;
 

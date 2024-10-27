@@ -1,5 +1,5 @@
-import { type Node } from "../renderable/Node.ts";
-import { type Edge } from "../renderable/Edge.ts";
+import type { Edge } from "./Edge.ts";
+import type { Node } from "./Node.ts";
 
 export type Graph = Map<Node, Array<Node>>;
 
@@ -36,18 +36,19 @@ export function originDFS(origin: Node, graph: Graph): Array<Node> {
     return visited;
   }
 
-  function innerDFS(node: Node, graph: Graph): void {
-    const neighbours = graph.get(node)!;
-    for (const node of neighbours) {
-      if (visited.includes(node)) {
-        continue;
-      }
-
-      visited.push(node);
-      innerDFS(node, graph);
-    }
-  }
-  innerDFS(origin, graph);
+  innerDFS(origin, graph, visited);
 
   return visited;
+}
+
+function innerDFS(node: Node, graph: Graph, visited: Array<Node>): void {
+  const neighbours = graph.get(node)!;
+  for (const node of neighbours) {
+    if (visited.includes(node)) {
+      continue;
+    }
+
+    visited.push(node);
+    innerDFS(node, graph, visited);
+  }
 }

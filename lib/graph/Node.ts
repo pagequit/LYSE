@@ -1,6 +1,6 @@
-import { type Renderable, createRenderable } from "./Renderable.ts";
-import { type Vector } from "../lib/Vector.ts";
-import { colors } from "../style.ts";
+import { type Renderable, createRenderable } from "../";
+import { colors } from "../../style.ts";
+import type { Vector } from "../vector";
 
 export type Node = {
   position: Vector;
