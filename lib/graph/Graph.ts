@@ -1,5 +1,4 @@
-import type { Edge } from "./Edge.ts";
-import type { Node } from "./Node.ts";
+import type { Node, Edge } from "./index.ts";
 
 export type Graph = Map<Node, Array<Node>>;
 

@@ -19,11 +19,26 @@ swapScene("NodesMenu");
 </template>
 
 <style>
+@font-face {
+  font-family: "magofonts";
+  src: url("/magofonts/mago1.ttf");
+}
 nav {
   position: absolute;
   top: 0;
   display: flex;
   gap: 1rem;
   margin: 1rem;
+
+  button {
+    padding: 0.5rem 1rem;
+    border: 2px solid whitesmoke;
+    border-radius: 0;
+    background-color: slateblue;
+    color: whitesmoke;
+    text-shadow: 2px 2px black;
+    font-family: "magofonts";
+    font-size: 1.5rem;
+  }
 }
 </style>

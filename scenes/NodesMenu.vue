@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import "../style.css";
-import { type Renderable, render } from "../lib/index.ts";
+import { type Renderable, render } from "../rendering/index.ts";
 import {
   type Edge,
   type Graph,
