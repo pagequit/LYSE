@@ -9,13 +9,21 @@ body {
   height: 100vh;
   width: 100vw;
   margin: 0;
-  background: black;
+  background: #161616;
 }
 
 #app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
 }

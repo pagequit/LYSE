@@ -4,6 +4,7 @@ import NodesMenu from "./scenes/NodesMenu.vue";
 import { useScene } from "./scenes/useScene.ts";
 
 const { setScene, getScene, swapScene, currentScene } = useScene();
+
 setScene("MainMenu", MainMenu);
 setScene("NodesMenu", NodesMenu);
 swapScene("NodesMenu");
@@ -26,7 +27,9 @@ swapScene("NodesMenu");
 nav {
   position: absolute;
   top: 0;
+  width: 100%;
   display: flex;
+  justify-content: center;
   gap: 1rem;
   margin: 1rem;
 
