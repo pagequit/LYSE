@@ -8,13 +8,20 @@ import {
   getNodeByPosition,
 } from "../lib/Node.ts";
 import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
-import { type Graph, createGraph, originDFS } from "../lib/Graph.ts";
+import { createGraph, originDFS } from "../lib/Graph.ts";
 import { type Vector } from "../lib/Vector.ts";
 import { type Scene } from "../lib/Scene.ts";
 import { getSegmentIntersection } from "../lib/Segment.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
+import { gameState } from "./useGameState.ts";
+import { getNodes } from "./getNodes.ts";
+
+const state = gameState.nodesMenu;
+
+const { nodes, origin } = getNodes();
+nodes.push(origin);
 
 const { canvas, ctx } = useCanvas();
 const { viewport, viewOffset } = useViewport();
@@ -50,59 +57,12 @@ const scene: Scene = {
   layers: [],
 };
 
-const nodes: Array<Node> = [
-  { x: 60, y: 221 },
-  { x: 100, y: 139 },
-  { x: 100, y: 495 },
-  { x: 127, y: 349 },
-  { x: 145, y: 687 },
-  { x: 188, y: 57 },
-  { x: 216, y: 217 },
-  { x: 288, y: 374 },
-  { x: 304, y: 553 },
-  { x: 307, y: 212 },
-  { x: 324, y: 670 },
-  { x: 359, y: 116 },
-  { x: 392, y: 303 },
-  { x: 495, y: 175 },
-  { x: 500, y: 615 },
-  { x: 487, y: 82 },
-  { x: 534, y: 476 },
-  { x: 560, y: 282 },
-  { x: 617, y: 54 },
-  { x: 623, y: 542 },
-  { x: 632, y: 198 },
-  { x: 655, y: 664 },
-  { x: 735, y: 271 },
-  { x: 782, y: 446 },
-  { x: 800, y: 700 },
-  { x: 803, y: 128 },
-  { x: 906, y: 287 },
-  { x: 954, y: 684 },
-  { x: 982, y: 429 },
-  { x: 985, y: 106 },
-  { x: 1065, y: 533 },
-  { x: 1088, y: 315 },
-  { x: 1098, y: 179 },
-  { x: 1108, y: 650 },
-].map(createNode);
-
-const origin: Node = createNode({
-  x: viewport.width / 2,
-  y: viewport.height / 2,
-});
-
-nodes.push(origin);
-
-const edges: Array<Edge> = [];
-
 const nextEdge: Array<Node> = [];
 
+let mainGraphNodes = originDFS(origin, state.graph);
 let isIntersecting = false;
 let activeNode: Node | null = null;
 let hoverNode: Node | null = null;
-let mainGraphNodes: Array<Node> = [origin];
-let graph: Graph = new Map();
 let isDragging = false;
 let isPointerDown = false;
 const dragVector: Vector = { x: 0, y: 0 };
@@ -187,7 +147,7 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   });
 
   if (activeNode !== null) {
-    for (const edge of edges.filter(
+    for (const edge of state.edges.filter(
       (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
     )) {
       isIntersecting = !!getSegmentIntersection(
@@ -217,7 +177,7 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
     const maybeEdge: Edge = createEdge([nextEdge[0], nextEdge[1]]);
 
     let existingIndex = 0;
-    const existingEdge: Edge | undefined = edges.find((edge, index) => {
+    const existingEdge: Edge | undefined = state.edges.find((edge, index) => {
       existingIndex = index;
       return (
         (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
@@ -226,16 +186,16 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
     });
 
     if (existingEdge !== undefined) {
-      edges.splice(existingIndex, 1);
+      state.edges.splice(existingIndex, 1);
     } else {
-      edges.push(maybeEdge);
+      state.edges.push(maybeEdge);
     }
 
-    scene.layers[0] = [...nodes, ...edges];
+    scene.layers[0] = [...nodes, ...state.edges];
     nextEdge.shift();
 
-    graph = createGraph(nodes, edges);
-    mainGraphNodes = originDFS(origin, graph);
+    state.graph = createGraph(nodes, state.edges);
+    mainGraphNodes = originDFS(origin, state.graph);
   }
 }
 
@@ -247,7 +207,7 @@ function onPointerUp(): void {
   nextEdge.length = 0;
 }
 
-scene.layers.push([...nodes, ...edges]);
+scene.layers.push([...nodes, ...state.edges]);
 
 let now: number = Date.now();
 let then: number = Date.now();
@@ -262,7 +222,7 @@ let then: number = Date.now();
     }
   }
 
-  for (const node of graph.keys()) {
+  for (const node of state.graph.keys()) {
     paintNode(node, ctx, colors.errorColor);
   }
 
