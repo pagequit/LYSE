@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "magofonts";
+  src: url("/magofonts/mago1.ttf");
+}
+
 *,
 *::after,
 *::before {

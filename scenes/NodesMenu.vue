@@ -15,18 +15,16 @@ import { getSegmentIntersection } from "../lib/Segment.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
-import { gameState } from "./useGameState.ts";
 import { getNodes } from "./getNodes.ts";
+import { gameState } from "./useGameState.ts";
 
 const state = gameState.nodesMenu;
-
 const { nodes, origin } = getNodes();
-nodes.push(origin);
-
 const { canvas, ctx } = useCanvas();
 const { viewport, viewOffset } = useViewport();
 const container = useTemplateRef("container");
 
+nodes.push(origin);
 canvas.width = Math.min(window.innerWidth, viewport.width);
 canvas.height = Math.min(window.innerHeight, viewport.height);
 
@@ -65,11 +63,13 @@ let activeNode: Node | null = null;
 let hoverNode: Node | null = null;
 let isDragging = false;
 let isPointerDown = false;
+
 const dragVector: Vector = { x: 0, y: 0 };
 const dragOffset: Vector = {
   x: Math.min(0, (canvas.width - viewport.width) * 0.5),
   y: Math.min(0, (canvas.height - viewport.height) * 0.5),
 };
+
 const pointerPosition: Vector = { x: 0, y: 0 };
 const pointerNode: Node = createNode(pointerPosition);
 const pointerOffset: Vector = {
@@ -89,6 +89,9 @@ function onResize(): void {
     window.innerHeight < viewport.height
       ? 0
       : (viewport.height - window.innerHeight) * 0.5;
+
+  pointerOffset.x = viewOffset.x - dragOffset.x;
+  pointerOffset.y = viewOffset.y - dragOffset.y;
 }
 
 function onPointerDown(event: MouseEvent | TouchEvent): void {
@@ -228,6 +231,10 @@ let then: number = Date.now();
 
   for (const node of mainGraphNodes) {
     paintNode(node, ctx, colors.warningColor);
+
+    ctx.arc(node.position.x, node.position.y, 128, 0, 2 * Math.PI);
+    ctx.fillStyle = "rgba(106, 90, 205, 0.05)";
+    ctx.fill();
   }
 
   if (activeNode) {
