@@ -8,23 +8,19 @@ import {
   getNodeByPosition,
 } from "../lib/Node.ts";
 import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
-import { createGraph, originDFS } from "../lib/Graph.ts";
 import { type Vector } from "../lib/Vector.ts";
 import { type Scene } from "../lib/Scene.ts";
 import { getSegmentIntersection } from "../lib/Segment.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
-import { getNodes } from "./getNodes.ts";
 import { gameState } from "./useGameState.ts";
 
-const state = gameState.nodesMenu;
-const { nodes, origin } = getNodes();
+const state = gameState.worldMap;
 const { canvas, ctx } = useCanvas();
 const { viewport, viewOffset } = useViewport();
 const container = useTemplateRef("container");
 
-nodes.push(origin);
 canvas.width = Math.min(window.innerWidth, viewport.width);
 canvas.height = Math.min(window.innerHeight, viewport.height);
 
@@ -57,14 +53,13 @@ const scene: Scene = {
 
 const nextEdge: Array<Node> = [];
 
-let mainGraphNodes = originDFS(origin, state.graph);
 let isIntersecting = false;
 let activeNode: Node | null = null;
 let hoverNode: Node | null = null;
-let isDragging = false;
+// let isDragging = false;
 let isPointerDown = false;
 
-const dragVector: Vector = { x: 0, y: 0 };
+// const dragVector: Vector = { x: 0, y: 0 };
 const dragOffset: Vector = {
   x: Math.min(0, (canvas.width - viewport.width) * 0.5),
   y: Math.min(0, (canvas.height - viewport.height) * 0.5),
@@ -101,15 +96,19 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
   pointerPosition.x = position.clientX + pointerOffset.x;
   pointerPosition.y = position.clientY + pointerOffset.y;
 
-  const node = getNodeByPosition(nodes, {
+  const node = getNodeByPosition(state.nodes, {
     x: pointerPosition.x,
     y: pointerPosition.y,
   });
 
   if (node === null) {
-    isDragging = true;
-    dragVector.x = position.clientX - dragOffset.x;
-    dragVector.y = position.clientY - dragOffset.y;
+    // isDragging = true;
+    // dragVector.x = position.clientX - dragOffset.x;
+    // dragVector.y = position.clientY - dragOffset.y;
+    state.nodes.push(createNode({ ...pointerPosition }));
+    console.log(state.nodes);
+
+    scene.layers.push([...state.nodes, ...state.edges]);
     return;
   }
 
@@ -124,27 +123,27 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   pointerPosition.x = position.clientX + pointerOffset.x;
   pointerPosition.y = position.clientY + pointerOffset.y;
 
-  if (isDragging) {
-    dragOffset.x = Math.min(
-      0,
-      Math.max(canvas.width - viewport.width, position.clientX - dragVector.x),
-    );
+  // if (isDragging) {
+  //   dragOffset.x = Math.min(
+  //     0,
+  //     Math.max(canvas.width - viewport.width, position.clientX - dragVector.x),
+  //   );
 
-    dragOffset.y = Math.min(
-      0,
-      Math.max(
-        canvas.height - viewport.height,
-        position.clientY - dragVector.y,
-      ),
-    );
+  //   dragOffset.y = Math.min(
+  //     0,
+  //     Math.max(
+  //       canvas.height - viewport.height,
+  //       position.clientY - dragVector.y,
+  //     ),
+  //   );
 
-    pointerOffset.x = viewOffset.x - dragOffset.x;
-    pointerOffset.y = viewOffset.y - dragOffset.y;
+  //   pointerOffset.x = viewOffset.x - dragOffset.x;
+  //   pointerOffset.y = viewOffset.y - dragOffset.y;
 
-    return;
-  }
+  //   return;
+  // }
 
-  hoverNode = getNodeByPosition(nodes, {
+  hoverNode = getNodeByPosition(state.nodes, {
     x: pointerPosition.x,
     y: pointerPosition.y,
   });
@@ -194,23 +193,18 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
       state.edges.push(maybeEdge);
     }
 
-    scene.layers[0] = [...nodes, ...state.edges];
+    scene.layers[0] = [...state.nodes, ...state.edges];
     nextEdge.shift();
-
-    state.graph = createGraph(nodes, state.edges);
-    mainGraphNodes = originDFS(origin, state.graph);
   }
 }
 
 function onPointerUp(): void {
   isPointerDown = false;
-  isDragging = false;
+  // isDragging = false;
   isIntersecting = false;
   activeNode = null;
   nextEdge.length = 0;
 }
-
-scene.layers.push([...nodes, ...state.edges]);
 
 let now: number = Date.now();
 let then: number = Date.now();
@@ -223,18 +217,6 @@ let then: number = Date.now();
     for (const renderable of layer) {
       render.call(renderable, ctx);
     }
-  }
-
-  for (const node of state.graph.keys()) {
-    paintNode(node, ctx, colors.errorColor);
-  }
-
-  for (const node of mainGraphNodes) {
-    paintNode(node, ctx, colors.warningColor);
-
-    ctx.arc(node.position.x, node.position.y, 128, 0, 2 * Math.PI);
-    ctx.fillStyle = "rgba(106, 90, 205, 0.05)";
-    ctx.fill();
   }
 
   if (activeNode) {

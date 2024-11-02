@@ -6,7 +6,7 @@ const { swapScene } = useScene();
 
 <template>
   <div class="container">
-    <div>
+    <div class="main-menu">
       <h1>MainMenu</h1>
       <button @click="swapScene('NodesMenu')">Back</button>
     </div>
@@ -14,10 +14,15 @@ const { swapScene } = useScene();
 </template>
 
 <style>
+.main-menu {
+  display: flex;
+  flex-direction: column;
+}
+
 h1 {
   color: whitesmoke;
   text-shadow: 2px 2px black;
   font-family: "magofonts";
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 </style>
