@@ -24,6 +24,10 @@ const container = useTemplateRef("container");
 canvas.width = Math.min(window.innerWidth, viewport.width);
 canvas.height = Math.min(window.innerHeight, viewport.height);
 
+let isDraggingNode = false;
+let shiftDown = false;
+let ctrlDown = false;
+
 onMounted(() => {
   container.value!.appendChild(canvas);
 
@@ -34,6 +38,28 @@ onMounted(() => {
   document.addEventListener("touchmove", onPointerMove);
   document.addEventListener("mouseup", onPointerUp);
   document.addEventListener("touchend", onPointerUp);
+
+  document.addEventListener("keydown", ({ key }) => {
+    switch (key) {
+      case "Shift":
+        shiftDown = true;
+        break;
+      case "Control":
+        ctrlDown = true;
+        break;
+    }
+  });
+
+  document.addEventListener("keyup", ({ key }) => {
+    switch (key) {
+      case "Shift":
+        shiftDown = false;
+        break;
+      case "Control":
+        ctrlDown = false;
+        break;
+    }
+  });
 });
 
 onUnmounted(() => {
@@ -56,10 +82,10 @@ const nextEdge: Array<Node> = [];
 let isIntersecting = false;
 let activeNode: Node | null = null;
 let hoverNode: Node | null = null;
-// let isDragging = false;
+let isDragging = false;
 let isPointerDown = false;
 
-// const dragVector: Vector = { x: 0, y: 0 };
+const dragVector: Vector = { x: 0, y: 0 };
 const dragOffset: Vector = {
   x: Math.min(0, (canvas.width - viewport.width) * 0.5),
   y: Math.min(0, (canvas.height - viewport.height) * 0.5),
@@ -102,18 +128,25 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
   });
 
   if (node === null) {
-    // isDragging = true;
-    // dragVector.x = position.clientX - dragOffset.x;
-    // dragVector.y = position.clientY - dragOffset.y;
-    state.nodes.push(createNode({ ...pointerPosition }));
-    console.log(state.nodes);
-
-    scene.layers.push([...state.nodes, ...state.edges]);
+    if (shiftDown) {
+      state.nodes.push(createNode({ ...pointerPosition }));
+      scene.layers.push([...state.nodes, ...state.edges]);
+    } else {
+      isDragging = true;
+      dragVector.x = position.clientX - dragOffset.x;
+      dragVector.y = position.clientY - dragOffset.y;
+    }
     return;
   }
 
   activeNode = node;
-  nextEdge.push(activeNode);
+
+  if (shiftDown) {
+    nextEdge.push(activeNode);
+    return;
+  }
+
+  isDraggingNode = true;
 }
 
 function onPointerMove(event: MouseEvent | TouchEvent): void {
@@ -123,25 +156,25 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   pointerPosition.x = position.clientX + pointerOffset.x;
   pointerPosition.y = position.clientY + pointerOffset.y;
 
-  // if (isDragging) {
-  //   dragOffset.x = Math.min(
-  //     0,
-  //     Math.max(canvas.width - viewport.width, position.clientX - dragVector.x),
-  //   );
+  if (isDragging) {
+    dragOffset.x = Math.min(
+      0,
+      Math.max(canvas.width - viewport.width, position.clientX - dragVector.x),
+    );
 
-  //   dragOffset.y = Math.min(
-  //     0,
-  //     Math.max(
-  //       canvas.height - viewport.height,
-  //       position.clientY - dragVector.y,
-  //     ),
-  //   );
+    dragOffset.y = Math.min(
+      0,
+      Math.max(
+        canvas.height - viewport.height,
+        position.clientY - dragVector.y,
+      ),
+    );
 
-  //   pointerOffset.x = viewOffset.x - dragOffset.x;
-  //   pointerOffset.y = viewOffset.y - dragOffset.y;
+    pointerOffset.x = viewOffset.x - dragOffset.x;
+    pointerOffset.y = viewOffset.y - dragOffset.y;
 
-  //   return;
-  // }
+    return;
+  }
 
   hoverNode = getNodeByPosition(state.nodes, {
     x: pointerPosition.x,
@@ -149,6 +182,12 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   });
 
   if (activeNode !== null) {
+    if (isDraggingNode) {
+      activeNode.position.x = pointerPosition.x;
+      activeNode.position.y = pointerPosition.y;
+      return;
+    }
+
     for (const edge of state.edges.filter(
       (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
     )) {
@@ -200,11 +239,14 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
 
 function onPointerUp(): void {
   isPointerDown = false;
-  // isDragging = false;
+  isDragging = false;
+  isDraggingNode = false;
   isIntersecting = false;
   activeNode = null;
   nextEdge.length = 0;
 }
+
+scene.layers.push([...state.nodes, ...state.edges]);
 
 let now: number = Date.now();
 let then: number = Date.now();
@@ -255,3 +297,9 @@ let then: number = Date.now();
 <template>
   <div class="container" ref="container"></div>
 </template>
+
+<style>
+canvas {
+  border: 1px solid whitesmoke;
+}
+</style>

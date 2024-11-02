@@ -9,7 +9,7 @@ const { setScene, getScene, swapScene, currentScene } = useScene();
 setScene("MainMenu", MainMenu);
 setScene("NodesMenu", NodesMenu);
 setScene("WorldMap", WorldMap);
-swapScene("NodesMenu");
+swapScene("WorldMap");
 </script>
 
 <template>
