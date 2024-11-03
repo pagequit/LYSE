@@ -2,8 +2,8 @@ import { type Viewport } from "../lib/Viewport.ts";
 
 // TODO: make the dimensions configurable
 const viewport: Viewport = {
-  width: 1200,
-  height: 780,
+  width: 1600,
+  height: 800,
 };
 
 const viewOffset = {

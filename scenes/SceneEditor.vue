@@ -28,6 +28,36 @@ let isDraggingNode = false;
 let shiftDown = false;
 let ctrlDown = false;
 
+type Grid = {
+  height: number;
+  width: number;
+  tileSize: number;
+  x: number;
+  y: number;
+};
+
+const grid: Grid = {
+  height: viewport.height,
+  width: viewport.width,
+  tileSize: 16,
+  x: viewport.width / 16,
+  y: viewport.height / 16,
+};
+
+function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
+  for (let i = 0; i < grid.x; i++) {
+    for (let j = 0; j < grid.y; j++) {
+      ctx.fillStyle = i % 2 === j % 2 ? "transparent" : "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(
+        i * grid.tileSize,
+        j * grid.tileSize,
+        grid.tileSize,
+        grid.tileSize,
+      );
+    }
+  }
+}
+
 onMounted(() => {
   container.value!.appendChild(canvas);
 
@@ -153,8 +183,13 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   const position: { clientX: number; clientY: number } =
     event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerPosition.x = position.clientX + pointerOffset.x;
-  pointerPosition.y = position.clientY + pointerOffset.y;
+  // grid move
+  pointerPosition.x =
+    Math.round(position.clientX / grid.tileSize) * grid.tileSize +
+    pointerOffset.x;
+  pointerPosition.y =
+    Math.round(position.clientY / grid.tileSize) * grid.tileSize +
+    pointerOffset.y;
 
   if (isDragging) {
     dragOffset.x = Math.min(
@@ -255,6 +290,8 @@ let then: number = Date.now();
   ctx.save();
   ctx.translate(dragOffset.x, dragOffset.y);
 
+  renderGrid(grid, ctx);
+
   for (const layer of scene.layers) {
     for (const renderable of layer) {
       render.call(renderable, ctx);
@@ -287,6 +324,16 @@ let then: number = Date.now();
     `FPS: ${Math.round(1000 / delta)}`,
     -dragOffset.x + 10,
     -dragOffset.y + 20,
+  );
+  ctx.fillText(
+    `Nodes: ${state.nodes.length}`,
+    -dragOffset.x + 10,
+    -dragOffset.y + 30,
+  );
+  ctx.fillText(
+    `Edges: ${state.edges.length}`,
+    -dragOffset.x + 10,
+    -dragOffset.y + 40,
   );
 
   ctx.restore();

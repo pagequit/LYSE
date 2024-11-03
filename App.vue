@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import MainMenu from "./scenes/MainMenu.vue";
 import NodesMenu from "./scenes/NodesMenu.vue";
-import WorldMap from "./scenes/WorldMap.vue";
+import SceneEditor from "./scenes/SceneEditor.vue";
 import { useScene } from "./scenes/useScene.ts";
 
 const { setScene, getScene, swapScene, currentScene } = useScene();
 
 setScene("MainMenu", MainMenu);
 setScene("NodesMenu", NodesMenu);
-setScene("WorldMap", WorldMap);
-swapScene("WorldMap");
+setScene("SceneEditor", SceneEditor);
+swapScene("SceneEditor");
 </script>
 
 <template>
@@ -27,10 +27,10 @@ swapScene("WorldMap");
       NodesMenu
     </button>
     <button
-      @click="swapScene('WorldMap')"
-      :class="currentScene === 'WorldMap' && 'active'"
+      @click="swapScene('SceneEditor')"
+      :class="currentScene === 'SceneEditor' && 'active'"
     >
-      WorldMap
+      SceneEditor
     </button>
   </nav>
 
