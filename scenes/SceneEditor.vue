@@ -185,11 +185,11 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
 
   // grid move
   pointerPosition.x =
-    Math.round(position.clientX / grid.tileSize) * grid.tileSize +
-    pointerOffset.x;
+    Math.round((position.clientX + pointerOffset.x) / grid.tileSize) *
+    grid.tileSize;
   pointerPosition.y =
-    Math.round(position.clientY / grid.tileSize) * grid.tileSize +
-    pointerOffset.y;
+    Math.round((position.clientY + pointerOffset.y) / grid.tileSize) *
+    grid.tileSize;
 
   if (isDragging) {
     dragOffset.x = Math.min(
