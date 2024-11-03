@@ -10,7 +10,6 @@ import {
 import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
 import { type Vector } from "../lib/Vector.ts";
 import { type Scene } from "../lib/Scene.ts";
-import { getSegmentIntersection } from "../lib/Segment.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
@@ -39,9 +38,9 @@ type Grid = {
 const grid: Grid = {
   height: viewport.height,
   width: viewport.width,
-  tileSize: 16,
-  x: viewport.width / 16,
-  y: viewport.height / 16,
+  tileSize: 64,
+  x: viewport.width / 64,
+  y: viewport.height / 64,
 };
 
 function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
@@ -57,7 +56,6 @@ function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
     }
   }
 }
-
 onMounted(() => {
   container.value!.appendChild(canvas);
 
@@ -107,9 +105,46 @@ const scene: Scene = {
   layers: [],
 };
 
+const player = {
+  position: {
+    x: viewport.width / 2,
+    y: viewport.height / 2,
+  },
+  sprite: new Image(),
+};
+
+player.sprite.src = "/BaseCharacter/idle.png";
+let frameSize = 80;
+let frameOffset = 48;
+let sequence = 1;
+let frameCount = 0;
+
+function drawPlayer(ctx: CanvasRenderingContext2D): void {
+  if (sequence >= 5) {
+    sequence = 1;
+  }
+
+  ctx.drawImage(
+    player.sprite,
+    frameSize * sequence - frameOffset,
+    193,
+    16,
+    16,
+    player.position.x,
+    player.position.y,
+    64,
+    64,
+  );
+
+  frameCount += 1;
+  if (frameCount >= 1000 / 24) {
+    sequence += 1;
+    frameCount = 0;
+  }
+}
+
 const nextEdge: Array<Node> = [];
 
-let isIntersecting = false;
 let activeNode: Node | null = null;
 let hoverNode: Node | null = null;
 let isDragging = false;
@@ -147,10 +182,19 @@ function onResize(): void {
 
 function onPointerDown(event: MouseEvent | TouchEvent): void {
   isPointerDown = true;
-  const position = event instanceof MouseEvent ? event : event.touches[0];
+  const position: { clientX: number; clientY: number } =
+    event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerPosition.x = position.clientX + pointerOffset.x;
-  pointerPosition.y = position.clientY + pointerOffset.y;
+  const gridPosition = getGridPosition(
+    {
+      x: position.clientX + pointerOffset.x,
+      y: position.clientY + pointerOffset.y,
+    },
+    grid.tileSize,
+  );
+
+  pointerPosition.x = gridPosition.x;
+  pointerPosition.y = gridPosition.y;
 
   const node = getNodeByPosition(state.nodes, {
     x: pointerPosition.x,
@@ -158,7 +202,7 @@ function onPointerDown(event: MouseEvent | TouchEvent): void {
   });
 
   if (node === null) {
-    if (shiftDown) {
+    if (ctrlDown) {
       state.nodes.push(createNode({ ...pointerPosition }));
       scene.layers.push([...state.nodes, ...state.edges]);
     } else {
@@ -183,13 +227,16 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
   const position: { clientX: number; clientY: number } =
     event instanceof MouseEvent ? event : event.touches[0];
 
-  // grid move
-  pointerPosition.x =
-    Math.round((position.clientX + pointerOffset.x) / grid.tileSize) *
-    grid.tileSize;
-  pointerPosition.y =
-    Math.round((position.clientY + pointerOffset.y) / grid.tileSize) *
-    grid.tileSize;
+  const gridPosition = getGridPosition(
+    {
+      x: position.clientX + pointerOffset.x,
+      y: position.clientY + pointerOffset.y,
+    },
+    grid.tileSize,
+  );
+
+  pointerPosition.x = gridPosition.x;
+  pointerPosition.y = gridPosition.y;
 
   if (isDragging) {
     dragOffset.x = Math.min(
@@ -216,33 +263,13 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
     y: pointerPosition.y,
   });
 
-  if (activeNode !== null) {
-    if (isDraggingNode) {
-      activeNode.position.x = pointerPosition.x;
-      activeNode.position.y = pointerPosition.y;
-      return;
-    }
-
-    for (const edge of state.edges.filter(
-      (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
-    )) {
-      isIntersecting = !!getSegmentIntersection(
-        [activeNode.position, pointerPosition],
-        [edge[0].position, edge[1].position],
-      );
-
-      if (isIntersecting) {
-        break;
-      }
-    }
+  if (activeNode !== null && isDraggingNode) {
+    activeNode.position.x = pointerPosition.x;
+    activeNode.position.y = pointerPosition.y;
+    return;
   }
 
-  if (
-    !isPointerDown ||
-    hoverNode === null ||
-    hoverNode === activeNode ||
-    isIntersecting
-  ) {
+  if (!isPointerDown || hoverNode === null || hoverNode === activeNode) {
     return;
   }
 
@@ -276,16 +303,24 @@ function onPointerUp(): void {
   isPointerDown = false;
   isDragging = false;
   isDraggingNode = false;
-  isIntersecting = false;
   activeNode = null;
   nextEdge.length = 0;
 }
 
+function getGridPosition(position: Vector, tileSize: number): Vector {
+  return {
+    x: Math.round(position.x / tileSize) * tileSize,
+    y: Math.round(position.y / tileSize) * tileSize,
+  };
+}
+
 scene.layers.push([...state.nodes, ...state.edges]);
+ctx.imageSmoothingEnabled = false;
 
 let now: number = Date.now();
 let then: number = Date.now();
 (function animate() {
+  requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.translate(dragOffset.x, dragOffset.y);
@@ -309,12 +344,7 @@ let then: number = Date.now();
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
-  if (isIntersecting) {
-    paintEdge(createEdge([activeNode!, pointerNode]), ctx, colors.errorColor);
-    paintNode(pointerNode, ctx, colors.errorColor);
-  } else if (hoverNode) {
-    paintNode(hoverNode, ctx, colors.infoColor);
-  }
+  drawPlayer(ctx);
 
   then = now;
   now = Date.now();
@@ -337,16 +367,9 @@ let then: number = Date.now();
   );
 
   ctx.restore();
-  requestAnimationFrame(animate);
 })();
 </script>
 
 <template>
   <div class="container" ref="container"></div>
 </template>
-
-<style>
-canvas {
-  border: 1px solid whitesmoke;
-}
-</style>
