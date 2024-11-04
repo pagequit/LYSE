@@ -10,6 +10,7 @@ import {
 import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
 import { type Vector } from "../lib/Vector.ts";
 import { type Scene } from "../lib/Scene.ts";
+import { type Sprite, renderSprite } from "../lib/Sprite.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
@@ -105,43 +106,24 @@ const scene: Scene = {
   layers: [],
 };
 
-const player = {
+const player: Sprite = {
+  image: new Image(),
   position: {
-    x: viewport.width / 2,
-    y: viewport.height / 2,
+    x: viewport.width / 2 - 256,
+    y: viewport.height / 2 - 256,
   },
-  sprite: new Image(),
+  width: 512,
+  height: 512,
+  frameRate: 42,
+  frameCount: 1,
+  subPosition: { x: 0, y: 128 },
+  subWidth: 80,
+  subHeight: 80,
+  sequence: 0,
+  sequenceStart: 0,
+  sequenceEnd: 3,
 };
-
-player.sprite.src = "/BaseCharacter/idle.png";
-let frameSize = 80;
-let frameOffset = 48;
-let sequence = 1;
-let frameCount = 0;
-
-function drawPlayer(ctx: CanvasRenderingContext2D): void {
-  if (sequence >= 5) {
-    sequence = 1;
-  }
-
-  ctx.drawImage(
-    player.sprite,
-    frameSize * sequence - frameOffset,
-    193,
-    16,
-    16,
-    player.position.x,
-    player.position.y,
-    64,
-    64,
-  );
-
-  frameCount += 1;
-  if (frameCount >= 1000 / 24) {
-    sequence += 1;
-    frameCount = 0;
-  }
-}
+player.image.src = "/BaseCharacter/idle.png"; // this sucks
 
 const nextEdge: Array<Node> = [];
 
@@ -344,7 +326,13 @@ let then: number = Date.now();
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
-  drawPlayer(ctx);
+  renderSprite(player, ctx);
+  ctx.strokeRect(
+    player.position.x,
+    player.position.y,
+    player.width,
+    player.height,
+  );
 
   then = now;
   now = Date.now();
