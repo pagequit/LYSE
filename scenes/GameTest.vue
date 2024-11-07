@@ -70,7 +70,7 @@ const game: Game = {
       v-for="(card, index) in game.player.hand"
       :key="index"
     >
-      <li class="player-card">
+      <li class="card">
         <div class="card-title">{{ card.title }}</div>
       </li>
     </ul>
@@ -79,5 +79,23 @@ const game: Game = {
 
 <style>
 .game-test {
+  .player-hand {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid whitesmoke;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    width: 8rem;
+    height: 12rem;
+    color: whitesmoke;
+  }
 }
 </style>
