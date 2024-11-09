@@ -10,7 +10,7 @@ import {
 import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
 import { type Vector } from "../lib/Vector.ts";
 import { type Scene } from "../lib/Scene.ts";
-import { type Sprite, renderSprite } from "../lib/Sprite.ts";
+import { type Sprite, animateSprite, createSprite } from "../lib/Sprite.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
@@ -106,8 +106,8 @@ const scene: Scene = {
   layers: [],
 };
 
-const player: Sprite = {
-  image: new Image(),
+const player: Sprite = createSprite({
+  imageSrc: "/BaseCharacter/idle.png",
   position: {
     x: viewport.width / 2 - 128,
     y: viewport.height / 2 - 128,
@@ -115,15 +115,12 @@ const player: Sprite = {
   width: 256,
   height: 256,
   frameRate: 42,
-  frameCount: 1,
   subPosition: { x: 0, y: 160 },
   subWidth: 80,
   subHeight: 80,
-  sequence: 0,
   sequenceStart: 0,
   sequenceEnd: 3,
-};
-player.image.src = "/BaseCharacter/idle.png"; // this sucks
+});
 
 const nextEdge: Array<Node> = [];
 
@@ -326,7 +323,8 @@ let then: number = Date.now();
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
-  renderSprite(player, ctx);
+  animateSprite(player, ctx);
+
   ctx.strokeRect(
     player.position.x,
     player.position.y,

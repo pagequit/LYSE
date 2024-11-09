@@ -15,7 +15,38 @@ export type Sprite = {
   sequenceEnd: number;
 };
 
-export function renderSprite(
+export function createSprite(spriteData: {
+  imageSrc: string;
+  position: Vector;
+  width: number;
+  height: number;
+  frameRate: number;
+  subPosition: Vector;
+  subWidth: number;
+  subHeight: number;
+  sequenceStart: number;
+  sequenceEnd: number;
+}): Sprite {
+  const image = new Image();
+  image.src = spriteData.imageSrc;
+
+  return {
+    image,
+    position: spriteData.position,
+    width: spriteData.width,
+    height: spriteData.height,
+    frameRate: spriteData.frameRate,
+    frameCount: 0,
+    subPosition: spriteData.subPosition,
+    subWidth: spriteData.subWidth,
+    subHeight: spriteData.subHeight,
+    sequence: spriteData.sequenceStart,
+    sequenceStart: spriteData.sequenceStart,
+    sequenceEnd: spriteData.sequenceEnd,
+  };
+}
+
+export function animateSprite(
   sprite: Sprite,
   ctx: CanvasRenderingContext2D,
 ): void {

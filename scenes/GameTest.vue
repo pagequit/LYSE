@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-
 type Action = () => void;
 
 type Stack = {
@@ -103,7 +101,7 @@ function allowDrop(event: DragEvent) {
   flex-flow: column nowrap;
 
   .game-test-board {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.1);
     border: 1px solid whitesmoke;
     border-radius: 8px;
     flex: 1 1 auto;
