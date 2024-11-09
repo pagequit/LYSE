@@ -2,7 +2,7 @@ import {
   type Sprite,
   createSprite,
   animateSprite,
-  setVFrame,
+  setYFrame,
 } from "../lib/Sprite.ts";
 import { type Vector } from "../lib/Vector.ts";
 
@@ -32,8 +32,8 @@ const idle = createSprite({
   frameRate: 42,
   frameWidth: 80,
   frameHeight: 80,
-  hFrames: 4,
-  vFrames: 4,
+  xFrames: 4,
+  yFrames: 4,
 });
 
 const walk = createSprite({
@@ -43,8 +43,8 @@ const walk = createSprite({
   frameRate: 21,
   frameWidth: 80,
   frameHeight: 80,
-  hFrames: 8,
-  vFrames: 4,
+  xFrames: 8,
+  yFrames: 4,
 });
 
 const animations = {
@@ -61,9 +61,13 @@ export function createPlayer(position: Vector): Player {
   };
 }
 
+export function setState(player: Player, state: State): void {
+  player.state = state;
+}
+
 export function setDirection(player: Player, direction: Direction): void {
   player.direction = direction;
-  setVFrame(player.animations[player.state], direction);
+  setYFrame(player.animations[player.state], direction);
 }
 
 export function animatePlayer(

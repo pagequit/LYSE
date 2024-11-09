@@ -21,6 +21,7 @@ import {
   animatePlayer,
   createPlayer,
   setDirection,
+  setState,
 } from "../entities/Player.ts";
 
 const state = gameState.worldMap;
@@ -118,7 +119,7 @@ const player: Player = createPlayer({
   y: (viewport.height - 256) / 2,
 });
 
-player.state = State.Idle;
+setState(player, State.Idle);
 setDirection(player, Direction.Down);
 
 const nextEdge: Array<Node> = [];

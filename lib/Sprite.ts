@@ -9,10 +9,10 @@ export type Sprite = {
   framePosition: Vector;
   frameWidth: number;
   frameHeight: number;
-  hFramesLenght: number;
-  vFramesLenght: number;
-  hFramesIndex: number;
-  vFramesIndex: number;
+  xLenght: number;
+  yLenght: number;
+  xIndex: number;
+  yIndex: number;
 };
 
 export function createSprite(spriteData: {
@@ -22,8 +22,8 @@ export function createSprite(spriteData: {
   frameRate: number;
   frameWidth: number;
   frameHeight: number;
-  hFrames: number;
-  vFrames: number;
+  xFrames: number;
+  yFrames: number;
 }): Sprite {
   const image = new Image();
   image.src = spriteData.imageSrc;
@@ -37,20 +37,20 @@ export function createSprite(spriteData: {
     framePosition: { x: 0, y: 0 },
     frameWidth: spriteData.frameWidth,
     frameHeight: spriteData.frameHeight,
-    hFramesLenght: spriteData.hFrames - 1,
-    vFramesLenght: spriteData.vFrames - 1,
-    hFramesIndex: 0,
-    vFramesIndex: 0,
+    xLenght: spriteData.xFrames - 1,
+    yLenght: spriteData.yFrames - 1,
+    xIndex: 0,
+    yIndex: 0,
   };
 }
 
-export function setHFrame(sprite: Sprite, frame: number): void {
-  sprite.hFramesIndex = frame;
+export function setXFrame(sprite: Sprite, frame: number): void {
+  sprite.xIndex = frame;
   sprite.framePosition.x = sprite.frameWidth * frame;
 }
 
-export function setVFrame(sprite: Sprite, frame: number): void {
-  sprite.vFramesIndex = frame;
+export function setYFrame(sprite: Sprite, frame: number): void {
+  sprite.yIndex = frame;
   sprite.framePosition.y = sprite.frameHeight * frame;
 }
 
@@ -74,10 +74,10 @@ export function animateSprite(
   if ((sprite.frameCount += 1) > sprite.frameRate) {
     sprite.frameCount = 0;
 
-    sprite.framePosition.x = sprite.frameWidth * sprite.hFramesIndex;
+    sprite.framePosition.x = sprite.frameWidth * sprite.xIndex;
 
-    if ((sprite.hFramesIndex += 1) > sprite.hFramesLenght) {
-      sprite.hFramesIndex = 0;
+    if ((sprite.xIndex += 1) > sprite.xLenght) {
+      sprite.xIndex = 0;
     }
   }
 }
