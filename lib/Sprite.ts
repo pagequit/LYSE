@@ -44,14 +44,14 @@ export function createSprite(spriteData: {
   };
 }
 
-export function setXFrame(sprite: Sprite, frame: number): void {
-  sprite.xIndex = frame;
-  sprite.framePosition.x = sprite.frameWidth * frame;
+export function setXFrame(sprite: Sprite, index: number): void {
+  sprite.xIndex = index;
+  sprite.framePosition.x = sprite.frameWidth * index;
 }
 
-export function setYFrame(sprite: Sprite, frame: number): void {
-  sprite.yIndex = frame;
-  sprite.framePosition.y = sprite.frameHeight * frame;
+export function setYFrame(sprite: Sprite, index: number): void {
+  sprite.yIndex = index;
+  sprite.framePosition.y = sprite.frameHeight * index;
 }
 
 export function animateSprite(

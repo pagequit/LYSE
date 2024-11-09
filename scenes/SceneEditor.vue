@@ -84,6 +84,22 @@ onMounted(() => {
       case "Control":
         ctrlDown = true;
         break;
+      case "ArrowUp":
+        setState(player, State.Walk);
+        setDirection(player, Direction.Up);
+        break;
+      case "ArrowDown":
+        setState(player, State.Walk);
+        setDirection(player, Direction.Down);
+        break;
+      case "ArrowLeft":
+        setState(player, State.Walk);
+        setDirection(player, Direction.Left);
+        break;
+      case "ArrowRight":
+        setState(player, State.Walk);
+        setDirection(player, Direction.Right);
+        break;
     }
   });
 
@@ -94,6 +110,18 @@ onMounted(() => {
         break;
       case "Control":
         ctrlDown = false;
+        break;
+      case "ArrowUp":
+        setState(player, State.Idle);
+        break;
+      case "ArrowDown":
+        setState(player, State.Idle);
+        break;
+      case "ArrowLeft":
+        setState(player, State.Idle);
+        break;
+      case "ArrowRight":
+        setState(player, State.Idle);
         break;
     }
   });
