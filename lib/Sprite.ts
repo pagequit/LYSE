@@ -10,9 +10,10 @@ export type Sprite = {
   subPosition: Vector;
   subWidth: number;
   subHeight: number;
-  sequence: number;
-  sequenceStart: number;
-  sequenceEnd: number;
+  hFrames: number;
+  vFrames: number;
+  lastHFrame: number;
+  lastVFrame: number;
 };
 
 export function createSprite(spriteData: {
@@ -21,11 +22,10 @@ export function createSprite(spriteData: {
   width: number;
   height: number;
   frameRate: number;
-  subPosition: Vector;
   subWidth: number;
   subHeight: number;
-  sequenceStart: number;
-  sequenceEnd: number;
+  hFrames: number;
+  vFrames: number;
 }): Sprite {
   const image = new Image();
   image.src = spriteData.imageSrc;
@@ -37,13 +37,26 @@ export function createSprite(spriteData: {
     height: spriteData.height,
     frameRate: spriteData.frameRate,
     frameCount: 0,
-    subPosition: spriteData.subPosition,
+    subPosition: { x: 0, y: 0 },
     subWidth: spriteData.subWidth,
     subHeight: spriteData.subHeight,
-    sequence: spriteData.sequenceStart,
-    sequenceStart: spriteData.sequenceStart,
-    sequenceEnd: spriteData.sequenceEnd,
+    hFrames: spriteData.hFrames,
+    vFrames: spriteData.vFrames,
+    lastHFrame: 0,
+    lastVFrame: 0,
   };
+}
+
+export function setHFrame(sprite: Sprite, frame: number): void {
+  sprite.lastHFrame = sprite.hFrames;
+  sprite.hFrames = frame;
+  sprite.subPosition.x = sprite.subWidth * frame;
+}
+
+export function setVFrame(sprite: Sprite, frame: number): void {
+  sprite.lastVFrame = sprite.vFrames;
+  sprite.vFrames = frame;
+  sprite.subPosition.y = sprite.subHeight * frame;
 }
 
 export function animateSprite(
@@ -65,10 +78,10 @@ export function animateSprite(
   if ((sprite.frameCount += 1) > sprite.frameRate) {
     sprite.frameCount = 0;
 
-    sprite.subPosition.x = sprite.subWidth * sprite.sequence;
+    sprite.subPosition.x = sprite.subWidth * sprite.lastHFrame;
 
-    if ((sprite.sequence += 1) > sprite.sequenceEnd) {
-      sprite.sequence = sprite.sequenceStart;
+    if ((sprite.lastHFrame += 1) > sprite.hFrames - 1) {
+      sprite.lastHFrame = 0;
     }
   }
 }

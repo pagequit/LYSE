@@ -10,7 +10,12 @@ import {
 import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
 import { type Vector } from "../lib/Vector.ts";
 import { type Scene } from "../lib/Scene.ts";
-import { type Sprite, animateSprite, createSprite } from "../lib/Sprite.ts";
+import {
+  type Sprite,
+  animateSprite,
+  createSprite,
+  setVFrame,
+} from "../lib/Sprite.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
@@ -115,12 +120,13 @@ const player: Sprite = createSprite({
   width: 256,
   height: 256,
   frameRate: 42,
-  subPosition: { x: 0, y: 160 },
   subWidth: 80,
   subHeight: 80,
-  sequenceStart: 0,
-  sequenceEnd: 3,
+  hFrames: 4,
+  vFrames: 4,
 });
+
+setVFrame(player, 2);
 
 const nextEdge: Array<Node> = [];
 
