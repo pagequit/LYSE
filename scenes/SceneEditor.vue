@@ -10,16 +10,18 @@ import {
 import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
 import { type Vector } from "../lib/Vector.ts";
 import { type Scene } from "../lib/Scene.ts";
-import {
-  type Sprite,
-  animateSprite,
-  createSprite,
-  setVFrame,
-} from "../lib/Sprite.ts";
 import { render } from "../lib/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
 import { gameState } from "./useGameState.ts";
+import {
+  type Player,
+  State,
+  Direction,
+  animatePlayer,
+  createPlayer,
+  setDirection,
+} from "../entities/Player.ts";
 
 const state = gameState.worldMap;
 const { canvas, ctx } = useCanvas();
@@ -111,22 +113,13 @@ const scene: Scene = {
   layers: [],
 };
 
-const player: Sprite = createSprite({
-  imageSrc: "/BaseCharacter/idle.png",
-  position: {
-    x: viewport.width / 2 - 128,
-    y: viewport.height / 2 - 128,
-  },
-  width: 256,
-  height: 256,
-  frameRate: 42,
-  subWidth: 80,
-  subHeight: 80,
-  hFrames: 4,
-  vFrames: 4,
+const player: Player = createPlayer({
+  x: (viewport.width - 256) / 2,
+  y: (viewport.height - 256) / 2,
 });
 
-setVFrame(player, 2);
+player.state = State.Idle;
+setDirection(player, Direction.Down);
 
 const nextEdge: Array<Node> = [];
 
@@ -329,14 +322,7 @@ let then: number = Date.now();
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
-  animateSprite(player, ctx);
-
-  ctx.strokeRect(
-    player.position.x,
-    player.position.y,
-    player.width,
-    player.height,
-  );
+  animatePlayer(player, ctx);
 
   then = now;
   now = Date.now();
