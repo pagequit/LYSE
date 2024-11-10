@@ -1,3 +1,4 @@
+import "../system/Input.ts";
 import {
   type Sprite,
   createSprite,
@@ -71,4 +72,17 @@ export function animatePlayer(
   ctx: CanvasRenderingContext2D,
 ): void {
   animateSprite(player.animations[player.state], ctx, player.position);
+}
+
+export function processPlayer(
+  player: Player,
+  _delta: number,
+  gamepad: Gamepad | null,
+): void {
+  if (gamepad) {
+    player.position.y -= gamepad.buttons[12].value;
+    player.position.y += gamepad.buttons[13].value;
+    player.position.x -= gamepad.buttons[14].value;
+    player.position.x += gamepad.buttons[15].value;
+  }
 }

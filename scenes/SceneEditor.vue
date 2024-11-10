@@ -22,7 +22,9 @@ import {
   createPlayer,
   setDirection,
   setState,
+  processPlayer,
 } from "../entities/Player.ts";
+import { useGamepad } from "../system/Input.ts";
 
 const state = gameState.worldMap;
 const { canvas, ctx } = useCanvas();
@@ -65,7 +67,17 @@ function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
     }
   }
 }
+
+let gamepad: Gamepad | null = null;
+
 onMounted(() => {
+  // FIXME
+  // this works only when I change the scene
+  gamepad = useGamepad(
+    () => {},
+    () => {},
+  );
+
   container.value!.appendChild(canvas);
 
   window.addEventListener("resize", onResize);
@@ -75,6 +87,23 @@ onMounted(() => {
   document.addEventListener("touchmove", onPointerMove);
   document.addEventListener("mouseup", onPointerUp);
   document.addEventListener("touchend", onPointerUp);
+  document.addEventListener("keydown", ({ key }) => {
+    if (key === "ArrowUp") {
+      player.position.y -= 4;
+    }
+
+    if (key === "ArrowDown") {
+      player.position.y += 4;
+    }
+
+    if (key === "ArrowLeft") {
+      player.position.x -= 4;
+    }
+
+    if (key === "ArrowRight") {
+      player.position.x += 4;
+    }
+  });
 
   document.addEventListener("keydown", ({ key }) => {
     switch (key) {
@@ -83,18 +112,6 @@ onMounted(() => {
         break;
       case "Control":
         ctrlDown = true;
-        break;
-      case "ArrowUp":
-        player.position.y -= 4;
-        break;
-      case "ArrowDown":
-        player.position.y += 4;
-        break;
-      case "ArrowLeft":
-        player.position.x -= 4;
-        break;
-      case "ArrowRight":
-        player.position.x += 4;
         break;
     }
   });
@@ -310,6 +327,7 @@ ctx.imageSmoothingEnabled = false;
 
 let now: number = Date.now();
 let then: number = Date.now();
+let delta: number = 0;
 (function animate() {
   requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -335,26 +353,18 @@ let then: number = Date.now();
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
+  processPlayer(player, delta, gamepad);
   animatePlayer(player, ctx);
 
   then = now;
   now = Date.now();
-  const delta: number = now - then;
+  delta = now - then;
+
   ctx.fillStyle = colors.foregroundColor;
   ctx.fillText(
     `FPS: ${Math.round(1000 / delta)}`,
     -dragOffset.x + 10,
     -dragOffset.y + 20,
-  );
-  ctx.fillText(
-    `Nodes: ${state.nodes.length}`,
-    -dragOffset.x + 10,
-    -dragOffset.y + 30,
-  );
-  ctx.fillText(
-    `Edges: ${state.edges.length}`,
-    -dragOffset.x + 10,
-    -dragOffset.y + 40,
   );
 
   ctx.restore();
