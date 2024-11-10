@@ -84,9 +84,9 @@ export function processPlayer(
   if (gamepad) {
     player.velocity.y = gamepad.buttons[13].value - gamepad.buttons[12].value;
     player.velocity.x = gamepad.buttons[15].value - gamepad.buttons[14].value;
-    normalize(player.velocity);
   }
 
-  player.position.x += player.velocity.x * delta;
-  player.position.y += player.velocity.y * delta;
+  normalize(player.velocity);
+  player.position.x += 0.25 * player.velocity.x * delta;
+  player.position.y += 0.25 * player.velocity.y * delta;
 }
