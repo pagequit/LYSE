@@ -5,7 +5,7 @@ import {
   animateSprite,
   setYFrame,
 } from "../lib/Sprite.ts";
-import { type Vector } from "../lib/Vector.ts";
+import { normalize, type Vector } from "../lib/Vector.ts";
 
 export enum State {
   Idle,
@@ -23,6 +23,7 @@ export type Player = {
   position: Vector;
   state: State;
   direction: Direction;
+  velocity: Vector;
   animations: Record<State, Sprite>;
 };
 
@@ -54,6 +55,7 @@ export function createPlayer(position: Vector): Player {
     position,
     state: State.Idle,
     direction: Direction.Down,
+    velocity: { x: 0, y: 0 },
     animations,
   };
 }
@@ -76,13 +78,15 @@ export function animatePlayer(
 
 export function processPlayer(
   player: Player,
-  _delta: number,
+  delta: number,
   gamepad: Gamepad | null,
 ): void {
   if (gamepad) {
-    player.position.y -= gamepad.buttons[12].value;
-    player.position.y += gamepad.buttons[13].value;
-    player.position.x -= gamepad.buttons[14].value;
-    player.position.x += gamepad.buttons[15].value;
+    player.velocity.y = gamepad.buttons[13].value - gamepad.buttons[12].value;
+    player.velocity.x = gamepad.buttons[15].value - gamepad.buttons[14].value;
+    normalize(player.velocity);
   }
+
+  player.position.x += player.velocity.x * delta;
+  player.position.y += player.velocity.y * delta;
 }
