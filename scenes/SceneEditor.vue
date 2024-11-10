@@ -85,20 +85,16 @@ onMounted(() => {
         ctrlDown = true;
         break;
       case "ArrowUp":
-        setState(player, State.Walk);
-        setDirection(player, Direction.Up);
+        player.position.y -= 4;
         break;
       case "ArrowDown":
-        setState(player, State.Walk);
-        setDirection(player, Direction.Down);
+        player.position.y += 4;
         break;
       case "ArrowLeft":
-        setState(player, State.Walk);
-        setDirection(player, Direction.Left);
+        player.position.x -= 4;
         break;
       case "ArrowRight":
-        setState(player, State.Walk);
-        setDirection(player, Direction.Right);
+        player.position.x += 4;
         break;
     }
   });
@@ -110,18 +106,6 @@ onMounted(() => {
         break;
       case "Control":
         ctrlDown = false;
-        break;
-      case "ArrowUp":
-        setState(player, State.Idle);
-        break;
-      case "ArrowDown":
-        setState(player, State.Idle);
-        break;
-      case "ArrowLeft":
-        setState(player, State.Idle);
-        break;
-      case "ArrowRight":
-        setState(player, State.Idle);
         break;
     }
   });
