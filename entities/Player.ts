@@ -66,7 +66,9 @@ export function setState(player: Player, state: State): void {
 
 export function setDirection(player: Player, direction: Direction): void {
   player.direction = direction;
-  setYFrame(player.animations[player.state], direction);
+  // TODO: fix me the internal direction is pointless
+  setYFrame(player.animations[State.Idle], direction);
+  setYFrame(player.animations[State.Walk], direction);
 }
 
 export function animatePlayer(
@@ -79,14 +81,28 @@ export function animatePlayer(
 export function processPlayer(
   player: Player,
   delta: number,
-  gamepad: Gamepad | null,
+  input: Record<string, () => number>,
 ): void {
-  if (gamepad) {
-    player.velocity.y = gamepad.buttons[13].value - gamepad.buttons[12].value;
-    player.velocity.x = gamepad.buttons[15].value - gamepad.buttons[14].value;
-  }
+  player.velocity.y = input.getActionKeyDown() - input.getActionKeyUp();
+  player.velocity.x = input.getActionKeyRight() - input.getActionKeyLeft();
 
   normalize(player.velocity);
+
   player.position.x += 0.25 * player.velocity.x * delta;
   player.position.y += 0.25 * player.velocity.y * delta;
+
+  if (player.velocity.x === 0 && player.velocity.y === 0) {
+    setState(player, State.Idle);
+  } else {
+    setState(player, State.Walk);
+    if (player.velocity.x > 0) {
+      setDirection(player, Direction.Right);
+    } else if (player.velocity.x < 0) {
+      setDirection(player, Direction.Left);
+    } else if (player.velocity.y > 0) {
+      setDirection(player, Direction.Down);
+    } else if (player.velocity.y < 0) {
+      setDirection(player, Direction.Up);
+    }
+  }
 }

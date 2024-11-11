@@ -24,7 +24,10 @@ import {
   setState,
   processPlayer,
 } from "../entities/Player.ts";
-import { useGamepad } from "../system/Input.ts";
+import { useKeyboard, useActionKeyInput } from "../system/Input.ts";
+
+const { listen, unlisten } = useKeyboard();
+const input = useActionKeyInput();
 
 const state = gameState.worldMap;
 const { canvas, ctx } = useCanvas();
@@ -68,16 +71,7 @@ function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
   }
 }
 
-let gamepad: Gamepad | null = null;
-
 onMounted(() => {
-  // FIXME
-  // this works only when I change the scene
-  gamepad = useGamepad(
-    () => {},
-    () => {},
-  );
-
   container.value!.appendChild(canvas);
 
   window.addEventListener("resize", onResize);
@@ -87,23 +81,6 @@ onMounted(() => {
   document.addEventListener("touchmove", onPointerMove);
   document.addEventListener("mouseup", onPointerUp);
   document.addEventListener("touchend", onPointerUp);
-  document.addEventListener("keydown", ({ key }) => {
-    if (key === "ArrowUp") {
-      player.position.y -= 4;
-    }
-
-    if (key === "ArrowDown") {
-      player.position.y += 4;
-    }
-
-    if (key === "ArrowLeft") {
-      player.position.x -= 4;
-    }
-
-    if (key === "ArrowRight") {
-      player.position.x += 4;
-    }
-  });
 
   document.addEventListener("keydown", ({ key }) => {
     switch (key) {
@@ -126,6 +103,8 @@ onMounted(() => {
         break;
     }
   });
+
+  listen();
 });
 
 onUnmounted(() => {
@@ -136,6 +115,8 @@ onUnmounted(() => {
   document.removeEventListener("touchmove", onPointerMove);
   document.removeEventListener("mouseup", onPointerUp);
   document.removeEventListener("touchend", onPointerUp);
+
+  unlisten();
 });
 
 const scene: Scene = {
@@ -353,7 +334,7 @@ let delta: number = 0;
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
-  processPlayer(player, delta, gamepad);
+  processPlayer(player, delta, input);
   animatePlayer(player, ctx);
 
   then = now;
