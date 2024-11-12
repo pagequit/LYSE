@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import MainMenu from "./scenes/MainMenu.vue";
 import NodesMenu from "./scenes/NodesMenu.vue";
 import SceneEditor from "./scenes/SceneEditor.vue";
 import GameTest from "./scenes/GameTest.vue";
@@ -7,7 +6,6 @@ import { useScene } from "./scenes/useScene.ts";
 
 const { setScene, getScene, swapScene, currentScene } = useScene();
 
-setScene("MainMenu", MainMenu);
 setScene("NodesMenu", NodesMenu);
 setScene("SceneEditor", SceneEditor);
 setScene("GameTest", GameTest);
@@ -16,12 +14,6 @@ swapScene("SceneEditor");
 
 <template>
   <nav>
-    <button
-      @click="swapScene('MainMenu')"
-      :class="currentScene === 'MainMenu' && 'active'"
-    >
-      MainMenu
-    </button>
     <button
       @click="swapScene('NodesMenu')"
       :class="currentScene === 'NodesMenu' && 'active'"

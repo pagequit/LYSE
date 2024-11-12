@@ -1,3 +1,4 @@
+import { type Vector } from "../lib/Vector";
 /*
 gamepad standard mapping
 0 	3 / A
@@ -37,26 +38,33 @@ export function useGamepad(
   return gamepad;
 }
 
-const actionKeys: Record<string, number> = {
-  arrowUp: 0,
-  arrowDown: 0,
-  arrowLeft: 0,
-  arrowRight: 0,
+export type ActionKeys = {
+  up: number;
+  down: number;
+  left: number;
+  right: number;
+};
+
+const actionKeys: ActionKeys = {
+  up: 0,
+  down: 0,
+  left: 0,
+  right: 0,
 };
 
 function onKeyDown(event: KeyboardEvent) {
   switch (event.key) {
     case "ArrowUp":
-      actionKeys.arrowUp = 1;
+      actionKeys.up = 1;
       break;
     case "ArrowDown":
-      actionKeys.arrowDown = 1;
+      actionKeys.down = 1;
       break;
     case "ArrowLeft":
-      actionKeys.arrowLeft = 1;
+      actionKeys.left = 1;
       break;
     case "ArrowRight":
-      actionKeys.arrowRight = 1;
+      actionKeys.right = 1;
       break;
   }
 }
@@ -64,38 +72,105 @@ function onKeyDown(event: KeyboardEvent) {
 function onKeyUp(event: KeyboardEvent) {
   switch (event.key) {
     case "ArrowUp":
-      actionKeys.arrowUp = 0;
+      actionKeys.up = 0;
       break;
     case "ArrowDown":
-      actionKeys.arrowDown = 0;
+      actionKeys.down = 0;
       break;
     case "ArrowLeft":
-      actionKeys.arrowLeft = 0;
+      actionKeys.left = 0;
       break;
     case "ArrowRight":
-      actionKeys.arrowRight = 0;
+      actionKeys.right = 0;
       break;
   }
 }
 
 export function useKeyboard() {
   return {
-    listen: () => {
+    listen(): void {
       document.addEventListener("keydown", onKeyDown);
       document.addEventListener("keyup", onKeyUp);
     },
-    unlisten: () => {
+    unlisten(): void {
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("keyup", onKeyUp);
     },
   };
 }
 
-export function useActionKeyInput() {
+export function getActionKeys(): ActionKeys {
+  return actionKeys;
+}
+
+export type PointerState = {
+  isDown: boolean;
+  position: Vector;
+};
+
+const pointerState: PointerState = {
+  isDown: false,
+  position: {
+    x: 0,
+    y: 0,
+  },
+};
+
+function onMouseDown(event: MouseEvent): void {
+  pointerState.isDown = true;
+  pointerState.position.x = event.clientX;
+  pointerState.position.y = event.clientY;
+}
+
+function onTouchStart(event: TouchEvent): void {
+  pointerState.isDown = true;
+  pointerState.position.x = event.touches[0].clientX;
+  pointerState.position.y = event.touches[0].clientY;
+}
+
+function onMouseUp(event: MouseEvent): void {
+  pointerState.isDown = false;
+  pointerState.position.x = event.clientX;
+  pointerState.position.y = event.clientY;
+}
+
+function onTouchEnd(event: TouchEvent): void {
+  pointerState.isDown = false;
+  pointerState.position.x = event.touches[0].clientX;
+  pointerState.position.y = event.touches[0].clientY;
+}
+
+function onMouseMove(event: MouseEvent): void {
+  pointerState.position.x = event.clientX;
+  pointerState.position.y = event.clientY;
+}
+
+function onTouchMove(event: TouchEvent): void {
+  pointerState.position.x = event.touches[0].clientX;
+  pointerState.position.y = event.touches[0].clientY;
+}
+
+export function usePointer() {
   return {
-    getActionKeyUp: () => actionKeys.arrowUp,
-    getActionKeyDown: () => actionKeys.arrowDown,
-    getActionKeyLeft: () => actionKeys.arrowLeft,
-    getActionKeyRight: () => actionKeys.arrowRight,
+    listen(): void {
+      document.addEventListener("mousedown", onMouseDown);
+      document.addEventListener("touchstart", onTouchStart);
+      document.addEventListener("mouseup", onMouseUp);
+      document.addEventListener("touchend", onTouchEnd);
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("touchmove", onTouchMove);
+    },
+    unlisten(): void {
+      document.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("touchend", onTouchEnd);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("touchmove", onTouchMove);
+    },
   };
+}
+
+export function getPointerState(): PointerState {
+  return pointerState;
 }

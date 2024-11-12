@@ -1,4 +1,3 @@
-import "../system/Input.ts";
 import {
   type Sprite,
   createSprite,
@@ -6,6 +5,7 @@ import {
   setYFrame,
 } from "../lib/Sprite.ts";
 import { normalize, type Vector } from "../lib/Vector.ts";
+import { type ActionKeys } from "../system/Input.ts";
 
 export enum State {
   Idle,
@@ -81,10 +81,10 @@ export function animatePlayer(
 export function processPlayer(
   player: Player,
   delta: number,
-  input: Record<string, () => number>,
+  actionKeys: ActionKeys,
 ): void {
-  player.velocity.x = input.getActionKeyRight() - input.getActionKeyLeft();
-  player.velocity.y = input.getActionKeyDown() - input.getActionKeyUp();
+  player.velocity.x = actionKeys.right - actionKeys.left;
+  player.velocity.y = actionKeys.down - actionKeys.up;
 
   normalize(player.velocity);
 

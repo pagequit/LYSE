@@ -24,10 +24,10 @@ import {
   setState,
   processPlayer,
 } from "../entities/Player.ts";
-import { useKeyboard, useActionKeyInput } from "../system/Input.ts";
+import { useKeyboard, getActionKeys } from "../system/Input.ts";
 
 const { listen, unlisten } = useKeyboard();
-const input = useActionKeyInput();
+const actionKeys = getActionKeys();
 
 const state = gameState.worldMap;
 const { canvas, ctx } = useCanvas();
@@ -334,7 +334,7 @@ let delta: number = 0;
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
-  processPlayer(player, delta, input);
+  processPlayer(player, delta, actionKeys);
   animatePlayer(player, ctx);
 
   then = now;
