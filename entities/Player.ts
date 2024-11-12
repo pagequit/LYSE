@@ -83,8 +83,8 @@ export function processPlayer(
   delta: number,
   input: Record<string, () => number>,
 ): void {
-  player.velocity.y = input.getActionKeyDown() - input.getActionKeyUp();
   player.velocity.x = input.getActionKeyRight() - input.getActionKeyLeft();
+  player.velocity.y = input.getActionKeyDown() - input.getActionKeyUp();
 
   normalize(player.velocity);
 
