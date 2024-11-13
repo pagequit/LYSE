@@ -4,7 +4,7 @@ import {
   animateSprite,
   setYFrame,
 } from "../lib/Sprite.ts";
-import { normalize, type Vector } from "../lib/Vector.ts";
+import { type Vector, normalize, isZero } from "../lib/Vector.ts";
 import { type ActionKeys } from "../system/Input.ts";
 
 export enum State {
@@ -22,7 +22,6 @@ export enum Direction {
 export type Player = {
   position: Vector;
   state: State;
-  direction: Direction;
   velocity: Vector;
   animations: Record<State, Sprite>;
 };
@@ -32,7 +31,7 @@ const animations: Record<State, Sprite> = {
     imageSrc: "/BaseCharacter/walk.png",
     width: 256,
     height: 256,
-    frameRate: 21,
+    frameRate: 1000 / 8,
     frameWidth: 80,
     frameHeight: 80,
     xFrames: 8,
@@ -42,7 +41,7 @@ const animations: Record<State, Sprite> = {
     imageSrc: "/BaseCharacter/idle.png",
     width: 256,
     height: 256,
-    frameRate: 42,
+    frameRate: 1000 / 4,
     frameWidth: 80,
     frameHeight: 80,
     xFrames: 4,
@@ -54,7 +53,6 @@ export function createPlayer(position: Vector): Player {
   return {
     position,
     state: State.Idle,
-    direction: Direction.Down,
     velocity: { x: 0, y: 0 },
     animations,
   };
@@ -65,8 +63,6 @@ export function setState(player: Player, state: State): void {
 }
 
 export function setDirection(player: Player, direction: Direction): void {
-  player.direction = direction;
-  // TODO: fix me the internal direction is pointless
   setYFrame(player.animations[State.Idle], direction);
   setYFrame(player.animations[State.Walk], direction);
 }
@@ -74,8 +70,9 @@ export function setDirection(player: Player, direction: Direction): void {
 export function animatePlayer(
   player: Player,
   ctx: CanvasRenderingContext2D,
+  delta: number,
 ): void {
-  animateSprite(player.animations[player.state], ctx, player.position);
+  animateSprite(player.animations[player.state], ctx, delta, player.position);
 }
 
 export function processPlayer(
@@ -91,7 +88,7 @@ export function processPlayer(
   player.position.x += 0.25 * player.velocity.x * delta;
   player.position.y += 0.25 * player.velocity.y * delta;
 
-  if (player.velocity.x === 0 && player.velocity.y === 0) {
+  if (isZero(player.velocity)) {
     setState(player, State.Idle);
   } else {
     setState(player, State.Walk);

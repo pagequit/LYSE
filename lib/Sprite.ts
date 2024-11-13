@@ -57,6 +57,7 @@ export function setYFrame(sprite: Sprite, index: number): void {
 export function animateSprite(
   sprite: Sprite,
   ctx: CanvasRenderingContext2D,
+  delta: number,
   position: Vector,
 ): void {
   ctx.drawImage(
@@ -71,7 +72,7 @@ export function animateSprite(
     sprite.height,
   );
 
-  if ((sprite.frameCount += 1) > sprite.frameRate) {
+  if ((sprite.frameCount += delta) > sprite.frameRate) {
     sprite.frameCount = 0;
 
     sprite.framePosition.x = sprite.frameWidth * sprite.xIndex;
