@@ -146,51 +146,20 @@ function renderTouchControls(ctx: CanvasRenderingContext2D): void {
   ctx.fill();
 }
 
-function processTouchControls(
-  player: Player,
-  ctx: CanvasRenderingContext2D,
-  delta: number,
-): void {
-  if (pointerState.isDown) {
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = colors.infoColor;
-    ctx.beginPath();
-    ctx.arc(
-      pointerState.position.x,
-      pointerState.position.y,
-      8,
-      0,
-      2 * Math.PI,
-    );
-    ctx.stroke();
+function processTouchControls(player: Player, delta: number): void {
+  const relativePosition = {
+    x: pointerState.position.x - touchControls.dPad.position.x,
+    y: pointerState.position.y - touchControls.dPad.position.y,
+  };
 
-    const magnitude = Math.hypot(
-      pointerState.position.x - touchControls.dPad.position.x,
-      pointerState.position.y - touchControls.dPad.position.y,
-    );
-
-    if (magnitude > touchControls.dPad.radius) {
-      player.velocity.x = 0;
-      player.velocity.y = 0;
-      return;
-    }
-
-    const debugPoint = {
-      x: pointerState.position.x - touchControls.dPad.position.x,
-      y: pointerState.position.y - touchControls.dPad.position.y,
-    };
-
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = colors.warningColor;
-    ctx.beginPath();
-    ctx.arc(debugPoint.x, debugPoint.y, 8, 0, 2 * Math.PI);
-    ctx.stroke();
-
-    const direction = Math.atan2(debugPoint.y, debugPoint.x);
-
+  if (
+    pointerState.isDown &&
+    Math.hypot(relativePosition.x, relativePosition.y) <=
+      touchControls.dPad.radius
+  ) {
+    const direction = Math.atan2(relativePosition.y, relativePosition.x);
     player.velocity.x = Math.cos(direction) * 0.25 * delta;
     player.velocity.y = Math.sin(direction) * 0.25 * delta;
-    normalize(player.velocity);
   } else {
     // FIXME
     player.velocity.x = 0;
@@ -213,7 +182,14 @@ let delta: number = 0;
   animatePlayer(player, ctx, delta);
 
   renderTouchControls(ctx);
-  processTouchControls(player, ctx, delta);
+  processTouchControls(player, delta);
+
+  // DEBUG
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = colors.infoColor;
+  ctx.beginPath();
+  ctx.arc(pointerState.position.x, pointerState.position.y, 8, 0, 2 * Math.PI);
+  ctx.stroke();
 
   then = now;
   now = Date.now();

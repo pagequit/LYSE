@@ -80,6 +80,7 @@ export function processPlayer(
   delta: number,
   actionKeys: ActionKeys,
 ): void {
+  // FIXME
   // player.velocity.x = actionKeys.right - actionKeys.left;
   // player.velocity.y = actionKeys.down - actionKeys.up;
 
