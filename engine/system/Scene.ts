@@ -1,4 +1,4 @@
-import { type Vector } from "../../component/Vector";
+import { type Vector } from "../lib/Vector.ts";
 
 export type Scene = {
   width: number;

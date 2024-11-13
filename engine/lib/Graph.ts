@@ -1,5 +1,6 @@
-import type { Node } from "../entity/Node.ts";
-import type { Edge } from "../entity/Edge.ts";
+// FIXME
+import type { Node } from "../../game/entity/Node.ts";
+import type { Edge } from "../../game/entity/Edge.ts";
 
 export type Graph = Map<Node, Array<Node>>;
 

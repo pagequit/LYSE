@@ -3,8 +3,8 @@ import {
   createSprite,
   animateSprite,
   setYFrame,
-} from "../component/Sprite.ts";
-import { type Vector, normalize, isZero } from "../component/Vector.ts";
+} from "../../engine/system/Sprite.ts";
+import { type Vector, normalize, isZero } from "../../engine/lib/Vector.ts";
 import { type ActionKeys } from "../../engine/system/Input.ts";
 
 export enum State {
