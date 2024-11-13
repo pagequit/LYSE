@@ -80,8 +80,8 @@ export function processPlayer(
   delta: number,
   actionKeys: ActionKeys,
 ): void {
-  player.velocity.x = actionKeys.right - actionKeys.left;
-  player.velocity.y = actionKeys.down - actionKeys.up;
+  // player.velocity.x = actionKeys.right - actionKeys.left;
+  // player.velocity.y = actionKeys.down - actionKeys.up;
 
   normalize(player.velocity);
 

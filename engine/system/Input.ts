@@ -110,10 +110,7 @@ export type PointerState = {
 
 const pointerState: PointerState = {
   isDown: false,
-  position: {
-    x: 0,
-    y: 0,
-  },
+  position: { x: 0, y: 0 },
 };
 
 function onMouseDown(event: MouseEvent): void {
@@ -128,18 +125,6 @@ function onTouchStart(event: TouchEvent): void {
   pointerState.position.y = event.touches[0].clientY;
 }
 
-function onMouseUp(event: MouseEvent): void {
-  pointerState.isDown = false;
-  pointerState.position.x = event.clientX;
-  pointerState.position.y = event.clientY;
-}
-
-function onTouchEnd(event: TouchEvent): void {
-  pointerState.isDown = false;
-  pointerState.position.x = event.touches[0].clientX;
-  pointerState.position.y = event.touches[0].clientY;
-}
-
 function onMouseMove(event: MouseEvent): void {
   pointerState.position.x = event.clientX;
   pointerState.position.y = event.clientY;
@@ -150,23 +135,31 @@ function onTouchMove(event: TouchEvent): void {
   pointerState.position.y = event.touches[0].clientY;
 }
 
+function onMouseUp(): void {
+  pointerState.isDown = false;
+}
+
+function onTouchEnd(): void {
+  pointerState.isDown = false;
+}
+
 export function usePointer() {
   return {
     listen(): void {
       document.addEventListener("mousedown", onMouseDown);
       document.addEventListener("touchstart", onTouchStart);
-      document.addEventListener("mouseup", onMouseUp);
-      document.addEventListener("touchend", onTouchEnd);
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("touchmove", onTouchMove);
+      document.addEventListener("mouseup", onMouseUp);
+      document.addEventListener("touchend", onTouchEnd);
     },
     unlisten(): void {
       document.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("touchstart", onTouchStart);
-      document.removeEventListener("mouseup", onMouseUp);
-      document.removeEventListener("touchend", onTouchEnd);
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("touchmove", onTouchMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      document.removeEventListener("touchend", onTouchEnd);
     },
   };
 }
