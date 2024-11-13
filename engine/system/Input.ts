@@ -1,4 +1,4 @@
-import { type Vector } from "../lib/Vector";
+import { type Vector } from "../../component/Vector";
 /*
 gamepad standard mapping
 0 	3 / A

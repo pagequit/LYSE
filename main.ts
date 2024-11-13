@@ -1,12 +1,12 @@
 import "./style.css";
 import { colors } from "./style.ts";
-import { useCanvas } from "./system/View.ts";
+import { useCanvas } from "./engine/system/View.ts";
 import {
   useKeyboard,
   getActionKeys,
   usePointer,
   getPointerState,
-} from "./system/Input.ts";
+} from "./engine/system/Input.ts";
 import {
   processPlayer,
   animatePlayer,
@@ -15,9 +15,9 @@ import {
   setState,
   State,
   Direction,
-} from "./entities/Player.ts";
+} from "./game/entity/Player.ts";
 
-const { canvas, ctx, offset } = useCanvas();
+const { canvas, ctx } = useCanvas();
 
 const { listen: listenKeyboard } = useKeyboard();
 const { listen: listenPointer } = usePointer();

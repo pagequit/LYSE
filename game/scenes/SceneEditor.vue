@@ -1,32 +1,75 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, useTemplateRef } from "vue";
-import { colors } from "../style.ts";
+import { colors } from "../../style.ts";
 import {
   type Node,
   createNode,
   paintNode,
   getNodeByPosition,
-} from "../lib/Node.ts";
-import { type Edge, createEdge, paintEdge } from "../lib/Edge.ts";
-import { createGraph, originDFS } from "../lib/Graph.ts";
-import { type Vector } from "../lib/Vector.ts";
-import { type Scene } from "../lib/Scene.ts";
-import { getSegmentIntersection } from "../lib/Segment.ts";
-import { render } from "../lib/Renderable.ts";
+} from "../entity/Node.ts";
+import { type Edge, createEdge, paintEdge } from "../entity/Edge.ts";
+import { type Vector } from "../component/Vector.ts";
+import { type Scene } from "../component/Scene.ts";
+import { render } from "../component/Renderable.ts";
 import { useViewport } from "./useViewport.ts";
 import { useCanvas } from "./useCanvas.ts";
-import { getNodes } from "./getNodes.ts";
 import { gameState } from "./useGameState.ts";
+import {
+  type Player,
+  State,
+  Direction,
+  animatePlayer,
+  createPlayer,
+  setDirection,
+  setState,
+  processPlayer,
+} from "../entity/Player.ts";
+import { useKeyboard, getActionKeys } from "../../engine/system/Input.ts";
 
-const state = gameState.nodesMenu;
-const { nodes, origin } = getNodes();
+const { listen, unlisten } = useKeyboard();
+const actionKeys = getActionKeys();
+
+const state = gameState.worldMap;
 const { canvas, ctx } = useCanvas();
 const { viewport, viewOffset } = useViewport();
 const container = useTemplateRef("container");
 
-nodes.push(origin);
 canvas.width = Math.min(window.innerWidth, viewport.width);
 canvas.height = Math.min(window.innerHeight, viewport.height);
+
+let isDraggingNode = false;
+let shiftDown = false;
+let ctrlDown = false;
+
+type Grid = {
+  height: number;
+  width: number;
+  tileSize: number;
+  x: number;
+  y: number;
+};
+
+const grid: Grid = {
+  height: viewport.height,
+  width: viewport.width,
+  tileSize: 64,
+  x: viewport.width / 64,
+  y: viewport.height / 64,
+};
+
+function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
+  for (let i = 0; i < grid.x; i++) {
+    for (let j = 0; j < grid.y; j++) {
+      ctx.fillStyle = i % 2 === j % 2 ? "transparent" : "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(
+        i * grid.tileSize,
+        j * grid.tileSize,
+        grid.tileSize,
+        grid.tileSize,
+      );
+    }
+  }
+}
 
 onMounted(() => {
   container.value!.appendChild(canvas);
@@ -38,6 +81,30 @@ onMounted(() => {
   document.addEventListener("touchmove", onPointerMove);
   document.addEventListener("mouseup", onPointerUp);
   document.addEventListener("touchend", onPointerUp);
+
+  document.addEventListener("keydown", ({ key }) => {
+    switch (key) {
+      case "Shift":
+        shiftDown = true;
+        break;
+      case "Control":
+        ctrlDown = true;
+        break;
+    }
+  });
+
+  document.addEventListener("keyup", ({ key }) => {
+    switch (key) {
+      case "Shift":
+        shiftDown = false;
+        break;
+      case "Control":
+        ctrlDown = false;
+        break;
+    }
+  });
+
+  listen();
 });
 
 onUnmounted(() => {
@@ -48,6 +115,8 @@ onUnmounted(() => {
   document.removeEventListener("touchmove", onPointerMove);
   document.removeEventListener("mouseup", onPointerUp);
   document.removeEventListener("touchend", onPointerUp);
+
+  unlisten();
 });
 
 const scene: Scene = {
@@ -55,10 +124,16 @@ const scene: Scene = {
   layers: [],
 };
 
+const player: Player = createPlayer({
+  x: (viewport.width - 256) / 2,
+  y: (viewport.height - 256) / 2,
+});
+
+setState(player, State.Idle);
+setDirection(player, Direction.Down);
+
 const nextEdge: Array<Node> = [];
 
-let mainGraphNodes = originDFS(origin, state.graph);
-let isIntersecting = false;
 let activeNode: Node | null = null;
 let hoverNode: Node | null = null;
 let isDragging = false;
@@ -96,33 +171,61 @@ function onResize(): void {
 
 function onPointerDown(event: MouseEvent | TouchEvent): void {
   isPointerDown = true;
-  const position = event instanceof MouseEvent ? event : event.touches[0];
+  const position: { clientX: number; clientY: number } =
+    event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerPosition.x = position.clientX + pointerOffset.x;
-  pointerPosition.y = position.clientY + pointerOffset.y;
+  const gridPosition = getGridPosition(
+    {
+      x: position.clientX + pointerOffset.x,
+      y: position.clientY + pointerOffset.y,
+    },
+    grid.tileSize,
+  );
 
-  const node = getNodeByPosition(nodes, {
+  pointerPosition.x = gridPosition.x;
+  pointerPosition.y = gridPosition.y;
+
+  const node = getNodeByPosition(state.nodes, {
     x: pointerPosition.x,
     y: pointerPosition.y,
   });
 
   if (node === null) {
-    isDragging = true;
-    dragVector.x = position.clientX - dragOffset.x;
-    dragVector.y = position.clientY - dragOffset.y;
+    if (ctrlDown) {
+      state.nodes.push(createNode({ ...pointerPosition }));
+      scene.layers.push([...state.nodes, ...state.edges]);
+    } else {
+      isDragging = true;
+      dragVector.x = position.clientX - dragOffset.x;
+      dragVector.y = position.clientY - dragOffset.y;
+    }
     return;
   }
 
   activeNode = node;
-  nextEdge.push(activeNode);
+
+  if (shiftDown) {
+    nextEdge.push(activeNode);
+    return;
+  }
+
+  isDraggingNode = true;
 }
 
 function onPointerMove(event: MouseEvent | TouchEvent): void {
   const position: { clientX: number; clientY: number } =
     event instanceof MouseEvent ? event : event.touches[0];
 
-  pointerPosition.x = position.clientX + pointerOffset.x;
-  pointerPosition.y = position.clientY + pointerOffset.y;
+  const gridPosition = getGridPosition(
+    {
+      x: position.clientX + pointerOffset.x,
+      y: position.clientY + pointerOffset.y,
+    },
+    grid.tileSize,
+  );
+
+  pointerPosition.x = gridPosition.x;
+  pointerPosition.y = gridPosition.y;
 
   if (isDragging) {
     dragOffset.x = Math.min(
@@ -144,32 +247,18 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
     return;
   }
 
-  hoverNode = getNodeByPosition(nodes, {
+  hoverNode = getNodeByPosition(state.nodes, {
     x: pointerPosition.x,
     y: pointerPosition.y,
   });
 
-  if (activeNode !== null) {
-    for (const edge of state.edges.filter(
-      (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
-    )) {
-      isIntersecting = !!getSegmentIntersection(
-        [activeNode.position, pointerPosition],
-        [edge[0].position, edge[1].position],
-      );
-
-      if (isIntersecting) {
-        break;
-      }
-    }
+  if (activeNode !== null && isDraggingNode) {
+    activeNode.position.x = pointerPosition.x;
+    activeNode.position.y = pointerPosition.y;
+    return;
   }
 
-  if (
-    !isPointerDown ||
-    hoverNode === null ||
-    hoverNode === activeNode ||
-    isIntersecting
-  ) {
+  if (!isPointerDown || hoverNode === null || hoverNode === activeNode) {
     return;
   }
 
@@ -194,47 +283,44 @@ function onPointerMove(event: MouseEvent | TouchEvent): void {
       state.edges.push(maybeEdge);
     }
 
-    scene.layers[0] = [...nodes, ...state.edges];
+    scene.layers[0] = [...state.nodes, ...state.edges];
     nextEdge.shift();
-
-    state.graph = createGraph(nodes, state.edges);
-    mainGraphNodes = originDFS(origin, state.graph);
   }
 }
 
 function onPointerUp(): void {
   isPointerDown = false;
   isDragging = false;
-  isIntersecting = false;
+  isDraggingNode = false;
   activeNode = null;
   nextEdge.length = 0;
 }
 
-scene.layers.push([...nodes, ...state.edges]);
+function getGridPosition(position: Vector, tileSize: number): Vector {
+  return {
+    x: Math.round(position.x / tileSize) * tileSize,
+    y: Math.round(position.y / tileSize) * tileSize,
+  };
+}
+
+scene.layers.push([...state.nodes, ...state.edges]);
+ctx.imageSmoothingEnabled = false;
 
 let now: number = Date.now();
 let then: number = Date.now();
+let delta: number = 0;
 (function animate() {
+  requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.translate(dragOffset.x, dragOffset.y);
+
+  renderGrid(grid, ctx);
 
   for (const layer of scene.layers) {
     for (const renderable of layer) {
       render.call(renderable, ctx);
     }
-  }
-
-  for (const node of state.graph.keys()) {
-    paintNode(node, ctx, colors.errorColor);
-  }
-
-  for (const node of mainGraphNodes) {
-    paintNode(node, ctx, colors.warningColor);
-
-    ctx.arc(node.position.x, node.position.y, 128, 0, 2 * Math.PI);
-    ctx.fillStyle = "rgba(106, 90, 205, 0.05)";
-    ctx.fill();
   }
 
   if (activeNode) {
@@ -248,16 +334,13 @@ let then: number = Date.now();
 
   paintNode(pointerNode, ctx, colors.infoColor);
 
-  if (isIntersecting) {
-    paintEdge(createEdge([activeNode!, pointerNode]), ctx, colors.errorColor);
-    paintNode(pointerNode, ctx, colors.errorColor);
-  } else if (hoverNode) {
-    paintNode(hoverNode, ctx, colors.infoColor);
-  }
+  processPlayer(player, delta, actionKeys);
+  animatePlayer(player, ctx);
 
   then = now;
   now = Date.now();
-  const delta: number = now - then;
+  delta = now - then;
+
   ctx.fillStyle = colors.foregroundColor;
   ctx.fillText(
     `FPS: ${Math.round(1000 / delta)}`,
@@ -266,7 +349,6 @@ let then: number = Date.now();
   );
 
   ctx.restore();
-  requestAnimationFrame(animate);
 })();
 </script>
 

@@ -1,6 +1,6 @@
-import { type Node } from "../lib/Node.ts";
-import { type Edge } from "../lib/Edge.ts";
-import { type Graph } from "../lib/Graph.ts";
+import { type Node } from "../entity/Node.ts";
+import { type Edge } from "../entity/Edge.ts";
+import { type Graph } from "../component/Graph.ts";
 
 export type GameState = {
   worldMap: {

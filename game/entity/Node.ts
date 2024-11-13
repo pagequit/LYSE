@@ -1,6 +1,6 @@
-import { colors } from "../style.ts"; // TODO: decouple styling
-import type { Vector } from "./Vector.ts";
-import { type Renderable, createRenderable } from "./Renderable.ts";
+import { colors } from "../../style.ts"; // TODO: decouple styling
+import type { Vector } from "../component/Vector.ts";
+import { type Renderable, createRenderable } from "../component/Renderable.ts";
 
 export type Node = {
   position: Vector;

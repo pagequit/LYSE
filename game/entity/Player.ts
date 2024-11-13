@@ -3,9 +3,9 @@ import {
   createSprite,
   animateSprite,
   setYFrame,
-} from "../lib/Sprite.ts";
-import { type Vector, normalize, isZero } from "../lib/Vector.ts";
-import { type ActionKeys } from "../system/Input.ts";
+} from "../component/Sprite.ts";
+import { type Vector, normalize, isZero } from "../component/Vector.ts";
+import { type ActionKeys } from "../../engine/system/Input.ts";
 
 export enum State {
   Idle,

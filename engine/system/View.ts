@@ -1,6 +1,3 @@
-import { type Vector } from "../lib/Vector.ts";
-
-const offset: Vector = { x: 0, y: 0 };
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
@@ -15,5 +12,5 @@ export function useCanvas() {
   window.addEventListener("resize", resize);
   resize();
 
-  return { canvas, ctx, offset };
+  return { canvas, ctx };
 }
