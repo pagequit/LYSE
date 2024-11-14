@@ -93,14 +93,18 @@ export function processPlayer(
     setState(player, State.Idle);
   } else {
     setState(player, State.Walk);
-    if (player.velocity.x > 0) {
-      setDirection(player, Direction.Right);
-    } else if (player.velocity.x < 0) {
-      setDirection(player, Direction.Left);
-    } else if (player.velocity.y > 0) {
-      setDirection(player, Direction.Down);
-    } else if (player.velocity.y < 0) {
+
+    const direction =
+      Math.atan2(player.velocity.y, player.velocity.x) / Math.PI + 1;
+
+    if (direction >= 0.25 && direction < 0.75) {
       setDirection(player, Direction.Up);
+    } else if (direction >= 0.75 && direction < 1.25) {
+      setDirection(player, Direction.Right);
+    } else if (direction >= 1.25 && direction < 1.75) {
+      setDirection(player, Direction.Down);
+    } else {
+      setDirection(player, Direction.Left);
     }
   }
 }

@@ -17,7 +17,6 @@ import {
   State,
   Direction,
 } from "./game/entity/Player.ts";
-import { normalize } from "./engine/lib/Vector.ts";
 
 const { canvas, ctx } = useCanvas();
 
@@ -79,7 +78,7 @@ const touchControls = {
       x: 64,
       y: canvas.height - 64,
     },
-    stickRadius: 24,
+    stickRadius: 32,
   },
   a: {
     position: {
@@ -147,23 +146,34 @@ function renderTouchControls(ctx: CanvasRenderingContext2D): void {
 }
 
 function processTouchControls(player: Player, delta: number): void {
-  const relativePosition = {
-    x: pointerState.position.x - touchControls.dPad.position.x,
-    y: pointerState.position.y - touchControls.dPad.position.y,
-  };
+  if (pointerState.isDown) {
+    const relativePosition = {
+      x: pointerState.position.x - touchControls.dPad.position.x,
+      y: pointerState.position.y - touchControls.dPad.position.y,
+    };
+    const magnitude = Math.hypot(relativePosition.x, relativePosition.y);
 
-  if (
-    pointerState.isDown &&
-    Math.hypot(relativePosition.x, relativePosition.y) <=
-      touchControls.dPad.radius
-  ) {
-    const direction = Math.atan2(relativePosition.y, relativePosition.x);
-    player.velocity.x = Math.cos(direction) * 0.25 * delta;
-    player.velocity.y = Math.sin(direction) * 0.25 * delta;
+    touchControls.dPad.stickPosition.x = pointerState.position.x;
+    touchControls.dPad.stickPosition.y = pointerState.position.y;
+    if (
+      magnitude <= touchControls.dPad.radius &&
+      magnitude >= touchControls.dPad.radius - touchControls.dPad.stickRadius
+    ) {
+      const direction = Math.atan2(relativePosition.y, relativePosition.x);
+      player.velocity.x = Math.cos(direction) * 0.25 * delta;
+      player.velocity.y = Math.sin(direction) * 0.25 * delta;
+    } else {
+      // FIXME
+      player.velocity.x = 0;
+      player.velocity.y = 0;
+    }
   } else {
     // FIXME
     player.velocity.x = 0;
     player.velocity.y = 0;
+
+    touchControls.dPad.stickPosition.x = touchControls.dPad.position.x;
+    touchControls.dPad.stickPosition.y = touchControls.dPad.position.y;
   }
 }
 
