@@ -55,15 +55,19 @@ const actionKeys: ActionKeys = {
 function onKeyDown(event: KeyboardEvent) {
   switch (event.key) {
     case "ArrowUp":
+    case "w":
       actionKeys.up = 1;
       break;
     case "ArrowDown":
+    case "s":
       actionKeys.down = 1;
       break;
     case "ArrowLeft":
+    case "a":
       actionKeys.left = 1;
       break;
     case "ArrowRight":
+    case "d":
       actionKeys.right = 1;
       break;
   }
@@ -72,15 +76,19 @@ function onKeyDown(event: KeyboardEvent) {
 function onKeyUp(event: KeyboardEvent) {
   switch (event.key) {
     case "ArrowUp":
+    case "w":
       actionKeys.up = 0;
       break;
     case "ArrowDown":
+    case "s":
       actionKeys.down = 0;
       break;
     case "ArrowLeft":
+    case "a":
       actionKeys.left = 0;
       break;
     case "ArrowRight":
+    case "d":
       actionKeys.right = 0;
       break;
   }

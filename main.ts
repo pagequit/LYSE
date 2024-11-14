@@ -6,9 +6,9 @@ import {
   getActionKeys,
   usePointer,
   getPointerState,
+  type ActionKeys,
 } from "./engine/system/Input.ts";
 import {
-  type Player,
   processPlayer,
   animatePlayer,
   createPlayer,
@@ -17,6 +17,7 @@ import {
   State,
   Direction,
 } from "./game/entity/Player.ts";
+import { type Vector } from "./engine/lib/Vector.ts";
 
 const { canvas, ctx } = useCanvas();
 
@@ -145,7 +146,7 @@ function renderTouchControls(ctx: CanvasRenderingContext2D): void {
   ctx.fill();
 }
 
-function processTouchControls(player: Player, delta: number): void {
+function processTouchControls(actionKeys: ActionKeys): void {
   if (pointerState.isDown) {
     const relativePosition = {
       x: pointerState.position.x - touchControls.dPad.position.x,
@@ -153,25 +154,31 @@ function processTouchControls(player: Player, delta: number): void {
     };
     const magnitude = Math.hypot(relativePosition.x, relativePosition.y);
 
-    touchControls.dPad.stickPosition.x = pointerState.position.x;
-    touchControls.dPad.stickPosition.y = pointerState.position.y;
     if (
       magnitude <= touchControls.dPad.radius &&
       magnitude >= touchControls.dPad.radius - touchControls.dPad.stickRadius
     ) {
       const direction = Math.atan2(relativePosition.y, relativePosition.x);
-      player.velocity.x = Math.cos(direction) * 0.25 * delta;
-      player.velocity.y = Math.sin(direction) * 0.25 * delta;
+      const dx = Math.cos(direction);
+      const dy = Math.sin(direction);
+
+      actionKeys.right = dx;
+      actionKeys.left = -dx;
+      actionKeys.down = dy;
+      actionKeys.up = -dy;
+
+      touchControls.dPad.stickPosition.x = pointerState.position.x;
+      touchControls.dPad.stickPosition.y = pointerState.position.y;
     } else {
-      // FIXME
-      player.velocity.x = 0;
-      player.velocity.y = 0;
+      actionKeys.right = 0;
+      actionKeys.left = 0;
+      actionKeys.down = 0;
+      actionKeys.up = 0;
+
+      touchControls.dPad.stickPosition.x = touchControls.dPad.position.x;
+      touchControls.dPad.stickPosition.y = touchControls.dPad.position.y;
     }
   } else {
-    // FIXME
-    player.velocity.x = 0;
-    player.velocity.y = 0;
-
     touchControls.dPad.stickPosition.x = touchControls.dPad.position.x;
     touchControls.dPad.stickPosition.y = touchControls.dPad.position.y;
   }
@@ -188,18 +195,11 @@ let delta: number = 0;
 
   renderGrid(grid, ctx);
 
+  renderTouchControls(ctx);
+  processTouchControls(actionKeys);
+
   processPlayer(player, delta, actionKeys);
   animatePlayer(player, ctx, delta);
-
-  renderTouchControls(ctx);
-  processTouchControls(player, delta);
-
-  // DEBUG
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = colors.infoColor;
-  ctx.beginPath();
-  ctx.arc(pointerState.position.x, pointerState.position.y, 8, 0, 2 * Math.PI);
-  ctx.stroke();
 
   then = now;
   now = Date.now();

@@ -80,10 +80,8 @@ export function processPlayer(
   delta: number,
   actionKeys: ActionKeys,
 ): void {
-  // FIXME
-  // player.velocity.x = actionKeys.right - actionKeys.left;
-  // player.velocity.y = actionKeys.down - actionKeys.up;
-
+  player.velocity.x = actionKeys.right - actionKeys.left;
+  player.velocity.y = actionKeys.down - actionKeys.up;
   normalize(player.velocity);
 
   player.position.x += 0.25 * player.velocity.x * delta;
@@ -97,11 +95,11 @@ export function processPlayer(
     const direction =
       Math.atan2(player.velocity.y, player.velocity.x) / Math.PI + 1;
 
-    if (direction >= 0.25 && direction < 0.75) {
+    if (direction > 0.25 && direction < 0.75) {
       setDirection(player, Direction.Up);
-    } else if (direction >= 0.75 && direction < 1.25) {
+    } else if (direction >= 0.75 && direction <= 1.25) {
       setDirection(player, Direction.Right);
-    } else if (direction >= 1.25 && direction < 1.75) {
+    } else if (direction > 1.25 && direction < 1.75) {
       setDirection(player, Direction.Down);
     } else {
       setDirection(player, Direction.Left);
