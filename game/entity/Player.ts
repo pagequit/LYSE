@@ -3,6 +3,7 @@ import {
   createSprite,
   animateSprite,
   setYFrame,
+  setXFrame,
 } from "../../engine/system/Sprite.ts";
 import { type Vector, normalize, isZero } from "../../engine/lib/Vector.ts";
 import { type ActionKeys } from "../../engine/system/Input.ts";
@@ -28,23 +29,23 @@ export type Player = {
 
 const animations: Record<State, Sprite> = {
   [State.Walk]: createSprite({
-    imageSrc: "/BaseCharacter/walk.png",
-    width: 256,
-    height: 256,
-    frameRate: 1000 / 8,
-    frameWidth: 80,
-    frameHeight: 80,
-    xFrames: 8,
+    imageSrc: "/BaseCharacter/lyse-walk.png",
+    width: 64,
+    height: 64,
+    frameRate: 1000 / 4,
+    frameWidth: 16,
+    frameHeight: 16,
+    xFrames: 4,
     yFrames: 4,
   }),
   [State.Idle]: createSprite({
-    imageSrc: "/BaseCharacter/idle.png",
-    width: 256,
-    height: 256,
-    frameRate: 1000 / 4,
-    frameWidth: 80,
-    frameHeight: 80,
-    xFrames: 4,
+    imageSrc: "/BaseCharacter/lyse-idle.png",
+    width: 64,
+    height: 64,
+    frameRate: 1000 / 1,
+    frameWidth: 16,
+    frameHeight: 16,
+    xFrames: 2,
     yFrames: 4,
   }),
 };
@@ -59,6 +60,16 @@ export function createPlayer(position: Vector): Player {
 }
 
 export function setState(player: Player, state: State): void {
+  if (player.state === state) {
+    return;
+  }
+
+  setXFrame(player.animations[player.state], 0);
+  player.animations[player.state].frameCount = 1000; // FIXME: why does the frame count need to ...
+
+  setXFrame(player.animations[state], 0);
+  player.animations[state].frameCount = 1000;
+
   player.state = state;
 }
 

@@ -72,6 +72,8 @@ export function animateSprite(
     sprite.height,
   );
 
+  // FIXME
+  // Logic flaw... first round counts always double
   if ((sprite.frameCount += delta) > sprite.frameRate) {
     sprite.frameCount = 0;
 

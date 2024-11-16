@@ -17,7 +17,6 @@ import {
   State,
   Direction,
 } from "./game/entity/Player.ts";
-import { type Vector } from "./engine/lib/Vector.ts";
 
 const { canvas, ctx } = useCanvas();
 
@@ -31,8 +30,8 @@ const actionKeys = getActionKeys();
 const pointerState = getPointerState();
 
 const player = createPlayer({
-  x: (canvas.width - 256) / 2,
-  y: (canvas.height - 256) / 2,
+  x: (canvas.width - 64) / 2,
+  y: (canvas.height - 64) / 2,
 });
 
 setState(player, State.Idle);
