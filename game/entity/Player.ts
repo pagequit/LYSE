@@ -23,6 +23,7 @@ export enum Direction {
 export type Player = {
   position: Vector;
   state: State;
+  direction: Direction;
   velocity: Vector;
   animations: Record<State, Sprite>;
 };
@@ -54,6 +55,7 @@ export function createPlayer(position: Vector): Player {
   return {
     position,
     state: State.Idle,
+    direction: Direction.Right,
     velocity: { x: 0, y: 0 },
     animations,
   };
@@ -65,17 +67,18 @@ export function setState(player: Player, state: State): void {
   }
 
   setXFrame(player.animations[player.state], 0);
-  player.animations[player.state].frameCount = 0;
-
   setXFrame(player.animations[state], 0);
-  player.animations[state].frameCount = 0;
-
   player.state = state;
 }
 
 export function setDirection(player: Player, direction: Direction): void {
+  if (player.direction === direction) {
+    return;
+  }
+
   setYFrame(player.animations[State.Idle], direction);
   setYFrame(player.animations[State.Walk], direction);
+  player.direction = direction;
 }
 
 export function animatePlayer(

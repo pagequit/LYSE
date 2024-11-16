@@ -4,8 +4,8 @@ export type Sprite = {
   image: HTMLImageElement;
   width: number;
   height: number;
-  frameRate: number;
-  frameCount: number;
+  frameDuration: number;
+  frameDelta: number;
   framePosition: Vector;
   frameWidth: number;
   frameHeight: number;
@@ -32,8 +32,8 @@ export function createSprite(spriteData: {
     image,
     width: spriteData.width,
     height: spriteData.height,
-    frameRate: spriteData.frameRate,
-    frameCount: 0,
+    frameDuration: spriteData.frameRate,
+    frameDelta: 0,
     framePosition: { x: 0, y: 0 },
     frameWidth: spriteData.frameWidth,
     frameHeight: spriteData.frameHeight,
@@ -47,11 +47,13 @@ export function createSprite(spriteData: {
 export function setXFrame(sprite: Sprite, index: number): void {
   sprite.xIndex = index;
   sprite.framePosition.x = sprite.frameWidth * index;
+  sprite.frameDelta = 0;
 }
 
 export function setYFrame(sprite: Sprite, index: number): void {
   sprite.yIndex = index;
   sprite.framePosition.y = sprite.frameHeight * index;
+  sprite.frameDelta = 0;
 }
 
 export function animateSprite(
@@ -73,8 +75,8 @@ export function animateSprite(
   );
 
   sprite.framePosition.x = sprite.frameWidth * sprite.xIndex;
-  if ((sprite.frameCount += delta) > sprite.frameRate) {
-    sprite.frameCount = 0;
+  if ((sprite.frameDelta += delta) > sprite.frameDuration) {
+    sprite.frameDelta = 0;
     if ((sprite.xIndex += 1) > sprite.xLenght) {
       sprite.xIndex = 0;
     }
