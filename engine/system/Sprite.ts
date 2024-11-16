@@ -72,13 +72,9 @@ export function animateSprite(
     sprite.height,
   );
 
-  // FIXME
-  // Logic flaw... first round counts always double
+  sprite.framePosition.x = sprite.frameWidth * sprite.xIndex;
   if ((sprite.frameCount += delta) > sprite.frameRate) {
     sprite.frameCount = 0;
-
-    sprite.framePosition.x = sprite.frameWidth * sprite.xIndex;
-
     if ((sprite.xIndex += 1) > sprite.xLenght) {
       sprite.xIndex = 0;
     }

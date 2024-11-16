@@ -65,10 +65,10 @@ export function setState(player: Player, state: State): void {
   }
 
   setXFrame(player.animations[player.state], 0);
-  player.animations[player.state].frameCount = 1000; // FIXME: why does the frame count need to ...
+  player.animations[player.state].frameCount = 0;
 
   setXFrame(player.animations[state], 0);
-  player.animations[state].frameCount = 1000;
+  player.animations[state].frameCount = 0;
 
   player.state = state;
 }
