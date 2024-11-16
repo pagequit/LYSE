@@ -30,7 +30,7 @@ export type Player = {
 
 const animations: Record<State, Sprite> = {
   [State.Walk]: createSprite({
-    imageSrc: "/player/lyse-walk.png",
+    imageSrc: "/player-walk.png",
     width: 64,
     height: 64,
     frameDuraton: 1000 / 4,
@@ -40,7 +40,7 @@ const animations: Record<State, Sprite> = {
     yFrames: 4,
   }),
   [State.Idle]: createSprite({
-    imageSrc: "/player/lyse-idle.png",
+    imageSrc: "/player-idle.png",
     width: 64,
     height: 64,
     frameDuraton: 1000 / 1,
