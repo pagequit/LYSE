@@ -19,7 +19,7 @@ export function createSprite(spriteData: {
   imageSrc: string;
   width: number;
   height: number;
-  frameRate: number;
+  frameDuraton: number;
   frameWidth: number;
   frameHeight: number;
   xFrames: number;
@@ -32,7 +32,7 @@ export function createSprite(spriteData: {
     image,
     width: spriteData.width,
     height: spriteData.height,
-    frameDuration: spriteData.frameRate,
+    frameDuration: spriteData.frameDuraton,
     frameDelta: 0,
     framePosition: { x: 0, y: 0 },
     frameWidth: spriteData.frameWidth,
