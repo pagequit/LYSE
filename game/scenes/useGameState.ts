@@ -1,6 +1,6 @@
 import { type Node } from "../entity/Node.ts";
 import { type Edge } from "../entity/Edge.ts";
-import { type Graph } from "../component/Graph.ts";
+import { type Graph } from "../entity/Graph.ts";
 
 export type GameState = {
   worldMap: {
@@ -23,7 +23,3 @@ export const gameState: GameState = {
     graph: new Map(),
   },
 };
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-window.gameState = gameState;

@@ -1,4 +1,4 @@
-import { ref, type Component } from "vue";
+import { type Component, ref } from "vue";
 
 type Scenes = Map<string, Component>;
 const scenes: Scenes = new Map();

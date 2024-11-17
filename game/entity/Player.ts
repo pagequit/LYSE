@@ -1,11 +1,11 @@
 import {
-  type Sprite,
-  createSprite,
   animateSprite,
-  setYFrame,
+  createSprite,
   setXFrame,
+  setYFrame,
+  type Sprite,
 } from "../../engine/system/Sprite.ts";
-import { type Vector, normalize, isZero } from "../../engine/lib/Vector.ts";
+import { isZero, normalize, type Vector } from "../../engine/lib/Vector.ts";
 import { type ActionKeys } from "../../engine/system/Input.ts";
 
 export enum State {

@@ -1,8 +1,8 @@
 import { colors } from "../../style.ts"; // TODO: decouple styling
 import type { Vector } from "../../engine/lib/Vector.ts";
 import {
-  type Renderable,
   createRenderable,
+  type Renderable,
 } from "../../engine/lib/Renderable.ts";
 
 export type Node = {

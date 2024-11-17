@@ -1,8 +1,8 @@
 import { colors } from "../../style.ts"; // TODO: decouple styling
 import type { Node } from "./Node.ts";
 import {
-  type Renderable,
   createRenderable,
+  type Renderable,
 } from "../../engine/lib/Renderable.ts";
 
 export type Edge = [Node, Node] & Renderable;

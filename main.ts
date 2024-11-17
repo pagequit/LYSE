@@ -2,20 +2,20 @@ import "./style.css";
 import { colors } from "./style.ts";
 import { useCanvas } from "./engine/system/View.ts";
 import {
-  useKeyboard,
-  getActionKeys,
-  usePointer,
-  getPointerState,
   type ActionKeys,
+  getActionKeys,
+  getPointerState,
+  useKeyboard,
+  usePointer,
 } from "./engine/system/Input.ts";
 import {
-  processPlayer,
   animatePlayer,
   createPlayer,
+  Direction,
+  processPlayer,
   setDirection,
   setState,
   State,
-  Direction,
 } from "./game/entity/Player.ts";
 
 const { canvas, ctx } = useCanvas();
