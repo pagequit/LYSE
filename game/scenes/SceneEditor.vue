@@ -24,10 +24,10 @@ import {
   setState,
   processPlayer,
 } from "../entity/Player.ts";
-import { useKeyboard, getActionKeys } from "../../engine/system/Input.ts";
+import { useKeyboard, getInput } from "../../engine/system/Input.ts";
 
 const { listen, unlisten } = useKeyboard();
-const actionKeys = getActionKeys();
+const actionKeys = getInput();
 
 const state = gameState.worldMap;
 const { canvas, ctx } = useCanvas();

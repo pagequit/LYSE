@@ -11,7 +11,7 @@ import {
   normalize,
   type Vector,
 } from "../../engine/lib/Vector.ts";
-import { type ActionKeys } from "../../engine/system/Input.ts";
+import { type Input } from "../../engine/system/Input.ts";
 
 export enum State {
   Idle,
@@ -97,11 +97,10 @@ export function animatePlayer(
 export function processPlayer(
   player: Player,
   delta: number,
-  actionKeys: ActionKeys,
+  input: Input,
 ): void {
-  player.velocity.x = actionKeys.right - actionKeys.left;
-  player.velocity.y = actionKeys.down - actionKeys.up;
-  normalize(player.velocity);
+  player.velocity.x = input.vector.x;
+  player.velocity.y = input.vector.y;
 
   player.position.x += 0.25 * player.velocity.x * delta;
   player.position.y += 0.25 * player.velocity.y * delta;

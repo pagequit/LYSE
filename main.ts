@@ -1,12 +1,8 @@
 import "./style.css";
 import { colors } from "./style.ts";
 import { useCanvas } from "./engine/system/View.ts";
-import {
-  getActionKeys,
-  useKeyboard,
-  usePointer,
-  useTouchControls,
-} from "./engine/system/Input.ts";
+import { input, useInputs } from "./engine/system/Input.ts";
+import { renderTouchControls } from "./engine/system/TouchControls.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -19,13 +15,7 @@ import {
 
 const { canvas, ctx } = useCanvas();
 
-const { listen: listenKeyboard } = useKeyboard();
-const { listen: listenPointer } = usePointer();
-listenKeyboard();
-listenPointer();
-
-const { renderTouchControls, processTouchControls } = useTouchControls();
-const actionKeys = getActionKeys();
+const processInputs = useInputs();
 
 const player = createPlayer({
   x: (canvas.width - 64) / 2,
@@ -77,9 +67,10 @@ let delta: number = 0;
   renderGrid(grid, ctx);
 
   renderTouchControls(ctx);
-  processTouchControls(actionKeys);
 
-  processPlayer(player, delta, actionKeys);
+  processInputs();
+
+  processPlayer(player, delta, input);
   animatePlayer(player, ctx, delta);
 
   then = now;
