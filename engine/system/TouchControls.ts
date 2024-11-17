@@ -6,6 +6,7 @@ export type TouchControls = {
   dPad: {
     position: Vector;
     radius: number;
+    deadZone: number;
     stickPosition: Vector;
     stickRadius: number;
   };
@@ -19,6 +20,7 @@ export const touchControls: TouchControls = {
       y: self.innerHeight - 64,
     },
     radius: 48,
+    deadZone: 8,
     stickPosition: {
       x: 64,
       y: self.innerHeight - 64,
@@ -27,25 +29,30 @@ export const touchControls: TouchControls = {
   },
 };
 
+const relativePosition: Vector = {
+  x: pointer.position.x - touchControls.dPad.position.x,
+  y: pointer.position.y - touchControls.dPad.position.y,
+};
+
+function resetDPad(): void {
+  touchControls.dPad.stickPosition.x = touchControls.dPad.position.x;
+  touchControls.dPad.stickPosition.y = touchControls.dPad.position.y;
+  touchControls.axes[0] = 0;
+  touchControls.axes[1] = 0;
+}
+
 export function processTouchControls(): void {
   if (!pointer.isDown) {
-    touchControls.dPad.stickPosition.x = touchControls.dPad.position.x;
-    touchControls.dPad.stickPosition.y = touchControls.dPad.position.y;
-    touchControls.axes[0] = 0;
-    touchControls.axes[1] = 0;
-
+    resetDPad();
     return;
   }
 
-  const relativePosition = {
-    x: pointer.position.x - touchControls.dPad.position.x,
-    y: pointer.position.y - touchControls.dPad.position.y,
-  };
-
+  relativePosition.x = pointer.position.x - touchControls.dPad.position.x;
+  relativePosition.y = pointer.position.y - touchControls.dPad.position.y;
   const magnitude = getMagnitude(relativePosition);
   if (
     magnitude <= touchControls.dPad.radius &&
-    magnitude >= touchControls.dPad.radius - touchControls.dPad.stickRadius
+    magnitude >= touchControls.dPad.deadZone
   ) {
     const direction = getDirection(relativePosition);
     touchControls.axes[0] = Math.cos(direction);
@@ -53,6 +60,8 @@ export function processTouchControls(): void {
 
     touchControls.dPad.stickPosition.x = pointer.position.x;
     touchControls.dPad.stickPosition.y = pointer.position.y;
+  } else {
+    resetDPad();
   }
 }
 

@@ -66,12 +66,11 @@ let delta: number = 0;
 
   renderGrid(grid, ctx);
 
-  renderTouchControls(ctx);
-
   processInputs();
-
-  processPlayer(player, delta, input);
+  processPlayer(player, input, delta);
   animatePlayer(player, ctx, delta);
+
+  renderTouchControls(ctx);
 
   then = now;
   now = Date.now();

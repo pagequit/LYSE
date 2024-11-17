@@ -96,8 +96,8 @@ export function animatePlayer(
 
 export function processPlayer(
   player: Player,
-  delta: number,
   input: Input,
+  delta: number,
 ): void {
   player.velocity.x = input.vector.x;
   player.velocity.y = input.vector.y;
