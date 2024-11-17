@@ -3,12 +3,16 @@ export type Vector = {
   y: number;
 };
 
-export function direction(vector: Vector): number {
+export function getDirection(vector: Vector): number {
   return Math.atan2(vector.y, vector.x);
 }
 
-export function magnitude(vector: Vector): number {
+export function getMagnitude(vector: Vector): number {
   return Math.hypot(vector.x, vector.y);
+}
+
+export function getScalar(a: Vector, b: Vector): number {
+  return a.x * b.x + a.y * b.y;
 }
 
 export function scale(vector: Vector, scalar: number): void {
@@ -24,28 +28,6 @@ export function normalize(vector: Vector): void {
   }
 }
 
-export function add(vector: Vector, other: Vector): void {
-  vector.x += other.x;
-  vector.y += other.y;
-}
-
-export function subtract(vector: Vector, other: Vector): void {
-  vector.x -= other.x;
-  vector.y -= other.y;
-}
-
-export function dot(vector: Vector, other: Vector): number {
-  return vector.x * other.x + vector.y * other.y;
-}
-
 export function isZero(vector: Vector): boolean {
   return vector.x === 0 && vector.y === 0;
-}
-
-export function equals(vector: Vector, other: Vector): boolean {
-  return vector.x === other.x && vector.y === other.y;
-}
-
-export function copy(vector: Vector): Vector {
-  return { x: vector.x, y: vector.y };
 }

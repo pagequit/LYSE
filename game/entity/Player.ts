@@ -5,7 +5,12 @@ import {
   setYFrame,
   type Sprite,
 } from "../../engine/system/Sprite.ts";
-import { isZero, normalize, type Vector } from "../../engine/lib/Vector.ts";
+import {
+  getDirection,
+  isZero,
+  normalize,
+  type Vector,
+} from "../../engine/lib/Vector.ts";
 import { type ActionKeys } from "../../engine/system/Input.ts";
 
 export enum State {
@@ -106,9 +111,7 @@ export function processPlayer(
   } else {
     setState(player, State.Walk);
 
-    const direction =
-      Math.atan2(player.velocity.y, player.velocity.x) / Math.PI + 1;
-
+    const direction = getDirection(player.velocity) / Math.PI + 1;
     if (direction > 0.25 && direction < 0.75) {
       setDirection(player, Direction.Up);
     } else if (direction >= 0.75 && direction <= 1.25) {
