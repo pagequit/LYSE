@@ -5,13 +5,8 @@ import {
   setYFrame,
   type Sprite,
 } from "../../engine/system/Sprite.ts";
-import {
-  getDirection,
-  isZero,
-  normalize,
-  type Vector,
-} from "../../engine/lib/Vector.ts";
-import { type Input } from "../../engine/system/Input.ts";
+import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
+import { input } from "../../engine/system/Input.ts";
 
 export enum State {
   Idle,
@@ -94,11 +89,7 @@ export function animatePlayer(
   animateSprite(player.animations[player.state], ctx, delta, player.position);
 }
 
-export function processPlayer(
-  player: Player,
-  input: Input,
-  delta: number,
-): void {
+export function processPlayer(player: Player, delta: number): void {
   player.velocity.x = input.vector.x;
   player.velocity.y = input.vector.y;
 

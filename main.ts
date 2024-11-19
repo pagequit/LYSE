@@ -1,7 +1,5 @@
 import "./style.css";
-import { colors } from "./style.ts";
-import { useCanvas } from "./engine/system/View.ts";
-import { input, useInputs } from "./engine/system/Input.ts";
+import { useAnimationProcess } from "./engine/system/animate.ts";
 import { renderTouchControls } from "./engine/system/TouchControls.ts";
 import {
   animatePlayer,
@@ -12,10 +10,10 @@ import {
   setState,
   State,
 } from "./game/entity/Player.ts";
+import { renderGrid, grid } from "./game/entity/Grid.ts";
+import { useCanvas } from "./engine/system/View.ts";
 
-const { canvas, ctx } = useCanvas();
-
-const processInputs = useInputs();
+const { canvas } = useCanvas();
 
 const player = createPlayer({
   x: (canvas.width - 64) / 2,
@@ -25,59 +23,13 @@ const player = createPlayer({
 setState(player, State.Idle);
 setDirection(player, Direction.Down);
 
-type Grid = {
-  height: number;
-  width: number;
-  tileSize: number;
-  x: number;
-  y: number;
-};
-
-const grid: Grid = {
-  height: canvas.height,
-  width: canvas.width,
-  tileSize: 64,
-  x: canvas.width / 64,
-  y: canvas.height / 64,
-};
-
-function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
-  for (let i = 0; i < grid.x; i++) {
-    for (let j = 0; j < grid.y; j++) {
-      ctx.fillStyle = i % 2 === j % 2 ? "transparent" : "rgba(0, 0, 0, 0.1)";
-      ctx.fillRect(
-        i * grid.tileSize,
-        j * grid.tileSize,
-        grid.tileSize,
-        grid.tileSize,
-      );
-    }
-  }
-}
-
-let now: number = Date.now();
-let then: number = Date.now();
-let delta: number = 0;
-(function animate() {
-  requestAnimationFrame(animate);
-  ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-
+const { animate, addProcess, addAnimation } = useAnimationProcess();
+addProcess((delta: number) => {
+  processPlayer(player, delta);
+});
+addAnimation((ctx: CanvasRenderingContext2D, delta: number) => {
   renderGrid(grid, ctx);
-
-  processInputs();
-  processPlayer(player, input, delta);
   animatePlayer(player, ctx, delta);
-
   renderTouchControls(ctx);
-
-  then = now;
-  now = Date.now();
-  delta = now - then;
-
-  ctx.fillStyle = colors.foregroundColor;
-  ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 20);
-
-  ctx.restore();
-})();
+});
+animate();
