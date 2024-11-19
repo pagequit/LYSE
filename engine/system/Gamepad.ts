@@ -7,7 +7,7 @@ function onGamepadConnected(event: GamepadEvent) {
 }
 
 export function useGamepad() {
-  addEventListener("gamepadconnected", onGamepadConnected);
+  self.addEventListener("gamepadconnected", onGamepadConnected);
 
   return {
     processGamepad() {

@@ -33,7 +33,7 @@ function animate(): void {
   now = Date.now();
   delta = now - then;
 
-  ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+  ctx.fillStyle = "#fff";
   ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 20);
 
   ctx.restore();
