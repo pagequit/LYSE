@@ -1,4 +1,4 @@
-import { createNode } from "../entity/Node";
+import { createNode } from "../../entity/Node";
 import { useViewport } from "./useViewport";
 
 const { viewport } = useViewport();
