@@ -1,7 +1,10 @@
 import "./style.css";
 import { useAnimationProcess } from "./engine/system/animate.ts";
-import TestScene from "./game/scenes/testScene.ts";
+import { testScene } from "./game/scenes/testScene.ts";
+// import { nodeScene } from "./game/scenes/nodeScene.ts";
 
-const { animate, addProcess, addAnimation } = useAnimationProcess();
-addScene(TestScene);
+const { animate, setCurrentScene } = useAnimationProcess();
+
+setCurrentScene(testScene);
+
 animate();

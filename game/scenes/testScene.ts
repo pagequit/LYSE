@@ -1,5 +1,3 @@
-import "./style.css";
-import { useAnimationProcess } from "../../engine/system/animate.ts";
 import { renderTouchControls } from "../../engine/system/TouchControls.ts";
 import {
   animatePlayer,
@@ -17,11 +15,14 @@ const player: Player = createPlayer({
 
 const testScene: Scene = createScene(1200, 800);
 
-addProcess((delta: number) => {
+testScene.process.push((delta: number) => {
   processPlayer(player, delta);
 });
-addAnimation((ctx: CanvasRenderingContext2D, delta: number) => {
+
+testScene.animations.push((ctx: CanvasRenderingContext2D, delta: number) => {
   renderGrid(grid, ctx);
   animatePlayer(player, ctx, delta);
   renderTouchControls(ctx);
 });
+
+export { testScene };
