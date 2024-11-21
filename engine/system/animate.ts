@@ -1,14 +1,13 @@
 import { useCanvas } from "./View.ts";
 import { useInputs } from "./Input.ts";
+import { type Scene } from "./Scene.ts";
 
 const { canvas, ctx } = useCanvas();
 const processInputs = useInputs();
 
-export type Process = (delta: number) => void;
-const processes: Process[] = [];
-
-export type Animation = (ctx: CanvasRenderingContext2D, delta: number) => void;
-const animations: Animation[] = [];
+const currentScene: { value: Scene | null } = {
+  value: null,
+};
 
 let now: number = Date.now();
 let then: number = Date.now();
@@ -21,12 +20,13 @@ function animate(): void {
   ctx.save();
 
   processInputs();
-  for (let i = 0; i < processes.length; i++) {
-    processes[i](delta);
+
+  for (const process of currentScene.value?.process ?? []) {
+    process(delta);
   }
 
-  for (let i = 0; i < animations.length; i++) {
-    animations[i](ctx, delta);
+  for (const animation of currentScene.value?.animations ?? []) {
+    animation(ctx, delta);
   }
 
   then = now;
@@ -39,22 +39,16 @@ function animate(): void {
   ctx.restore();
 }
 
-function addProcess(process: Process): void {
-  processes.push(process);
-}
-
-function addAnimation(animation: Animation): void {
-  animations.push(animation);
+export function setCurrentScene(scene: Scene): void {
+  currentScene.value = scene;
 }
 
 export function useAnimationProcess(): {
   animate: () => void;
-  addProcess: (process: Process) => void;
-  addAnimation: (animation: Animation) => void;
+  setCurrentScene: (scene: Scene) => void;
 } {
   return {
     animate,
-    addProcess,
-    addAnimation,
+    setCurrentScene,
   };
 }

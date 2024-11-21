@@ -5,16 +5,18 @@ import {
   animatePlayer,
   createPlayer,
   processPlayer,
+  type Player,
 } from "../entity/Player.ts";
 import { renderGrid, grid } from "../entity/Grid.ts";
-import { type Scene } from "../../engine/system/Scene.ts";
+import { createScene, type Scene } from "../../engine/system/Scene.ts";
 
-const player = createPlayer({
+const player: Player = createPlayer({
   x: (self.innerWidth - 64) / 2,
   y: (self.innerHeight - 64) / 2,
 });
 
-const { addProcess, addAnimation } = useAnimationProcess();
+const testScene: Scene = createScene(1200, 800);
+
 addProcess((delta: number) => {
   processPlayer(player, delta);
 });
