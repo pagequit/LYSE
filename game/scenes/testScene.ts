@@ -6,23 +6,22 @@ import {
   type Player,
 } from "../entity/Player.ts";
 import { renderGrid, grid } from "../entity/Grid.ts";
-import { createScene, type Scene } from "../../engine/system/Scene.ts";
+import { createScene } from "../../engine/system/Scene.ts";
 
 const player: Player = createPlayer({
   x: (self.innerWidth - 64) / 2,
   y: (self.innerHeight - 64) / 2,
 });
 
-const testScene: Scene = createScene(1200, 800);
-
-testScene.process.push((delta: number) => {
-  processPlayer(player, delta);
-});
-
-testScene.animations.push((ctx: CanvasRenderingContext2D, delta: number) => {
-  renderGrid(grid, ctx);
-  animatePlayer(player, ctx, delta);
-  renderTouchControls(ctx);
-});
-
-export { testScene };
+export default createScene(
+  (ctx: CanvasRenderingContext2D, delta: number) => {
+    renderGrid(grid, ctx);
+    animatePlayer(player, ctx, delta);
+    renderTouchControls(ctx);
+    processPlayer(player, delta);
+  },
+  {
+    width: self.innerWidth,
+    height: self.innerHeight,
+  },
+);

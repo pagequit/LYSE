@@ -1,23 +1,30 @@
 import { type Vector } from "../lib/Vector.ts";
-
-export type Process = (delta: number) => void;
-
-export type Animation = (ctx: CanvasRenderingContext2D, delta: number) => void;
+import { type Animation } from "./Animation.ts";
 
 export type Scene = {
   width: number;
   height: number;
   offset: Vector;
-  process: Array<Process>;
-  animations: Array<Animation>;
+  animation: Animation;
 };
 
-export function createScene(width: number, height: number): Scene {
-  return {
+export type SceneOptions = {
+  width: number;
+  height: number;
+};
+
+export function createScene(
+  animation: Animation,
+  { width, height }: SceneOptions,
+): Scene {
+  const scene = {
     width,
     height,
     offset: { x: 0, y: 0 },
-    process: [],
-    animations: [],
+    animation,
   };
+
+  scene.animation = animation.bind(scene);
+
+  return scene satisfies Scene;
 }

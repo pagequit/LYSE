@@ -12,8 +12,6 @@ import {
 import { createEdge, paintEdge, type Edge } from "../entity/Edge.ts";
 import { originDFS, createGraph, type Graph } from "../entity/Graph";
 
-const nodeScene: Scene = createScene(1200, 800);
-
 const nodes: Array<Node> = [
   { x: 60, y: 221 },
   { x: 100, y: 139 },
@@ -81,9 +79,11 @@ nodeScene.process.push(() => {
       isDragging = true;
       dragVector.x = pointer.position.x - dragOffset.x;
       dragVector.y = pointer.position.y - dragOffset.y;
-    } else {
-      nextEdge.push(activeNode);
+
+      return;
     }
+
+    nextEdge.push(activeNode);
 
     if (isDragging) {
       dragOffset.x = Math.min(
@@ -106,6 +106,7 @@ nodeScene.process.push(() => {
 
       return;
     }
+
     hoverNode = getNodeByPosition(nodes, {
       x: pointer.position.x,
       y: pointer.position.y,
@@ -169,8 +170,11 @@ nodeScene.process.push(() => {
   }
 });
 
+const pointerNode = createNode(pointer.position);
 nodeScene.animations.push((ctx: CanvasRenderingContext2D) => {
-  const pointerNode = createNode(pointer.position);
+  for (const node of nodes) {
+    node.render(ctx);
+  }
 
   for (const node of graph.keys()) {
     paintNode(node, ctx, colors.errorColor);
@@ -189,6 +193,7 @@ nodeScene.animations.push((ctx: CanvasRenderingContext2D) => {
     }
   }
 
+  pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, colors.infoColor);
 
   if (isIntersecting) {
@@ -197,6 +202,21 @@ nodeScene.animations.push((ctx: CanvasRenderingContext2D) => {
   } else if (hoverNode) {
     paintNode(hoverNode, ctx, colors.infoColor);
   }
+
+  ctx.fillStyle = colors.foregroundColor;
+  ctx.fillText(
+    `nextEdge: ${nextEdge.length}`,
+    -nodeScene.offset.x + 10,
+    -nodeScene.offset.y + 30,
+  );
 });
 
-export { nodeScene };
+export default createScene(
+  (ctx: CanvasRenderingContext2D, delta: number) => {
+    // TODO
+  },
+  {
+    width: 1200,
+    height: 800,
+  },
+);

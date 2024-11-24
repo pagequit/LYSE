@@ -2,9 +2,16 @@ import { useCanvas } from "./View.ts";
 import { useInputs } from "./Input.ts";
 import { type Scene } from "./Scene.ts";
 
+export type Animation = (
+  this: Scene,
+  ctx: CanvasRenderingContext2D,
+  delta: number,
+) => void;
+
 const { canvas, ctx } = useCanvas();
 const processInputs = useInputs();
 
+// TODO: get rid of the null
 const currentScene: { value: Scene | null } = {
   value: null,
 };
@@ -21,13 +28,7 @@ function animate(): void {
 
   processInputs();
 
-  for (const process of currentScene.value?.process ?? []) {
-    process(delta);
-  }
-
-  for (const animation of currentScene.value?.animations ?? []) {
-    animation(ctx, delta);
-  }
+  currentScene.value?.animation(ctx, delta);
 
   then = now;
   now = Date.now();
