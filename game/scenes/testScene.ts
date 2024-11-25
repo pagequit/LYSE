@@ -7,7 +7,7 @@ import {
 } from "../entity/Player.ts";
 import { renderGrid, grid } from "../entity/Grid.ts";
 import { createScene, changeScene } from "../../engine/system/Scene.ts";
-import testScene2 from "./testScene2.ts";
+import nodeScene from "./nodeScene.ts";
 
 const player: Player = createPlayer({
   x: (self.innerWidth - 64) / 2,
@@ -16,7 +16,7 @@ const player: Player = createPlayer({
 
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
-    changeScene(testScene2);
+    changeScene(nodeScene);
   }
 }
 
@@ -27,6 +27,7 @@ function construct(): void {
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
 }
+
 export default createScene(
   (ctx: CanvasRenderingContext2D, delta: number) => {
     renderGrid(grid, ctx);

@@ -1,6 +1,10 @@
 import { colors } from "../../style.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
-import { createScene } from "../../engine/system/Scene.ts";
+import {
+  createScene,
+  changeScene,
+  type Scene,
+} from "../../engine/system/Scene.ts";
 import { type Vector } from "../../engine/lib/Vector.ts";
 import { getSegmentIntersection } from "../../engine/lib/Segment.ts";
 import {
@@ -11,6 +15,28 @@ import {
 } from "../entity/Node.ts";
 import { createEdge, paintEdge, type Edge } from "../entity/Edge.ts";
 import { originDFS, createGraph, type Graph } from "../entity/Graph";
+import testScene from "./testScene.ts";
+
+function handleEscape({ key }: KeyboardEvent): void {
+  if (key === "Escape") {
+    changeScene(testScene);
+  }
+}
+
+function construct(): void {
+  self.addEventListener("keyup", handleEscape);
+}
+
+function destruct(): void {
+  self.removeEventListener("keyup", handleEscape);
+}
+
+const scene: Scene = createScene(process, {
+  width: 1200,
+  height: 800,
+  construct,
+  destruct,
+});
 
 const nodes: Array<Node> = [
   { x: 60, y: 221 },
@@ -67,11 +93,11 @@ let isDragging = false;
 
 const dragVector: Vector = { x: 0, y: 0 };
 const dragOffset: Vector = {
-  x: Math.min(0, (nodeScene.width - self.innerWidth) * 0.5),
-  y: Math.min(0, (nodeScene.height - self.innerHeight) * 0.5),
+  x: Math.min(0, (scene.width - self.innerWidth) * 0.5),
+  y: Math.min(0, (scene.height - self.innerHeight) * 0.5),
 };
 
-nodeScene.process.push(() => {
+function process(ctx: CanvasRenderingContext2D, delta: number): void {
   if (pointer.isDown) {
     activeNode = getNodeByPosition(nodes, pointer.position);
 
@@ -89,20 +115,20 @@ nodeScene.process.push(() => {
       dragOffset.x = Math.min(
         0,
         Math.max(
-          nodeScene.width - self.innerWidth,
+          scene.width - self.innerWidth,
           pointer.position.x - dragVector.x,
         ),
       );
       dragOffset.y = Math.min(
         0,
         Math.max(
-          nodeScene.height - self.innerHeight,
+          scene.height - self.innerHeight,
           pointer.position.y - dragVector.y,
         ),
       );
 
-      nodeScene.offset.x = dragOffset.x;
-      nodeScene.offset.y = dragOffset.y;
+      scene.offset.x = dragOffset.x;
+      scene.offset.y = dragOffset.y;
 
       return;
     }
@@ -168,10 +194,7 @@ nodeScene.process.push(() => {
     activeNode = null;
     nextEdge.length = 0;
   }
-});
-
-const pointerNode = createNode(pointer.position);
-nodeScene.animations.push((ctx: CanvasRenderingContext2D) => {
+  const pointerNode = createNode(pointer.position);
   for (const node of nodes) {
     node.render(ctx);
   }
@@ -206,17 +229,9 @@ nodeScene.animations.push((ctx: CanvasRenderingContext2D) => {
   ctx.fillStyle = colors.foregroundColor;
   ctx.fillText(
     `nextEdge: ${nextEdge.length}`,
-    -nodeScene.offset.x + 10,
-    -nodeScene.offset.y + 30,
+    -scene.offset.x + 10,
+    -scene.offset.y + 30,
   );
-});
+}
 
-export default createScene(
-  (ctx: CanvasRenderingContext2D, delta: number) => {
-    // TODO
-  },
-  {
-    width: 1200,
-    height: 800,
-  },
-);
+export default scene;
