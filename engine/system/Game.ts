@@ -17,34 +17,33 @@ export const game: Game = {
   state: {},
 };
 
+const { canvas, ctx } = useCanvas();
+const processInputs = useInputs();
+
+let now: number = Date.now();
+let then: number = now;
+let delta: number = 0;
+
+function animate(timestamp: number): void {
+  requestAnimationFrame(animate);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+
+  processInputs();
+
+  game.scene.process(ctx, delta);
+
+  then = now;
+  now = timestamp;
+  delta = now - then;
+
+  ctx.fillStyle = "#fff";
+  ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 20);
+
+  ctx.restore();
+}
+
 export function startGame(): void {
-  const { canvas, ctx } = useCanvas();
-  const processInputs = useInputs();
-
-  let now: number = Date.now();
-  let then: number = now;
-  let delta: number = 0;
-
-  function animate(timestamp: number): void {
-    requestAnimationFrame(animate);
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-
-    processInputs();
-
-    game.scene.process(ctx, delta);
-
-    then = now;
-    now = timestamp;
-    delta = now - then;
-
-    ctx.fillStyle = "#fff";
-    ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 20);
-
-    ctx.restore();
-  }
-
-  game.scene.construct();
   animate(now);
 }
