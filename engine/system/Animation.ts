@@ -3,9 +3,9 @@ import { useInputs } from "./Input.ts";
 import { type Scene } from "./Scene.ts";
 
 export type Animation = (
-  this: Scene,
   ctx: CanvasRenderingContext2D,
   delta: number,
+  scene: Scene,
 ) => void;
 
 const { canvas, ctx } = useCanvas();
@@ -28,7 +28,7 @@ function animate(): void {
 
   processInputs();
 
-  currentScene.value?.animation(ctx, delta);
+  currentScene.value?.animation(ctx, delta, currentScene.value);
 
   then = now;
   now = Date.now();

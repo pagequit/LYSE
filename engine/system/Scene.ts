@@ -8,23 +8,19 @@ export type Scene = {
   animation: Animation;
 };
 
-export type SceneOptions = {
+export type SceneSettings = {
   width: number;
   height: number;
 };
 
 export function createScene(
   animation: Animation,
-  { width, height }: SceneOptions,
+  settings: SceneSettings,
 ): Scene {
-  const scene = {
-    width,
-    height,
+  return {
+    width: settings.width,
+    height: settings.height,
     offset: { x: 0, y: 0 },
     animation,
   };
-
-  scene.animation = animation.bind(scene);
-
-  return scene satisfies Scene;
 }
