@@ -5,12 +5,11 @@ import {
   processPlayer,
   type Player,
 } from "../entity/Player.ts";
-import { renderGrid, grid } from "../entity/Grid.ts";
 import { createScene } from "../../engine/system/Scene.ts";
 
 import game from "../../main.ts";
 import { changeScene } from "../../engine/system/Game.ts";
-import testScene2 from "./testScene2.ts";
+import testScene from "./testScene.ts";
 
 const player: Player = createPlayer({
   x: (self.innerWidth - 64) / 2,
@@ -19,8 +18,8 @@ const player: Player = createPlayer({
 
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
-    console.log("changeScene: testScene2");
-    changeScene(game, testScene2);
+    console.log("changeScene: testScene");
+    changeScene(game, testScene);
   }
 }
 
@@ -31,9 +30,9 @@ function construct(): void {
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
 }
+
 export default createScene(
   (ctx: CanvasRenderingContext2D, delta: number) => {
-    renderGrid(grid, ctx);
     animatePlayer(player, ctx, delta);
     renderTouchControls(ctx);
     processPlayer(player, delta);

@@ -28,30 +28,30 @@ export type Player = {
   animations: Record<State, Sprite>;
 };
 
-const animations: Record<State, Sprite> = {
-  [State.Walk]: createSprite({
-    imageSrc: "/player-walk.png",
-    width: 64,
-    height: 64,
-    frameDuraton: 1000 / 4,
-    frameWidth: 16,
-    frameHeight: 16,
-    xFrames: 4,
-    yFrames: 4,
-  }),
-  [State.Idle]: createSprite({
-    imageSrc: "/player-idle.png",
-    width: 64,
-    height: 64,
-    frameDuraton: 1000 / 1,
-    frameWidth: 16,
-    frameHeight: 16,
-    xFrames: 2,
-    yFrames: 4,
-  }),
-};
-
 export function createPlayer(position: Vector): Player {
+  const animations: Record<State, Sprite> = {
+    [State.Walk]: createSprite({
+      imageSrc: "/player-walk.png",
+      width: 64,
+      height: 64,
+      frameDuraton: 1000 / 4,
+      frameWidth: 16,
+      frameHeight: 16,
+      xFrames: 4,
+      yFrames: 4,
+    }),
+    [State.Idle]: createSprite({
+      imageSrc: "/player-idle.png",
+      width: 64,
+      height: 64,
+      frameDuraton: 1000 / 1,
+      frameWidth: 16,
+      frameHeight: 16,
+      xFrames: 2,
+      yFrames: 4,
+    }),
+  };
+
   return {
     position,
     state: State.Idle,

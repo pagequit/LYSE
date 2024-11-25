@@ -12,24 +12,34 @@ export type TouchControls = {
   };
 };
 
-export const touchControls: TouchControls = {
-  axes: [0, 0],
-  dPad: {
-    position: {
-      x: 64,
-      y: self.innerHeight - 64,
-    },
-    radius: 48,
-    deadZone: 8,
-    stickPosition: {
-      x: 64,
-      y: self.innerHeight - 64,
-    },
-    stickRadius: 32,
-  },
-};
+export const touchControls = setup();
 
-const relativePosition: Vector = {
+function setup(): TouchControls {
+  self.addEventListener("resize", () => {
+    touchControls.dPad.position.x = 64;
+    touchControls.dPad.position.y = self.innerHeight - 64;
+    resetDPad();
+  });
+
+  return {
+    axes: [0, 0],
+    dPad: {
+      position: {
+        x: 64,
+        y: self.innerHeight - 64,
+      },
+      radius: 48,
+      deadZone: 8,
+      stickPosition: {
+        x: 64,
+        y: self.innerHeight - 64,
+      },
+      stickRadius: 32,
+    },
+  };
+}
+
+const touchVector: Vector = {
   x: pointer.position.x - touchControls.dPad.position.x,
   y: pointer.position.y - touchControls.dPad.position.y,
 };
@@ -47,14 +57,14 @@ export function processTouchControls(): void {
     return;
   }
 
-  relativePosition.x = pointer.position.x - touchControls.dPad.position.x;
-  relativePosition.y = pointer.position.y - touchControls.dPad.position.y;
-  const magnitude = getMagnitude(relativePosition);
+  touchVector.x = pointer.position.x - touchControls.dPad.position.x;
+  touchVector.y = pointer.position.y - touchControls.dPad.position.y;
+  const magnitude = getMagnitude(touchVector);
   if (
     magnitude <= touchControls.dPad.radius &&
     magnitude >= touchControls.dPad.deadZone
   ) {
-    const direction = getDirection(relativePosition);
+    const direction = getDirection(touchVector);
     touchControls.axes[0] = Math.cos(direction);
     touchControls.axes[1] = Math.sin(direction);
 

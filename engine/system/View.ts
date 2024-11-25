@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 function resize(): void {
   canvas.width = self.innerWidth;
   canvas.height = self.innerHeight;
+  ctx.imageSmoothingEnabled = false;
 }
 
 export function useCanvas() {

@@ -1,22 +1,27 @@
-import { useCanvas } from "../../engine/system/View.ts";
-
-const { canvas } = useCanvas();
-
 export type Grid = {
-  height: number;
-  width: number;
   tileSize: number;
+  width: number;
+  height: number;
   x: number;
   y: number;
 };
 
-export const grid: Grid = {
-  height: canvas.height,
-  width: canvas.width,
-  tileSize: 64,
-  x: canvas.width / 64,
-  y: canvas.height / 64,
-};
+export const grid = setup(64);
+
+function setup(tileSize: number): Grid {
+  self.addEventListener("resize", () => {
+    grid.x = self.innerWidth / tileSize;
+    grid.y = self.innerHeight / tileSize;
+  });
+
+  return {
+    tileSize,
+    width: self.innerWidth,
+    height: self.innerHeight,
+    x: self.innerWidth / tileSize,
+    y: self.innerHeight / tileSize,
+  };
+}
 
 export function renderGrid(grid: Grid, ctx: CanvasRenderingContext2D): void {
   for (let i = 0; i < grid.x; i++) {
