@@ -2,11 +2,11 @@ import { renderTouchControls } from "../../engine/system/TouchControls.ts";
 import {
   animatePlayer,
   createPlayer,
-  processPlayer,
   type Player,
+  processPlayer,
 } from "../entity/Player.ts";
-import { renderGrid, grid } from "../entity/Grid.ts";
-import { createScene, changeScene } from "../../engine/system/Scene.ts";
+import { grid, renderGrid } from "../entity/Grid.ts";
+import { changeScene, createScene } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 
 const player: Player = createPlayer({

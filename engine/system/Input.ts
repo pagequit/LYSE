@@ -1,6 +1,6 @@
-import { type Vector, normalize } from "../lib/Vector.ts";
+import { normalize, type Vector } from "../lib/Vector.ts";
 import { keyboardInput, useKeyboard } from "./Keyboard";
-import { touchControls, processTouchControls } from "./TouchControls";
+import { processTouchControls, touchControls } from "./TouchControls";
 import { usePointer } from "./Pointer";
 
 export type Input = {

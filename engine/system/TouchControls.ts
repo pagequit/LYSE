@@ -1,4 +1,4 @@
-import { type Vector, getDirection, getMagnitude } from "../lib/Vector.ts";
+import { getDirection, getMagnitude, type Vector } from "../lib/Vector.ts";
 import { pointer } from "./Pointer.ts";
 
 export type TouchControls = {

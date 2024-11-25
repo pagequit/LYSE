@@ -1,20 +1,20 @@
 import { colors } from "../../style.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
-  createScene,
   changeScene,
+  createScene,
   type Scene,
 } from "../../engine/system/Scene.ts";
 import { type Vector } from "../../engine/lib/Vector.ts";
 import { getSegmentIntersection } from "../../engine/lib/Segment.ts";
 import {
   createNode,
-  paintNode,
   getNodeByPosition,
   type Node,
+  paintNode,
 } from "../entity/Node.ts";
-import { createEdge, paintEdge, type Edge } from "../entity/Edge.ts";
-import { originDFS, createGraph, type Graph } from "../entity/Graph";
+import { createEdge, type Edge, paintEdge } from "../entity/Edge.ts";
+import { createGraph, type Graph, originDFS } from "../entity/Graph";
 import testScene from "./testScene.ts";
 
 function handleEscape({ key }: KeyboardEvent): void {
