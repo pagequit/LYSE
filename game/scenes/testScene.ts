@@ -6,10 +6,7 @@ import {
   type Player,
 } from "../entity/Player.ts";
 import { renderGrid, grid } from "../entity/Grid.ts";
-import { createScene } from "../../engine/system/Scene.ts";
-
-import game from "../../main.ts";
-import { changeScene } from "../../engine/system/Game.ts";
+import { createScene, changeScene } from "../../engine/system/Scene.ts";
 import testScene2 from "./testScene2.ts";
 
 const player: Player = createPlayer({
@@ -19,8 +16,7 @@ const player: Player = createPlayer({
 
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
-    console.log("changeScene: testScene2");
-    changeScene(game, testScene2);
+    changeScene(testScene2);
   }
 }
 

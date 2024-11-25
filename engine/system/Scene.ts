@@ -1,5 +1,6 @@
 import { type Vector } from "../lib/Vector.ts";
 import { type Process } from "./Game.ts";
+import { game } from "./Game.ts";
 
 export type Scene = {
   width: number;
@@ -13,17 +14,26 @@ export type Scene = {
 export type SceneSettings = {
   width: number;
   height: number;
-  construct: Scene["construct"];
-  destruct: Scene["destruct"];
+  construct?: Scene["construct"];
+  destruct?: Scene["destruct"];
 };
 
-export function createScene(process: Process, settings: SceneSettings): Scene {
+export function createScene(
+  process: Process,
+  { width, height, construct, destruct }: SceneSettings,
+): Scene {
   return {
-    width: settings.width,
-    height: settings.height,
+    width,
+    height,
     offset: { x: 0, y: 0 },
     process,
-    construct: settings.construct,
-    destruct: settings.destruct,
+    construct: construct ? construct : () => {},
+    destruct: destruct ? destruct : () => {},
   };
+}
+
+export function changeScene(scene: Scene): void {
+  game.scene.destruct();
+  game.scene = scene;
+  game.scene.construct();
 }

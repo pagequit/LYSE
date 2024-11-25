@@ -1,6 +1,6 @@
 import { colors } from "../../style.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
-import { createScene, type Scene } from "../../engine/system/Scene.ts";
+import { createScene } from "../../engine/system/Scene.ts";
 import { type Vector } from "../../engine/lib/Vector.ts";
 import { getSegmentIntersection } from "../../engine/lib/Segment.ts";
 import {

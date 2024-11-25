@@ -5,10 +5,7 @@ import {
   processPlayer,
   type Player,
 } from "../entity/Player.ts";
-import { createScene } from "../../engine/system/Scene.ts";
-
-import game from "../../main.ts";
-import { changeScene } from "../../engine/system/Game.ts";
+import { createScene, changeScene } from "../../engine/system/Scene.ts";
 import testScene from "./testScene.ts";
 
 const player: Player = createPlayer({
@@ -19,7 +16,7 @@ const player: Player = createPlayer({
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
     console.log("changeScene: testScene");
-    changeScene(game, testScene);
+    changeScene(testScene);
   }
 }
 

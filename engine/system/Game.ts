@@ -1,11 +1,6 @@
 import { useCanvas } from "./View.ts";
 import { useInputs } from "./Input.ts";
-import { type Scene } from "./Scene.ts";
-
-export type Game = {
-  scene: Scene;
-  state: unknown;
-};
+import { createScene, type Scene } from "./Scene.ts";
 
 export type Process = (
   ctx: CanvasRenderingContext2D,
@@ -13,7 +8,20 @@ export type Process = (
   scene: Scene,
 ) => void;
 
-export function startGame(game: Game): void {
+export type Game = {
+  scene: Scene;
+  state: unknown;
+};
+
+export const game: Game = {
+  scene: createScene(() => {}, {
+    width: 0,
+    height: 0,
+  }),
+  state: {},
+};
+
+export function startGame(): void {
   const { canvas, ctx } = useCanvas();
   const processInputs = useInputs();
 
@@ -43,17 +51,4 @@ export function startGame(game: Game): void {
 
   game.scene.construct();
   animate(now);
-}
-
-export function changeScene(game: Game, scene: Scene): void {
-  game.scene.destruct();
-  game.scene = scene;
-  game.scene.construct();
-}
-
-export function createGame(startScene: Scene): Game {
-  return {
-    scene: startScene,
-    state: {},
-  };
 }
