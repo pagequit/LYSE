@@ -1,8 +1,6 @@
 import { useCanvas } from "./View.ts";
 import { useInputs } from "./Input.ts";
-import { createScene, type Scene } from "./Scene.ts";
-
-export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
+import { createScene, changeScene, type Scene } from "./Scene.ts";
 
 export type Game = {
   scene: Scene;
@@ -44,6 +42,7 @@ function animate(timestamp: number): void {
   ctx.restore();
 }
 
-export function startGame(): void {
+export function startGame(scene: Scene): void {
+  changeScene(scene);
   animate(now);
 }

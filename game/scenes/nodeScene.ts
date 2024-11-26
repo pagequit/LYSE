@@ -25,10 +25,24 @@ function handleEscape({ key }: KeyboardEvent): void {
 
 function construct(): void {
   self.addEventListener("keyup", handleEscape);
+
+  document.addEventListener("mousedown", onPointerDown);
+  document.addEventListener("touchstart", onPointerDown);
+  document.addEventListener("mousemove", onPointerMove);
+  document.addEventListener("touchmove", onPointerMove);
+  document.addEventListener("mouseup", onPointerUp);
+  document.addEventListener("touchend", onPointerUp);
 }
 
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
+
+  document.removeEventListener("mousedown", onPointerDown);
+  document.removeEventListener("touchstart", onPointerDown);
+  document.removeEventListener("mousemove", onPointerMove);
+  document.removeEventListener("touchmove", onPointerMove);
+  document.removeEventListener("mouseup", onPointerUp);
+  document.removeEventListener("touchend", onPointerUp);
 }
 
 const scene: Scene = createScene(process, {
@@ -97,106 +111,100 @@ const dragOffset: Vector = {
   y: Math.min(0, (scene.height - self.innerHeight) * 0.5),
 };
 
-function process(ctx: CanvasRenderingContext2D, delta: number): void {
-  if (pointer.isDown) {
-    activeNode = getNodeByPosition(nodes, pointer.position);
+function onPointerDown(): void {
+  const node = getNodeByPosition(nodes, {
+    x: pointer.position.x,
+    y: pointer.position.y,
+  });
 
-    if (activeNode === null) {
-      isDragging = true;
-      dragVector.x = pointer.position.x - dragOffset.x;
-      dragVector.y = pointer.position.y - dragOffset.y;
+  if (node === null) {
+    isDragging = true;
+    dragVector.x = pointer.position.x - dragOffset.x;
+    dragVector.y = pointer.position.y - dragOffset.y;
+    return;
+  }
 
-      return;
-    }
+  activeNode = node;
+  nextEdge.push(activeNode);
+}
 
-    nextEdge.push(activeNode);
+function onPointerMove(): void {
+  if (isDragging) {
+    return;
+  }
 
-    if (isDragging) {
-      dragOffset.x = Math.min(
-        0,
-        Math.max(
-          scene.width - self.innerWidth,
-          pointer.position.x - dragVector.x,
-        ),
+  hoverNode = getNodeByPosition(nodes, {
+    x: pointer.position.x,
+    y: pointer.position.y,
+  });
+
+  if (activeNode !== null) {
+    for (const edge of edges.filter(
+      (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
+    )) {
+      isIntersecting = !!getSegmentIntersection(
+        [activeNode.position, pointer.position],
+        [edge[0].position, edge[1].position],
       );
-      dragOffset.y = Math.min(
-        0,
-        Math.max(
-          scene.height - self.innerHeight,
-          pointer.position.y - dragVector.y,
-        ),
-      );
 
-      scene.offset.x = dragOffset.x;
-      scene.offset.y = dragOffset.y;
-
-      return;
+      if (isIntersecting) {
+        break;
+      }
     }
+  }
 
-    hoverNode = getNodeByPosition(nodes, {
-      x: pointer.position.x,
-      y: pointer.position.y,
+  if (
+    !pointer.isDown ||
+    hoverNode === null ||
+    hoverNode === activeNode ||
+    isIntersecting
+  ) {
+    return;
+  }
+
+  activeNode = hoverNode as Node;
+  nextEdge.push(activeNode);
+
+  if (nextEdge.length === 2) {
+    const maybeEdge: Edge = createEdge([nextEdge[0], nextEdge[1]]);
+
+    let existingIndex = 0;
+    const existingEdge: Edge | undefined = edges.find((edge, index) => {
+      existingIndex = index;
+      return (
+        (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
+        (edge[0] === nextEdge[1] && edge[1] === nextEdge[0])
+      );
     });
 
-    if (activeNode !== null) {
-      for (const edge of edges.filter(
-        (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
-      )) {
-        isIntersecting = !!getSegmentIntersection(
-          [activeNode.position, pointer.position],
-          [edge[0].position, edge[1].position],
-        );
-
-        if (isIntersecting) {
-          break;
-        }
-      }
+    if (existingEdge !== undefined) {
+      edges.splice(existingIndex, 1);
+    } else {
+      edges.push(maybeEdge);
     }
 
-    if (
-      !pointer.isDown ||
-      hoverNode === null ||
-      hoverNode === activeNode ||
-      isIntersecting
-    ) {
-      return;
-    }
+    nextEdge.shift();
 
-    activeNode = hoverNode as Node;
-    nextEdge.push(activeNode);
-
-    if (nextEdge.length === 2) {
-      const maybeEdge: Edge = createEdge([nextEdge[0], nextEdge[1]]);
-
-      let existingIndex = 0;
-      const existingEdge: Edge | undefined = edges.find((edge, index) => {
-        existingIndex = index;
-        return (
-          (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
-          (edge[0] === nextEdge[1] && edge[1] === nextEdge[0])
-        );
-      });
-
-      if (existingEdge !== undefined) {
-        edges.splice(existingIndex, 1);
-      } else {
-        edges.push(maybeEdge);
-      }
-
-      nextEdge.shift();
-
-      graph = createGraph(nodes, edges);
-      mainGraphNodes = originDFS(origin, graph);
-    }
-  } else {
-    isDragging = false;
-    isIntersecting = false;
-    activeNode = null;
-    nextEdge.length = 0;
+    graph = createGraph(nodes, edges);
+    mainGraphNodes = originDFS(origin, graph);
   }
+}
+
+function onPointerUp(): void {
+  isDragging = false;
+  isIntersecting = false;
+  activeNode = null;
+  nextEdge.length = 0;
+}
+
+function process(ctx: CanvasRenderingContext2D): void {
   const pointerNode = createNode(pointer.position);
   for (const node of nodes) {
     node.render(ctx);
+  }
+
+  for (const edge of edges) {
+    edge.render(ctx);
   }
 
   for (const node of graph.keys()) {

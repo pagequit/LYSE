@@ -1,6 +1,7 @@
 import { type Vector } from "../lib/Vector.ts";
-import { type Process } from "./Game.ts";
 import { game } from "./Game.ts";
+
+export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
 
 export type Scene = {
   width: number;
