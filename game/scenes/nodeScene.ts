@@ -98,6 +98,8 @@ nodes.push(origin);
 const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];
 
+const pointerNode = createNode(pointer.position);
+
 let graph: Graph = createGraph(nodes, edges);
 let mainGraphNodes: Array<Node> = originDFS(origin, graph);
 let isIntersecting = false;
@@ -198,7 +200,6 @@ function onPointerUp(): void {
 }
 
 function process(ctx: CanvasRenderingContext2D): void {
-  const pointerNode = createNode(pointer.position);
   for (const node of nodes) {
     node.render(ctx);
   }
@@ -233,13 +234,6 @@ function process(ctx: CanvasRenderingContext2D): void {
   } else if (hoverNode) {
     paintNode(hoverNode, ctx, colors.infoColor);
   }
-
-  ctx.fillStyle = colors.foregroundColor;
-  ctx.fillText(
-    `nextEdge: ${nextEdge.length}`,
-    -scene.offset.x + 10,
-    -scene.offset.y + 30,
-  );
 }
 
 export default scene;
