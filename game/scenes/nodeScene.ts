@@ -99,19 +99,16 @@ const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];
 
 const pointerNode = createNode(pointer.position);
+const dragVector: Vector = { x: 0, y: 0 };
+
+let isDragging = false;
+let isIntersecting = false;
+
+let hoverNode: Node | null = null;
+let activeNode: Node | null = null;
 
 let graph: Graph = createGraph(nodes, edges);
 let mainGraphNodes: Array<Node> = originDFS(origin, graph);
-let isIntersecting = false;
-let activeNode: Node | null = null;
-let hoverNode: Node | null = null;
-let isDragging = false;
-
-const dragVector: Vector = { x: 0, y: 0 };
-const dragOffset: Vector = {
-  x: Math.min(0, (scene.width - self.innerWidth) * 0.5),
-  y: Math.min(0, (scene.height - self.innerHeight) * 0.5),
-};
 
 function onPointerDown(): void {
   const node = getNodeByPosition(nodes, {
@@ -121,8 +118,9 @@ function onPointerDown(): void {
 
   if (node === null) {
     isDragging = true;
-    dragVector.x = pointer.position.x - dragOffset.x;
-    dragVector.y = pointer.position.y - dragOffset.y;
+    dragVector.x = pointer.position.x;
+    dragVector.y = pointer.position.y;
+
     return;
   }
 
@@ -132,6 +130,18 @@ function onPointerDown(): void {
 
 function onPointerMove(): void {
   if (isDragging) {
+    dragVector.x = pointer.position.x - dragVector.x;
+    dragVector.y = pointer.position.y - dragVector.y;
+
+    // FIXME
+    console.log(dragVector);
+
+    scene.offset.x += dragVector.x;
+    scene.offset.y += dragVector.y;
+
+    pointer.offset.x = scene.offset.x;
+    pointer.offset.y = scene.offset.y;
+
     return;
   }
 
@@ -200,6 +210,8 @@ function onPointerUp(): void {
 }
 
 function process(ctx: CanvasRenderingContext2D): void {
+  ctx.translate(scene.offset.x, scene.offset.y);
+
   for (const node of nodes) {
     node.render(ctx);
   }
