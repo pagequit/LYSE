@@ -37,7 +37,11 @@ function animate(timestamp: number): void {
   delta = now - then;
 
   ctx.fillStyle = "#fff";
-  ctx.fillText(`FPS: ${Math.round(1000 / delta)}`, 10, 20);
+  ctx.fillText(
+    `FPS: ${Math.round(1000 / delta)}`,
+    game.scene.offset.x + 10,
+    game.scene.offset.y + 20,
+  );
 
   ctx.restore();
 }

@@ -117,9 +117,9 @@ function onPointerDown(): void {
   });
 
   if (node === null) {
-    isDragging = true;
     dragVector.x = pointer.position.x;
     dragVector.y = pointer.position.y;
+    isDragging = true;
 
     return;
   }
@@ -136,8 +136,8 @@ function onPointerMove(): void {
     // FIXME
     console.log(dragVector);
 
-    scene.offset.x += dragVector.x;
-    scene.offset.y += dragVector.y;
+    scene.offset.x = Math.min(scene.width, dragVector.x);
+    scene.offset.y = Math.min(scene.height, dragVector.y);
 
     pointer.offset.x = scene.offset.x;
     pointer.offset.y = scene.offset.y;
