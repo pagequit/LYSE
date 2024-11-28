@@ -99,6 +99,7 @@ const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];
 
 const pointerNode = createNode(pointer.position);
+const dragOrigin: Vector = { x: 0, y: 0 };
 const dragVector: Vector = { x: 0, y: 0 };
 
 let isDragging = false;
@@ -117,8 +118,8 @@ function onPointerDown(): void {
   });
 
   if (node === null) {
-    dragVector.x = pointer.position.x;
-    dragVector.y = pointer.position.y;
+    dragOrigin.x = pointer.position.x;
+    dragOrigin.y = pointer.position.y;
     isDragging = true;
 
     return;
@@ -130,14 +131,11 @@ function onPointerDown(): void {
 
 function onPointerMove(): void {
   if (isDragging) {
-    dragVector.x = pointer.position.x - dragVector.x;
-    dragVector.y = pointer.position.y - dragVector.y;
+    dragVector.x = dragOrigin.x - pointer.position.x;
+    dragVector.y = dragOrigin.y - pointer.position.y;
 
-    // FIXME
-    console.log(dragVector);
-
-    scene.offset.x = Math.min(scene.width, dragVector.x);
-    scene.offset.y = Math.min(scene.height, dragVector.y);
+    scene.offset.x += dragVector.x;
+    scene.offset.y += dragVector.y;
 
     pointer.offset.x = scene.offset.x;
     pointer.offset.y = scene.offset.y;
@@ -210,7 +208,7 @@ function onPointerUp(): void {
 }
 
 function process(ctx: CanvasRenderingContext2D): void {
-  ctx.translate(scene.offset.x, scene.offset.y);
+  ctx.translate(-scene.offset.x, -scene.offset.y);
 
   for (const node of nodes) {
     node.render(ctx);

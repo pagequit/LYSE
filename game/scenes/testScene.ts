@@ -1,4 +1,5 @@
 import { renderTouchControls } from "../../engine/system/TouchControls.ts";
+import { pointer } from "../../engine/system/Pointer.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -22,6 +23,8 @@ function handleEscape({ key }: KeyboardEvent): void {
 
 function construct(): void {
   self.addEventListener("keyup", handleEscape);
+  pointer.offset.x = 0;
+  pointer.offset.y = 0;
 }
 
 function destruct(): void {
