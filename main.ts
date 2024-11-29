@@ -1,6 +1,5 @@
 import "./style.css";
 import { startGame } from "./engine/system/Game.ts";
-// import testScene from "./game/scenes/testScene.ts";
-import nodeScene from "./game/scenes/nodeScene.ts";
+import testScene from "./game/scenes/testScene.ts";
 
-startGame(nodeScene);
+startGame(testScene);
