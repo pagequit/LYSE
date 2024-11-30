@@ -1,6 +1,6 @@
 import { useCanvas } from "./View.ts";
 import { useInputs } from "./Input.ts";
-import { createScene, changeScene, type Scene } from "./Scene.ts";
+import { changeScene, createScene, type Scene } from "./Scene.ts";
 
 export type Game = {
   scene: Scene;
@@ -18,7 +18,7 @@ export const game: Game = {
 const { canvas, ctx } = useCanvas();
 const processInputs = useInputs();
 
-let now: number = Date.now();
+let now: number = self.performance.now();
 let then: number = now;
 let delta: number = 0;
 

@@ -13,7 +13,7 @@ import {
   type Scene,
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
-import { paintNode, createNode } from "../entity/Node.ts";
+import { createNode, paintNode } from "../entity/Node.ts";
 
 const player: Player = createPlayer({
   x: (self.innerWidth - 64) / 2,

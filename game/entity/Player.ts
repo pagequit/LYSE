@@ -44,7 +44,7 @@ export function createPlayer(position: Vector): Player {
       imageSrc: "/player-idle.png",
       width: 64,
       height: 64,
-      frameDuraton: 1000 / 1,
+      frameDuraton: 1000 / 2,
       frameWidth: 16,
       frameHeight: 16,
       xFrames: 2,
