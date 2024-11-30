@@ -75,11 +75,14 @@ export function processTouchControls(): void {
   }
 }
 
-export function renderTouchControls(ctx: CanvasRenderingContext2D): void {
+export function renderTouchControls(
+  ctx: CanvasRenderingContext2D,
+  offset: Vector,
+): void {
   ctx.beginPath();
   ctx.arc(
-    touchControls.dPad.position.x,
-    touchControls.dPad.position.y,
+    touchControls.dPad.position.x + offset.x,
+    touchControls.dPad.position.y + offset.y,
     touchControls.dPad.radius,
     0,
     2 * Math.PI,
@@ -92,8 +95,8 @@ export function renderTouchControls(ctx: CanvasRenderingContext2D): void {
 
   ctx.beginPath();
   ctx.arc(
-    touchControls.dPad.stickPosition.x,
-    touchControls.dPad.stickPosition.y,
+    touchControls.dPad.stickPosition.x + offset.x,
+    touchControls.dPad.stickPosition.y + offset.y,
     touchControls.dPad.stickRadius,
     0,
     2 * Math.PI,

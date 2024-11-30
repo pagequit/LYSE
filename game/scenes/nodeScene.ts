@@ -23,34 +23,38 @@ function handleEscape({ key }: KeyboardEvent): void {
   }
 }
 
-function construct(): void {
-  self.addEventListener("keyup", handleEscape);
-
-  document.addEventListener("mousedown", onPointerDown);
-  document.addEventListener("touchstart", onPointerDown);
-  document.addEventListener("mousemove", onPointerMove);
-  document.addEventListener("touchmove", onPointerMove);
-  document.addEventListener("mouseup", onPointerUp);
-  document.addEventListener("touchend", onPointerUp);
-}
-
-function destruct(): void {
-  self.removeEventListener("keyup", handleEscape);
-
-  document.removeEventListener("mousedown", onPointerDown);
-  document.removeEventListener("touchstart", onPointerDown);
-  document.removeEventListener("mousemove", onPointerMove);
-  document.removeEventListener("touchmove", onPointerMove);
-  document.removeEventListener("mouseup", onPointerUp);
-  document.removeEventListener("touchend", onPointerUp);
-}
-
 const scene: Scene = createScene(process, {
   width: 1200,
   height: 800,
   construct,
   destruct,
 });
+
+function construct(): void {
+  document.addEventListener("mousedown", onPointerDown);
+  document.addEventListener("touchstart", onPointerDown);
+  document.addEventListener("mousemove", onPointerMove);
+  document.addEventListener("touchmove", onPointerMove);
+  document.addEventListener("mouseup", onPointerUp);
+  document.addEventListener("touchend", onPointerUp);
+
+  self.addEventListener("keyup", handleEscape);
+  pointer.offset.x = scene.offset.x;
+  pointer.offset.y = scene.offset.y;
+}
+
+function destruct(): void {
+  document.removeEventListener("mousedown", onPointerDown);
+  document.removeEventListener("touchstart", onPointerDown);
+  document.removeEventListener("mousemove", onPointerMove);
+  document.removeEventListener("touchmove", onPointerMove);
+  document.removeEventListener("mouseup", onPointerUp);
+  document.removeEventListener("touchend", onPointerUp);
+
+  self.removeEventListener("keyup", handleEscape);
+  pointer.offset.x = 0;
+  pointer.offset.y = 0;
+}
 
 const nodes: Array<Node> = [
   { x: 60, y: 221 },

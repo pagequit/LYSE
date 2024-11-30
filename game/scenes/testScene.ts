@@ -7,9 +7,12 @@ import {
   processPlayer,
 } from "../entity/Player.ts";
 import { grid, renderGrid } from "../entity/Grid.ts";
-import { changeScene, createScene } from "../../engine/system/Scene.ts";
+import {
+  changeScene,
+  createScene,
+  type Scene,
+} from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
-import scene from "./nodeScene.ts";
 import { paintNode, createNode } from "../entity/Node.ts";
 
 const player: Player = createPlayer({
@@ -23,36 +26,40 @@ function handleEscape({ key }: KeyboardEvent): void {
   }
 }
 
+const scene: Scene = createScene(process, {
+  width: self.innerWidth,
+  height: self.innerHeight,
+  construct,
+  destruct,
+});
+
 function construct(): void {
   self.addEventListener("keyup", handleEscape);
-  pointer.offset.x = 0;
-  pointer.offset.y = 0;
+  // pointer.offset.x = scene.offset.x;
+  // pointer.offset.y = scene.offset.y;
 }
 
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
+  // pointer.offset.x = 0;
+  // pointer.offset.y = 0;
 }
 
 const pointerNode = createNode(pointer.position);
 
-export default createScene(
-  (ctx: CanvasRenderingContext2D, delta: number) => {
-    pointerNode.position = pointer.position;
-    paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
+function process(ctx: CanvasRenderingContext2D, delta: number): void {
+  scene.offset.x = player.position.x - (self.innerWidth - 64) / 2;
+  scene.offset.y = player.position.y - (self.innerHeight - 64) / 2;
+  ctx.translate(-scene.offset.x, -scene.offset.y);
 
-    scene.offset.x = player.position.x - (self.innerWidth - 64) / 2;
-    scene.offset.y = player.position.y - (self.innerHeight - 64) / 2;
+  pointerNode.position = pointer.position;
+  paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
 
-    ctx.translate(-scene.offset.x, -scene.offset.y);
-    renderGrid(grid, ctx);
-    animatePlayer(player, ctx, delta);
-    renderTouchControls(ctx);
-    processPlayer(player, delta);
-  },
-  {
-    width: self.innerWidth,
-    height: self.innerHeight,
-    construct,
-    destruct,
-  },
-);
+  renderGrid(grid, ctx);
+  animatePlayer(player, ctx, delta);
+  processPlayer(player, delta);
+  // FIXME
+  renderTouchControls(ctx, { x: 0, y: 0 });
+}
+
+export default scene;
