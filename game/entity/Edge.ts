@@ -1,4 +1,4 @@
-import { colors } from "../../style.ts"; // TODO: decouple styling
+import { colors } from "../style.ts"; // TODO: decouple styling
 import type { Node } from "./Node.ts";
 import {
   createRenderable,

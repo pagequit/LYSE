@@ -1,4 +1,4 @@
-import { colors } from "../../style.ts"; // TODO: decouple styling
+import { colors } from "../style.ts"; // TODO: decouple styling
 import type { Vector } from "../../engine/lib/Vector.ts";
 import {
   createRenderable,

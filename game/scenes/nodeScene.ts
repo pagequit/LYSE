@@ -1,5 +1,5 @@
 import { camera } from "../../engine/system/View.ts";
-import { colors } from "../../style.ts";
+import { colors } from "../style.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
   changeScene,
