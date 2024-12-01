@@ -1,4 +1,4 @@
-import { useCanvas } from "./View.ts";
+import { camera, canvas, ctx, applyCanvas } from "./View.ts";
 import { useInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 
@@ -15,7 +15,7 @@ export const game: Game = {
   state: {},
 };
 
-const { canvas, ctx } = useCanvas();
+applyCanvas();
 const processInputs = useInputs();
 
 let now: number = self.performance.now();
@@ -27,6 +27,7 @@ function animate(timestamp: number): void {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
+  ctx.translate(-camera.position.x, -camera.position.y);
 
   processInputs();
 
@@ -39,8 +40,8 @@ function animate(timestamp: number): void {
   ctx.fillStyle = "#fff";
   ctx.fillText(
     `FPS: ${Math.round(1000 / delta)}`,
-    game.scene.offset.x + 10,
-    game.scene.offset.y + 20,
+    camera.position.x + 10,
+    camera.position.y + 20,
   );
 
   ctx.restore();

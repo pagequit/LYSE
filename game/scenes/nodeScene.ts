@@ -1,3 +1,4 @@
+import { camera } from "../../engine/system/View.ts";
 import { colors } from "../../style.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
@@ -39,8 +40,6 @@ function construct(): void {
   document.addEventListener("touchend", onPointerUp);
 
   self.addEventListener("keyup", handleEscape);
-  pointer.offset.x = scene.offset.x;
-  pointer.offset.y = scene.offset.y;
 }
 
 function destruct(): void {
@@ -52,8 +51,6 @@ function destruct(): void {
   document.removeEventListener("touchend", onPointerUp);
 
   self.removeEventListener("keyup", handleEscape);
-  pointer.offset.x = 0;
-  pointer.offset.y = 0;
 }
 
 const nodes: Array<Node> = [
@@ -138,11 +135,11 @@ function onPointerMove(): void {
     dragVector.x = dragOrigin.x - pointer.position.x;
     dragVector.y = dragOrigin.y - pointer.position.y;
 
-    scene.offset.x += dragVector.x;
-    scene.offset.y += dragVector.y;
+    camera.position.x += dragVector.x;
+    camera.position.y += dragVector.y;
 
-    pointer.offset.x = scene.offset.x;
-    pointer.offset.y = scene.offset.y;
+    pointer.offset.x = camera.position.x;
+    pointer.offset.y = camera.position.y;
 
     return;
   }
@@ -212,8 +209,6 @@ function onPointerUp(): void {
 }
 
 function process(ctx: CanvasRenderingContext2D): void {
-  ctx.translate(-scene.offset.x, -scene.offset.y);
-
   for (const node of nodes) {
     node.render(ctx);
   }

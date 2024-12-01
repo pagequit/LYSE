@@ -1,5 +1,6 @@
 import { getDirection, getMagnitude, type Vector } from "../lib/Vector.ts";
 import { pointer } from "./Pointer.ts";
+import { camera, ctx } from "./View.ts";
 
 export type TouchControls = {
   axes: [number, number];
@@ -75,14 +76,11 @@ export function processTouchControls(): void {
   }
 }
 
-export function renderTouchControls(
-  ctx: CanvasRenderingContext2D,
-  offset: Vector,
-): void {
+export function renderTouchControls(): void {
   ctx.beginPath();
   ctx.arc(
-    touchControls.dPad.position.x + offset.x,
-    touchControls.dPad.position.y + offset.y,
+    touchControls.dPad.position.x + camera.position.x,
+    touchControls.dPad.position.y + camera.position.y,
     touchControls.dPad.radius,
     0,
     2 * Math.PI,
@@ -95,8 +93,8 @@ export function renderTouchControls(
 
   ctx.beginPath();
   ctx.arc(
-    touchControls.dPad.stickPosition.x + offset.x,
-    touchControls.dPad.stickPosition.y + offset.y,
+    touchControls.dPad.stickPosition.x + camera.position.x,
+    touchControls.dPad.stickPosition.y + camera.position.y,
     touchControls.dPad.stickRadius,
     0,
     2 * Math.PI,

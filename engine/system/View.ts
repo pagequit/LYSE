@@ -1,5 +1,15 @@
-const canvas = document.createElement("canvas");
-const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+import { type Vector } from "../lib/Vector.ts";
+
+export type Camera = {
+  position: Vector;
+};
+
+export const camera: Camera = {
+  position: { x: 0, y: 0 },
+};
+
+export const canvas = document.createElement("canvas");
+export const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
 function resize(): void {
   canvas.width = self.innerWidth;
@@ -7,11 +17,9 @@ function resize(): void {
   ctx.imageSmoothingEnabled = false;
 }
 
-export function useCanvas() {
+export function applyCanvas(): void {
   document.body.appendChild(canvas);
 
   self.addEventListener("resize", resize);
   resize();
-
-  return { canvas, ctx };
 }

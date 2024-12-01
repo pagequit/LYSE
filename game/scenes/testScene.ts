@@ -1,3 +1,4 @@
+import { camera } from "../../engine/system/View.ts";
 import { renderTouchControls } from "../../engine/system/TouchControls.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
@@ -35,22 +36,17 @@ const scene: Scene = createScene(process, {
 
 function construct(): void {
   self.addEventListener("keyup", handleEscape);
-  // pointer.offset.x = scene.offset.x;
-  // pointer.offset.y = scene.offset.y;
 }
 
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
-  // pointer.offset.x = 0;
-  // pointer.offset.y = 0;
 }
 
 const pointerNode = createNode(pointer.position);
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
-  scene.offset.x = player.position.x - (self.innerWidth - 64) / 2;
-  scene.offset.y = player.position.y - (self.innerHeight - 64) / 2;
-  ctx.translate(-scene.offset.x, -scene.offset.y);
+  camera.position.x = player.position.x - (self.innerWidth - 64) / 2;
+  camera.position.y = player.position.y - (self.innerHeight - 64) / 2;
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
@@ -58,8 +54,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   renderGrid(grid, ctx);
   animatePlayer(player, ctx, delta);
   processPlayer(player, delta);
-  // FIXME
-  renderTouchControls(ctx, { x: 0, y: 0 });
+  renderTouchControls();
 }
 
 export default scene;
