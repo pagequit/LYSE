@@ -89,6 +89,7 @@ function resetDPad(): void {
 }
 
 export function processTouchControls(): void {
+  console.log("processing touch controls");
   if (!pointer.isDown) {
     resetDPad();
     return;
@@ -139,8 +140,10 @@ export function renderTouchControls(): void {
   ctx.fill();
 }
 
+let animationRequest: number;
+
 function animate() {
-  requestAnimationFrame(animate);
+  animationRequest = requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   processTouchControls();
   renderTouchControls();
@@ -152,4 +155,12 @@ export function applyTouchControls(): void {
   canvas.addEventListener("touchend", onTouchEnd);
   document.body.appendChild(canvas);
   animate();
+}
+
+export function destructTouchControls(): void {
+  canvas.removeEventListener("touchstart", onTouchStart);
+  canvas.removeEventListener("touchmove", onTouchMove);
+  canvas.removeEventListener("touchend", onTouchEnd);
+  cancelAnimationFrame(animationRequest);
+  document.body.removeChild(canvas);
 }

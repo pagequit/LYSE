@@ -1,5 +1,8 @@
 import { camera } from "../../engine/system/View.ts";
-import { applyTouchControls } from "../../engine/gui/TouchControls.ts";
+import {
+  applyTouchControls,
+  destructTouchControls,
+} from "../../engine/gui/TouchControls.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
   animatePlayer,
@@ -34,17 +37,23 @@ const scene: Scene = createScene(process, {
   destruct,
 });
 
+const isTouchDevice = "ontouchstart" in self || navigator.maxTouchPoints > 0;
+
 function construct(): void {
   self.addEventListener("keyup", handleEscape);
+  if (isTouchDevice) {
+    applyTouchControls();
+  }
 }
 
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
+  if (isTouchDevice) {
+    destructTouchControls();
+  }
 }
 
 const pointerNode = createNode(pointer.position);
-
-applyTouchControls();
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   camera.position.x = player.position.x - (self.innerWidth - 64) / 2;
