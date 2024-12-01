@@ -1,4 +1,3 @@
-import { camera } from "../../engine/system/View.ts";
 import { colors } from "../style.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
@@ -134,8 +133,8 @@ function onPointerMove(): void {
   if (isDragging) {
     dragVector.x = dragOrigin.x - pointer.position.x;
     dragVector.y = dragOrigin.y - pointer.position.y;
-    camera.position.x += dragVector.x;
-    camera.position.y += dragVector.y;
+    scene.camera.position.x += dragVector.x;
+    scene.camera.position.y += dragVector.y;
 
     return;
   }

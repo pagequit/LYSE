@@ -1,8 +1,8 @@
-import { camera, canvas, ctx, applyCanvas } from "./View.ts";
+import { canvas, ctx, applyCanvas } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { pointer } from "./Pointer.ts";
-import { applyMonitor, monoitor } from "../gui/monitor.ts";
+import { applyMonitor, monitor } from "../gui/monitor.ts";
 
 export type Game = {
   scene: Scene;
@@ -21,11 +21,11 @@ applyCanvas();
 applyInputs();
 applyMonitor();
 const fpsMonitor = document.createElement("div");
-monoitor.appendChild(fpsMonitor);
+monitor.appendChild(fpsMonitor);
 const pointerMonitor = document.createElement("div");
-monoitor.appendChild(pointerMonitor);
+monitor.appendChild(pointerMonitor);
 const cameraMonitor = document.createElement("div");
-monoitor.appendChild(cameraMonitor);
+monitor.appendChild(cameraMonitor);
 
 let now: number = self.performance.now();
 let then: number = now;
@@ -36,7 +36,7 @@ function animate(timestamp: number): void {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  ctx.translate(-camera.position.x, -camera.position.y);
+  ctx.translate(-game.scene.camera.position.x, -game.scene.camera.position.y);
 
   processInputs();
 
@@ -50,7 +50,7 @@ function animate(timestamp: number): void {
 
   fpsMonitor.innerText = `FPS: ${Math.round(1000 / delta)}`;
   pointerMonitor.innerText = `pointer: (${pointer.position.x}, ${pointer.position.y})`;
-  cameraMonitor.innerText = `camera: (${camera.position.x}, ${camera.position.y})`;
+  cameraMonitor.innerText = `camera: (${game.scene.camera.position.x}, ${game.scene.camera.position.y})`;
 }
 
 export function startGame(scene: Scene): void {

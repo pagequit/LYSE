@@ -1,4 +1,3 @@
-import { camera } from "../../engine/system/View.ts";
 import {
   applyTouchControls,
   destructTouchControls,
@@ -56,8 +55,8 @@ function destruct(): void {
 const pointerNode = createNode(pointer.position);
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
-  camera.position.x = player.position.x - (self.innerWidth - 64) / 2;
-  camera.position.y = player.position.y - (self.innerHeight - 64) / 2;
+  scene.camera.position.x = player.position.x - (self.innerWidth - 64) / 2;
+  scene.camera.position.y = player.position.y - (self.innerHeight - 64) / 2;
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");

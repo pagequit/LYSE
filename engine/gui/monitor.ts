@@ -1,13 +1,13 @@
-export const monoitor = document.createElement("div");
-monoitor.style.position = "absolute";
-monoitor.style.top = "0";
-monoitor.style.left = "0";
-monoitor.style.fontSize = "12px";
-monoitor.style.color = "#fff";
-monoitor.style.fontFamily = "monospace";
-monoitor.style.padding = "10px";
-monoitor.style.background = "rgba(0, 0, 0, 0.5)";
+export const monitor = document.createElement("div");
+monitor.style.position = "absolute";
+monitor.style.top = "0";
+monitor.style.left = "0";
+monitor.style.fontSize = "12px";
+monitor.style.color = "#fff";
+monitor.style.fontFamily = "monospace";
+monitor.style.padding = "10px";
+monitor.style.background = "rgba(0, 0, 0, 0.5)";
 
 export function applyMonitor(): void {
-  document.body.appendChild(monoitor);
+  document.body.appendChild(monitor);
 }

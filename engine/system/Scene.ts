@@ -1,10 +1,12 @@
 import { game } from "./Game.ts";
+import { createCamera, type Camera } from "./View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
 
 export type Scene = {
   width: number;
   height: number;
+  camera: Camera;
   process: Process;
   construct: () => void;
   destruct: () => void;
@@ -24,6 +26,7 @@ export function createScene(
   return {
     width,
     height,
+    camera: createCamera(),
     process,
     construct: construct ? construct : () => {},
     destruct: destruct ? destruct : () => {},
