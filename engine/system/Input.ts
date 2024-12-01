@@ -21,7 +21,7 @@ export const input: Input = {
   vector: { x: 0, y: 0 },
 };
 
-function processInputs() {
+export function processInputs() {
   processTouchControls();
 
   input.up = keyboardInput.arrowUp;
@@ -37,9 +37,7 @@ function processInputs() {
   normalize(input.vector);
 }
 
-export function useInputs(): () => void {
+export function applyInputs(): void {
   usePointer();
   useKeyboard();
-
-  return processInputs;
 }

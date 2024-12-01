@@ -1,5 +1,5 @@
 import { camera, canvas, ctx, applyCanvas } from "./View.ts";
-import { useInputs } from "./Input.ts";
+import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 
 export type Game = {
@@ -16,7 +16,7 @@ export const game: Game = {
 };
 
 applyCanvas();
-const processInputs = useInputs();
+applyInputs();
 
 let now: number = self.performance.now();
 let then: number = now;
