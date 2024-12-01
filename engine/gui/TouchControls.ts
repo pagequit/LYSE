@@ -1,6 +1,42 @@
 import { getDirection, getMagnitude, type Vector } from "../lib/Vector.ts";
-import { pointer } from "./Pointer.ts";
-import { camera, ctx } from "./View.ts";
+import { type Pointer } from "../system/Pointer.ts";
+
+const canvas = document.createElement("canvas");
+canvas.width = 164;
+canvas.height = 164;
+canvas.style.position = "absolute";
+canvas.style.left = "0";
+canvas.style.bottom = "0";
+canvas.style.borderRadius = "50%";
+
+const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+const pointer: Pointer = {
+  isDown: false,
+  position: { x: 0, y: 0 },
+};
+
+const camera = {
+  position: {
+    x: 0,
+    y: -(self.innerHeight - canvas.height),
+  },
+};
+
+function onTouchStart(event: TouchEvent): void {
+  pointer.position.x = event.touches[0].clientX + camera.position.x;
+  pointer.position.y = event.touches[0].clientY + camera.position.y;
+  pointer.isDown = true;
+}
+
+function onTouchMove(event: TouchEvent): void {
+  pointer.position.x = event.touches[0].clientX + camera.position.x;
+  pointer.position.y = event.touches[0].clientY + camera.position.y;
+}
+
+function onTouchEnd(): void {
+  pointer.isDown = false;
+}
 
 export type TouchControls = {
   axes: [number, number];
@@ -17,8 +53,8 @@ export const touchControls = setup();
 
 function setup(): TouchControls {
   self.addEventListener("resize", () => {
-    touchControls.dPad.position.x = 64;
-    touchControls.dPad.position.y = self.innerHeight - 64;
+    touchControls.dPad.position.x = canvas.width / 2;
+    touchControls.dPad.position.y = canvas.height / 2;
     resetDPad();
   });
 
@@ -26,14 +62,14 @@ function setup(): TouchControls {
     axes: [0, 0],
     dPad: {
       position: {
-        x: 64,
-        y: self.innerHeight - 64,
+        x: canvas.width / 2,
+        y: canvas.height / 2,
       },
       radius: 48,
       deadZone: 8,
       stickPosition: {
-        x: 64,
-        y: self.innerHeight - 64,
+        x: canvas.width / 2,
+        y: canvas.height / 2,
       },
       stickRadius: 32,
     },
@@ -79,8 +115,8 @@ export function processTouchControls(): void {
 export function renderTouchControls(): void {
   ctx.beginPath();
   ctx.arc(
-    touchControls.dPad.position.x + camera.position.x,
-    touchControls.dPad.position.y + camera.position.y,
+    touchControls.dPad.position.x,
+    touchControls.dPad.position.y,
     touchControls.dPad.radius,
     0,
     2 * Math.PI,
@@ -93,12 +129,27 @@ export function renderTouchControls(): void {
 
   ctx.beginPath();
   ctx.arc(
-    touchControls.dPad.stickPosition.x + camera.position.x,
-    touchControls.dPad.stickPosition.y + camera.position.y,
+    touchControls.dPad.stickPosition.x,
+    touchControls.dPad.stickPosition.y,
     touchControls.dPad.stickRadius,
     0,
     2 * Math.PI,
   );
   ctx.stroke();
   ctx.fill();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  processTouchControls();
+  renderTouchControls();
+}
+
+export function applyTouchControls(): void {
+  canvas.addEventListener("touchstart", onTouchStart);
+  canvas.addEventListener("touchmove", onTouchMove);
+  canvas.addEventListener("touchend", onTouchEnd);
+  document.body.appendChild(canvas);
+  animate();
 }

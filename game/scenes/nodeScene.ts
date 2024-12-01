@@ -134,12 +134,8 @@ function onPointerMove(): void {
   if (isDragging) {
     dragVector.x = dragOrigin.x - pointer.position.x;
     dragVector.y = dragOrigin.y - pointer.position.y;
-
     camera.position.x += dragVector.x;
     camera.position.y += dragVector.y;
-
-    pointer.offset.x = camera.position.x;
-    pointer.offset.y = camera.position.y;
 
     return;
   }

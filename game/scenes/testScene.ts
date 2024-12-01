@@ -1,5 +1,5 @@
 import { camera } from "../../engine/system/View.ts";
-import { renderTouchControls } from "../../engine/system/TouchControls.ts";
+import { applyTouchControls } from "../../engine/gui/TouchControls.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
   animatePlayer,
@@ -44,6 +44,8 @@ function destruct(): void {
 
 const pointerNode = createNode(pointer.position);
 
+applyTouchControls();
+
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   camera.position.x = player.position.x - (self.innerWidth - 64) / 2;
   camera.position.y = player.position.y - (self.innerHeight - 64) / 2;
@@ -54,7 +56,6 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   renderGrid(grid, ctx);
   animatePlayer(player, ctx, delta);
   processPlayer(player, delta);
-  renderTouchControls();
 }
 
 export default scene;

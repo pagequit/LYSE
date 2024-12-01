@@ -1,6 +1,6 @@
 import { normalize, type Vector } from "../lib/Vector.ts";
 import { keyboardInput, useKeyboard } from "./Keyboard";
-import { processTouchControls, touchControls } from "./TouchControls";
+import { touchControls } from "../gui/TouchControls.ts";
 import { usePointer } from "./Pointer";
 
 export type Input = {
@@ -22,8 +22,6 @@ export const input: Input = {
 };
 
 export function processInputs() {
-  processTouchControls();
-
   input.up = keyboardInput.arrowUp;
   input.down = keyboardInput.arrowDown;
   input.left = keyboardInput.arrowLeft;
