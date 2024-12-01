@@ -89,7 +89,6 @@ function resetDPad(): void {
 }
 
 export function processTouchControls(): void {
-  console.log("processing touch controls");
   if (!pointer.isDown) {
     resetDPad();
     return;
