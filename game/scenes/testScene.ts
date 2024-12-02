@@ -1,6 +1,6 @@
 import {
   applyTouchControls,
-  revokeTouchControls,
+  removeTouchControls,
 } from "../../engine/gui/TouchControls.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
 import {
@@ -48,7 +48,7 @@ function construct(): void {
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
   if (isTouchDevice) {
-    revokeTouchControls();
+    removeTouchControls();
   }
 }
 

@@ -9,6 +9,10 @@ canvas.style.bottom = "0";
 canvas.style.borderRadius = "50%";
 
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+let animationRequestId: number;
+
+const touchVector: Vector = { x: 0, y: 0 };
+let yOffset: number = canvas.height - self.innerHeight;
 
 export type TouchControls = {
   axes: [number, number];
@@ -21,42 +25,26 @@ export type TouchControls = {
   };
 };
 
-export const touchControls = setup();
-
-function setup(): TouchControls {
-  self.addEventListener("resize", () => {
-    touchControls.dPad.position.x = canvas.width / 2;
-    touchControls.dPad.position.y = canvas.height / 2;
-    resetDPad();
-  });
-
-  return {
-    axes: [0, 0],
-    dPad: {
-      position: {
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-      },
-      radius: 48,
-      deadZone: 8,
-      stickPosition: {
-        x: canvas.width / 2,
-        y: canvas.height / 2,
-      },
-      stickRadius: 32,
+export const touchControls: TouchControls = {
+  axes: [0, 0],
+  dPad: {
+    position: {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
     },
-  };
-}
-
-const touchVector: Vector = { x: 0, y: 0 };
+    radius: 48,
+    deadZone: 8,
+    stickPosition: {
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+    },
+    stickRadius: 32,
+  },
+};
 
 function processDPad(touch: Touch): void {
   touchVector.x = touch.clientX - touchControls.dPad.position.x;
-  touchVector.y =
-    touch.clientY -
-    touchControls.dPad.position.y -
-    self.innerHeight +
-    canvas.height;
+  touchVector.y = touch.clientY - touchControls.dPad.position.y + yOffset;
 
   const magnitude = getMagnitude(touchVector);
   if (
@@ -68,8 +56,7 @@ function processDPad(touch: Touch): void {
     touchControls.axes[1] = Math.sin(direction);
 
     touchControls.dPad.stickPosition.x = touch.clientX;
-    touchControls.dPad.stickPosition.y =
-      touch.clientY - self.innerHeight + canvas.height;
+    touchControls.dPad.stickPosition.y = touch.clientY + yOffset;
   } else {
     resetDPad();
   }
@@ -91,6 +78,15 @@ function onTouchMove(event: TouchEvent): void {
 }
 
 function onTouchEnd(): void {
+  resetDPad();
+}
+
+function onContextMenu(event: MouseEvent): void {
+  event.preventDefault();
+}
+
+function onResize(): void {
+  yOffset = canvas.height - self.innerHeight;
   resetDPad();
 }
 
@@ -121,8 +117,6 @@ export function renderTouchControls(): void {
   ctx.fill();
 }
 
-let animationRequestId: number;
-
 function animate() {
   animationRequestId = requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -133,15 +127,19 @@ export function applyTouchControls(): void {
   canvas.addEventListener("touchstart", onTouchStart);
   canvas.addEventListener("touchmove", onTouchMove);
   canvas.addEventListener("touchend", onTouchEnd);
+  canvas.addEventListener("contextmenu", onContextMenu);
+  self.addEventListener("resize", onResize);
 
   document.body.appendChild(canvas);
   animate();
 }
 
-export function revokeTouchControls(): void {
+export function removeTouchControls(): void {
   canvas.removeEventListener("touchstart", onTouchStart);
   canvas.removeEventListener("touchmove", onTouchMove);
   canvas.removeEventListener("touchend", onTouchEnd);
+  canvas.removeEventListener("contextmenu", onContextMenu);
+  self.removeEventListener("resize", onResize);
 
   cancelAnimationFrame(animationRequestId);
   document.body.removeChild(canvas);
