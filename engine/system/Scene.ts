@@ -1,5 +1,5 @@
 import { game } from "./Game.ts";
-import { createCamera, type Camera } from "./View.ts";
+import { type Camera, createCamera } from "./View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
 

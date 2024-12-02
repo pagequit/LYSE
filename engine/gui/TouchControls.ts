@@ -1,5 +1,4 @@
 import { getDirection, getMagnitude, type Vector } from "../lib/Vector.ts";
-import { type Pointer } from "../system/Pointer.ts";
 
 const canvas = document.createElement("canvas");
 canvas.width = 164;
@@ -10,33 +9,6 @@ canvas.style.bottom = "0";
 canvas.style.borderRadius = "50%";
 
 const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-const pointer: Pointer = {
-  isDown: false,
-  position: { x: 0, y: 0 },
-};
-
-const camera = {
-  position: {
-    x: 0,
-    y: -(self.innerHeight - canvas.height),
-  },
-};
-
-function onTouchStart(event: TouchEvent): void {
-  pointer.position.x = event.touches[0].clientX + camera.position.x;
-  pointer.position.y = event.touches[0].clientY + camera.position.y;
-  pointer.isDown = true;
-}
-
-function onTouchMove(event: TouchEvent): void {
-  pointer.position.x = event.touches[0].clientX + camera.position.x;
-  pointer.position.y = event.touches[0].clientY + camera.position.y;
-}
-
-function onTouchEnd(): void {
-  pointer.isDown = false;
-}
 
 export type TouchControls = {
   axes: [number, number];
@@ -76,26 +48,16 @@ function setup(): TouchControls {
   };
 }
 
-const touchVector: Vector = {
-  x: pointer.position.x - touchControls.dPad.position.x,
-  y: pointer.position.y - touchControls.dPad.position.y,
-};
+const touchVector: Vector = { x: 0, y: 0 };
 
-function resetDPad(): void {
-  touchControls.dPad.stickPosition.x = touchControls.dPad.position.x;
-  touchControls.dPad.stickPosition.y = touchControls.dPad.position.y;
-  touchControls.axes[0] = 0;
-  touchControls.axes[1] = 0;
-}
+function processDPad(touch: Touch): void {
+  touchVector.x = touch.clientX - touchControls.dPad.position.x;
+  touchVector.y =
+    touch.clientY -
+    touchControls.dPad.position.y -
+    self.innerHeight +
+    canvas.height;
 
-export function processTouchControls(): void {
-  if (!pointer.isDown) {
-    resetDPad();
-    return;
-  }
-
-  touchVector.x = pointer.position.x - touchControls.dPad.position.x;
-  touchVector.y = pointer.position.y - touchControls.dPad.position.y;
   const magnitude = getMagnitude(touchVector);
   if (
     magnitude <= touchControls.dPad.radius &&
@@ -105,11 +67,31 @@ export function processTouchControls(): void {
     touchControls.axes[0] = Math.cos(direction);
     touchControls.axes[1] = Math.sin(direction);
 
-    touchControls.dPad.stickPosition.x = pointer.position.x;
-    touchControls.dPad.stickPosition.y = pointer.position.y;
+    touchControls.dPad.stickPosition.x = touch.clientX;
+    touchControls.dPad.stickPosition.y =
+      touch.clientY - self.innerHeight + canvas.height;
   } else {
     resetDPad();
   }
+}
+
+function resetDPad(): void {
+  touchControls.dPad.stickPosition.x = touchControls.dPad.position.x;
+  touchControls.dPad.stickPosition.y = touchControls.dPad.position.y;
+  touchControls.axes[0] = 0;
+  touchControls.axes[1] = 0;
+}
+
+function onTouchStart(event: TouchEvent): void {
+  processDPad(event.touches[0]);
+}
+
+function onTouchMove(event: TouchEvent): void {
+  processDPad(event.touches[0]);
+}
+
+function onTouchEnd(): void {
+  resetDPad();
 }
 
 export function renderTouchControls(): void {
@@ -139,12 +121,11 @@ export function renderTouchControls(): void {
   ctx.fill();
 }
 
-let animationRequest: number;
+let animationRequestId: number;
 
 function animate() {
-  animationRequest = requestAnimationFrame(animate);
+  animationRequestId = requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  processTouchControls();
   renderTouchControls();
 }
 
@@ -152,14 +133,16 @@ export function applyTouchControls(): void {
   canvas.addEventListener("touchstart", onTouchStart);
   canvas.addEventListener("touchmove", onTouchMove);
   canvas.addEventListener("touchend", onTouchEnd);
+
   document.body.appendChild(canvas);
   animate();
 }
 
-export function destructTouchControls(): void {
+export function revokeTouchControls(): void {
   canvas.removeEventListener("touchstart", onTouchStart);
   canvas.removeEventListener("touchmove", onTouchMove);
   canvas.removeEventListener("touchend", onTouchEnd);
-  cancelAnimationFrame(animationRequest);
+
+  cancelAnimationFrame(animationRequestId);
   document.body.removeChild(canvas);
 }

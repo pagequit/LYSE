@@ -1,4 +1,4 @@
-import { canvas, ctx, applyCanvas } from "./View.ts";
+import { applyCanvas, canvas, ctx } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { pointer } from "./Pointer.ts";
