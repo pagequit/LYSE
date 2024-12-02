@@ -3,6 +3,8 @@ import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { pointer } from "./Pointer.ts";
 import { applyMonitor, monitor } from "../gui/monitor.ts";
+import { paintNode, createNode } from "../../game/entity/Node.ts";
+import { colors } from "../../game/style.ts";
 
 export type Game = {
   scene: Scene;
@@ -27,6 +29,8 @@ monitor.appendChild(pointerMonitor);
 const cameraMonitor = document.createElement("div");
 monitor.appendChild(cameraMonitor);
 
+const origin = createNode({ x: 0, y: 0 });
+
 let now: number = self.performance.now();
 let then: number = now;
 let delta: number = 0;
@@ -36,6 +40,10 @@ function animate(timestamp: number): void {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
+
+  origin.position.x = -game.scene.camera.position.x;
+  origin.position.y = -game.scene.camera.position.y;
+  paintNode(origin, ctx, colors.warningColor);
   ctx.translate(-game.scene.camera.position.x, -game.scene.camera.position.y);
 
   processInputs();
