@@ -46,12 +46,12 @@ function onKeyUp(event: KeyboardEvent) {
   }
 }
 
-export function useKeyboard(): () => void {
+export function applyKeyboard(): void {
   document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
+}
 
-  return (): void => {
-    document.removeEventListener("keydown", onKeyDown);
-    document.removeEventListener("keyup", onKeyUp);
-  };
+export function removeKeyboard(): void {
+  document.removeEventListener("keydown", onKeyDown);
+  document.removeEventListener("keyup", onKeyUp);
 }

@@ -24,8 +24,8 @@ const player: Player = createPlayer({
 });
 
 const scene: Scene = createScene(process, {
-  width: 1200,
-  height: 800,
+  width: 2048,
+  height: 1152,
   construct,
   destruct,
 });

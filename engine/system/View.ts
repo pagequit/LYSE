@@ -21,7 +21,11 @@ function resize(): void {
 
 export function applyCanvas(): void {
   document.body.appendChild(canvas);
-
   self.addEventListener("resize", resize);
   resize();
+}
+
+export function removeCanvas(): void {
+  self.removeEventListener("resize", resize);
+  document.body.removeChild(canvas);
 }

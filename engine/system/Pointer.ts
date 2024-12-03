@@ -41,20 +41,20 @@ function onTouchEnd(): void {
   pointer.isDown = false;
 }
 
-export function usePointer(): () => void {
+export function applyPointer(): void {
   document.addEventListener("mousedown", onMouseDown);
   document.addEventListener("touchstart", onTouchStart);
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("touchmove", onTouchMove);
   document.addEventListener("mouseup", onMouseUp);
   document.addEventListener("touchend", onTouchEnd);
+}
 
-  return (): void => {
-    document.removeEventListener("mousedown", onMouseDown);
-    document.removeEventListener("touchstart", onTouchStart);
-    document.removeEventListener("mousemove", onMouseMove);
-    document.removeEventListener("touchmove", onTouchMove);
-    document.removeEventListener("mouseup", onMouseUp);
-    document.removeEventListener("touchend", onTouchEnd);
-  };
+export function removePointer(): void {
+  document.removeEventListener("mousedown", onMouseDown);
+  document.removeEventListener("touchstart", onTouchStart);
+  document.removeEventListener("mousemove", onMouseMove);
+  document.removeEventListener("touchmove", onTouchMove);
+  document.removeEventListener("mouseup", onMouseUp);
+  document.removeEventListener("touchend", onTouchEnd);
 }

@@ -1,7 +1,7 @@
 import { normalize, type Vector } from "../lib/Vector.ts";
-import { keyboardInput, useKeyboard } from "./Keyboard";
+import { applyKeyboard, keyboardInput, removeKeyboard } from "./Keyboard";
 import { touchControls } from "../gui/TouchControls.ts";
-import { usePointer } from "./Pointer";
+import { applyPointer, removePointer } from "./Pointer";
 
 export type Input = {
   up: number;
@@ -36,6 +36,11 @@ export function processInputs() {
 }
 
 export function applyInputs(): void {
-  usePointer();
-  useKeyboard();
+  applyPointer();
+  applyKeyboard();
+}
+
+export function removeInputs(): void {
+  removePointer();
+  removeKeyboard();
 }

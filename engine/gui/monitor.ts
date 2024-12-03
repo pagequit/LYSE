@@ -11,3 +11,7 @@ monitor.style.background = "rgba(0, 0, 0, 0.5)";
 export function applyMonitor(): void {
   document.body.appendChild(monitor);
 }
+
+export function removeMonitor(): void {
+  document.body.removeChild(monitor);
+}
