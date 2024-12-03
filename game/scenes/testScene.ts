@@ -14,6 +14,7 @@ import {
   changeScene,
   createScene,
   type Scene,
+  setSceneCameraPosition,
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
@@ -57,13 +58,16 @@ function destruct(): void {
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
-  scene.camera.position.x = player.position.x - (self.innerWidth - 64) / 2;
-  scene.camera.position.y = player.position.y - (self.innerHeight - 64) / 2;
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
 
   animatePlayer(player, ctx, delta);
   processPlayer(player, delta);
+
+  setSceneCameraPosition(
+    player.position.x - (self.innerWidth - 64) / 2,
+    player.position.y - (self.innerHeight - 64) / 2,
+  );
 }
 
 export default scene;

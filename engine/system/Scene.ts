@@ -38,3 +38,14 @@ export function changeScene(scene: Scene): void {
   game.scene = scene;
   game.scene.construct();
 }
+
+export function setSceneCameraPosition(x: number, y: number): void {
+  game.scene.camera.position.x = Math.max(
+    0,
+    Math.min(x, game.scene.width - self.innerWidth),
+  );
+  game.scene.camera.position.y = Math.max(
+    0,
+    Math.min(y, game.scene.height - self.innerHeight),
+  );
+}
