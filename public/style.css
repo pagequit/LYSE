@@ -10,4 +10,7 @@ body {
   width: 100vw;
   margin: 0;
   background: #161616;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

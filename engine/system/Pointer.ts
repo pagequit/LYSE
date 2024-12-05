@@ -1,4 +1,5 @@
 import { type Vector } from "../lib/Vector.ts";
+import { canvas } from "./View.ts";
 import { game } from "./Game.ts";
 
 export type Pointer = {
@@ -12,25 +13,33 @@ export const pointer: Pointer = {
 };
 
 function onMouseDown(event: MouseEvent): void {
-  pointer.position.x = event.clientX + game.scene.camera.position.x;
-  pointer.position.y = event.clientY + game.scene.camera.position.y;
+  pointer.position.x =
+    event.clientX + game.scene.camera.position.x - canvas.offsetLeft;
+  pointer.position.y =
+    event.clientY + game.scene.camera.position.y - canvas.offsetTop;
   pointer.isDown = true;
 }
 
 function onTouchStart(event: TouchEvent): void {
-  pointer.position.x = event.touches[0].clientX + game.scene.camera.position.x;
-  pointer.position.y = event.touches[0].clientY + game.scene.camera.position.y;
+  pointer.position.x =
+    event.touches[0].clientX + game.scene.camera.position.x - canvas.offsetLeft;
+  pointer.position.y =
+    event.touches[0].clientY + game.scene.camera.position.y - canvas.offsetTop;
   pointer.isDown = true;
 }
 
 function onMouseMove(event: MouseEvent): void {
-  pointer.position.x = event.clientX + game.scene.camera.position.x;
-  pointer.position.y = event.clientY + game.scene.camera.position.y;
+  pointer.position.x =
+    event.clientX + game.scene.camera.position.x - canvas.offsetLeft;
+  pointer.position.y =
+    event.clientY + game.scene.camera.position.y - canvas.offsetTop;
 }
 
 function onTouchMove(event: TouchEvent): void {
-  pointer.position.x = event.touches[0].clientX + game.scene.camera.position.x;
-  pointer.position.y = event.touches[0].clientY + game.scene.camera.position.y;
+  pointer.position.x =
+    event.touches[0].clientX + game.scene.camera.position.x - canvas.offsetLeft;
+  pointer.position.y =
+    event.touches[0].clientY + game.scene.camera.position.y - canvas.offsetTop;
 }
 
 function onMouseUp(): void {
@@ -42,19 +51,19 @@ function onTouchEnd(): void {
 }
 
 export function applyPointer(): void {
-  document.addEventListener("mousedown", onMouseDown);
-  document.addEventListener("touchstart", onTouchStart);
-  document.addEventListener("mousemove", onMouseMove);
-  document.addEventListener("touchmove", onTouchMove);
-  document.addEventListener("mouseup", onMouseUp);
-  document.addEventListener("touchend", onTouchEnd);
+  canvas.addEventListener("mousedown", onMouseDown);
+  canvas.addEventListener("touchstart", onTouchStart);
+  canvas.addEventListener("mousemove", onMouseMove);
+  canvas.addEventListener("touchmove", onTouchMove);
+  canvas.addEventListener("mouseup", onMouseUp);
+  canvas.addEventListener("touchend", onTouchEnd);
 }
 
 export function removePointer(): void {
-  document.removeEventListener("mousedown", onMouseDown);
-  document.removeEventListener("touchstart", onTouchStart);
-  document.removeEventListener("mousemove", onMouseMove);
-  document.removeEventListener("touchmove", onTouchMove);
-  document.removeEventListener("mouseup", onMouseUp);
-  document.removeEventListener("touchend", onTouchEnd);
+  canvas.removeEventListener("mousedown", onMouseDown);
+  canvas.removeEventListener("touchstart", onTouchStart);
+  canvas.removeEventListener("mousemove", onMouseMove);
+  canvas.removeEventListener("touchmove", onTouchMove);
+  canvas.removeEventListener("mouseup", onMouseUp);
+  canvas.removeEventListener("touchend", onTouchEnd);
 }
