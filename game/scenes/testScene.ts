@@ -6,8 +6,10 @@ import { pointer } from "../../engine/system/Pointer.ts";
 import {
   animatePlayer,
   createPlayer,
+  Direction,
   type Player,
   processPlayer,
+  setDirection,
 } from "../entity/Player.ts";
 import { createGrid, type Grid } from "../entity/Grid.ts";
 import {
@@ -19,17 +21,19 @@ import {
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
 
-const player: Player = createPlayer({
-  x: (self.innerWidth - 64) / 2,
-  y: (self.innerHeight - 64) / 2,
-});
-
 const scene: Scene = createScene(process, {
   width: 2048,
   height: 1152,
   construct,
   destruct,
 });
+
+const player: Player = createPlayer({
+  x: (scene.width - 64) / 2,
+  y: (scene.height - 64) / 2,
+});
+
+setDirection(player, Direction.Down);
 
 const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);

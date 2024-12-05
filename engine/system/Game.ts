@@ -11,8 +11,8 @@ export type Game = {
 
 export const game: Game = {
   scene: createScene(() => {}, {
-    width: 0,
-    height: 0,
+    width: self.innerWidth,
+    height: self.innerHeight,
   }),
   state: {},
 };

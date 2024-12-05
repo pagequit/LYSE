@@ -1,4 +1,5 @@
 import { type Vector } from "../lib/Vector.ts";
+import { game } from "./Game.ts";
 
 export type Camera = {
   position: Vector;
@@ -13,19 +14,18 @@ export function createCamera(): Camera {
   };
 }
 
-function resize(): void {
-  canvas.width = self.innerWidth;
-  canvas.height = self.innerHeight;
+export function resizeCanvas(): void {
+  canvas.width = Math.min(self.innerWidth, game.scene.width);
+  canvas.height = Math.min(self.innerHeight, game.scene.height);
   ctx.imageSmoothingEnabled = false;
 }
 
 export function applyCanvas(): void {
   document.body.appendChild(canvas);
-  self.addEventListener("resize", resize);
-  resize();
+  self.addEventListener("resize", resizeCanvas);
 }
 
 export function removeCanvas(): void {
-  self.removeEventListener("resize", resize);
+  self.removeEventListener("resize", resizeCanvas);
   document.body.removeChild(canvas);
 }

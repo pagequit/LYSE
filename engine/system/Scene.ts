@@ -1,5 +1,5 @@
 import { game } from "./Game.ts";
-import { type Camera, createCamera } from "./View.ts";
+import { type Camera, createCamera, resizeCanvas } from "./View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
 
@@ -36,6 +36,7 @@ export function createScene(
 export function changeScene(scene: Scene): void {
   game.scene.destruct();
   game.scene = scene;
+  resizeCanvas();
   game.scene.construct();
 }
 

@@ -3,6 +3,7 @@ import { pointer } from "../../engine/system/Pointer.ts";
 import {
   changeScene,
   createScene,
+  setSceneCameraPosition,
   type Scene,
 } from "../../engine/system/Scene.ts";
 import { type Vector } from "../../engine/lib/Vector.ts";
@@ -24,8 +25,8 @@ function handleEscape({ key }: KeyboardEvent): void {
 }
 
 const scene: Scene = createScene(process, {
-  width: 1200,
-  height: 800,
+  width: 1024,
+  height: 768,
   construct,
   destruct,
 });
@@ -133,8 +134,10 @@ function onPointerMove(): void {
   if (isDragging) {
     dragVector.x = dragOrigin.x - pointer.position.x;
     dragVector.y = dragOrigin.y - pointer.position.y;
-    scene.camera.position.x += dragVector.x;
-    scene.camera.position.y += dragVector.y;
+    setSceneCameraPosition(
+      scene.camera.position.x + dragVector.x,
+      scene.camera.position.y + dragVector.y,
+    );
 
     return;
   }
