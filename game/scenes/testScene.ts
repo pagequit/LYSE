@@ -3,6 +3,7 @@ import {
   removeTouchControls,
 } from "../../engine/gui/TouchControls.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
+import { type Vector } from "../../engine/lib/Vector.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -20,6 +21,10 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
+import {
+  createRenderable,
+  type Renderable,
+} from "../../engine/lib/Renderable.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -28,12 +33,44 @@ const scene: Scene = createScene(process, {
   destruct,
 });
 
+type Shape = {
+  position: Vector;
+};
+
+type CollisionShape = Shape & Renderable;
+
+function renderCollisionShape(
+  this: CollisionShape,
+  ctx: CanvasRenderingContext2D,
+): void {
+  ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
+  ctx.beginPath();
+  ctx.arc(this.position.x, this.position.y, 32, 0, 2 * Math.PI);
+  ctx.fill();
+}
+
+const collisionShape: CollisionShape = createRenderable(
+  { position: { x: 0, y: 0 } },
+  renderCollisionShape,
+);
+
+type KinematicBody = Shape & {
+  velocity: Vector;
+};
+
 const player: Player = createPlayer({
   x: (scene.width - 64) / 2,
-  y: (scene.height - 64) / 2,
+  y: ((scene.height - 64) / 2) * 0.725,
 });
 
-setDirection(player, Direction.Down);
+setDirection(player, Direction.Right);
+
+const dummy: Player = createPlayer({
+  x: (scene.width - 64) / 2,
+  y: ((scene.height - 64) / 2) * 1.125,
+});
+
+setDirection(dummy, Direction.Left);
 
 const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
@@ -67,6 +104,8 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   animatePlayer(player, ctx, delta);
   processPlayer(player, delta);
+
+  animatePlayer(dummy, ctx, delta);
 
   setSceneCameraPosition(
     player.position.x - (self.innerWidth - 64) / 2,
