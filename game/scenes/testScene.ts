@@ -20,6 +20,7 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
+import type { CollisionShape } from "../../engine/lib/Shape.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -66,7 +67,29 @@ function destruct(): void {
   }
 }
 
+function processCollisions(cShapes: Array<CollisionShape>) {
+  for (let i = 0; i < cShapes.length; i++) {
+    for (let j = 0; j < cShapes.length; j++) {
+      if (cShapes[i] === cShapes[j]) {
+        continue;
+      }
+
+      const x = Math.abs(cShapes[i].position.x - cShapes[j].position.x);
+      const y = Math.abs(cShapes[i].position.y - cShapes[j].position.y);
+
+      // all shapes a circles with a radius of 16
+      if (x + y < 32) {
+        console.log("collision");
+      }
+    }
+  }
+}
+
+const cShapes = [player.collisionShape, dummy.collisionShape];
+
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
+  processCollisions(cShapes);
+
   grid.render(ctx);
 
   pointerNode.position = pointer.position;
@@ -74,9 +97,10 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   animatePlayer(player, ctx, delta);
   processPlayer(player, delta);
-  player.collisionShape.render(ctx);
 
   animatePlayer(dummy, ctx, delta);
+
+  player.collisionShape.render(ctx);
   dummy.collisionShape.render(ctx);
 
   setSceneCameraPosition(
