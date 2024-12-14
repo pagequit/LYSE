@@ -3,7 +3,6 @@ import {
   removeTouchControls,
 } from "../../engine/gui/TouchControls.ts";
 import { pointer } from "../../engine/system/Pointer.ts";
-import { type Vector } from "../../engine/lib/Vector.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -21,10 +20,6 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
-import {
-  createRenderable,
-  type Renderable,
-} from "../../engine/lib/Renderable.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,

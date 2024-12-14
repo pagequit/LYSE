@@ -9,7 +9,6 @@ import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
 import { input } from "../../engine/system/Input.ts";
 import {
   type CollisionShape,
-  type Shape,
   createCollisionShape,
 } from "../../engine/lib/Shape.ts";
 
