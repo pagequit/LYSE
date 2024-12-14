@@ -7,6 +7,11 @@ import {
 } from "../../engine/system/Sprite.ts";
 import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
 import { input } from "../../engine/system/Input.ts";
+import {
+  type CollisionShape,
+  type Shape,
+  createCollisionShape,
+} from "../../engine/lib/Shape.ts";
 
 export enum State {
   Idle,
@@ -26,6 +31,7 @@ export type Player = {
   direction: Direction;
   velocity: Vector;
   animations: Record<State, Sprite>;
+  collisionShape: CollisionShape;
 };
 
 export function createPlayer(position: Vector): Player {
@@ -58,6 +64,7 @@ export function createPlayer(position: Vector): Player {
     direction: Direction.Right,
     velocity: { x: 0, y: 0 },
     animations,
+    collisionShape: createCollisionShape(position),
   };
 }
 
@@ -86,7 +93,10 @@ export function animatePlayer(
   ctx: CanvasRenderingContext2D,
   delta: number,
 ): void {
-  animateSprite(player.animations[player.state], ctx, delta, player.position);
+  animateSprite(player.animations[player.state], ctx, delta, {
+    x: player.position.x - player.animations[player.state].width / 2,
+    y: player.position.y - player.animations[player.state].height / 2 - 8,
+  });
 }
 
 export function processPlayer(player: Player, delta: number): void {

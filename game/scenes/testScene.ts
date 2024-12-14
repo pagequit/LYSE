@@ -33,31 +33,6 @@ const scene: Scene = createScene(process, {
   destruct,
 });
 
-type Shape = {
-  position: Vector;
-};
-
-type CollisionShape = Shape & Renderable;
-
-function renderCollisionShape(
-  this: CollisionShape,
-  ctx: CanvasRenderingContext2D,
-): void {
-  ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
-  ctx.beginPath();
-  ctx.arc(this.position.x, this.position.y, 32, 0, 2 * Math.PI);
-  ctx.fill();
-}
-
-const collisionShape: CollisionShape = createRenderable(
-  { position: { x: 0, y: 0 } },
-  renderCollisionShape,
-);
-
-type KinematicBody = Shape & {
-  velocity: Vector;
-};
-
 const player: Player = createPlayer({
   x: (scene.width - 64) / 2,
   y: ((scene.height - 64) / 2) * 0.725,
@@ -104,8 +79,10 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   animatePlayer(player, ctx, delta);
   processPlayer(player, delta);
+  player.collisionShape.render(ctx);
 
   animatePlayer(dummy, ctx, delta);
+  dummy.collisionShape.render(ctx);
 
   setSceneCameraPosition(
     player.position.x - (self.innerWidth - 64) / 2,
