@@ -78,6 +78,7 @@ function processCollisions(cShapes: Array<CollisionShape>) {
       const y = Math.abs(cShapes[i].position.y - cShapes[j].position.y);
 
       // all shapes a circles with a radius of 16
+      // FIXME: circles not squares
       if (x + y < 32) {
         console.log("collision");
       }

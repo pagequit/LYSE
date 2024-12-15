@@ -9,8 +9,8 @@ export type Sprite = {
   framePosition: Vector;
   frameWidth: number;
   frameHeight: number;
-  xLenght: number;
-  yLenght: number;
+  xLength: number;
+  yLength: number;
   xIndex: number;
   yIndex: number;
 };
@@ -37,8 +37,8 @@ export function createSprite(spriteData: {
     framePosition: { x: 0, y: 0 },
     frameWidth: spriteData.frameWidth,
     frameHeight: spriteData.frameHeight,
-    xLenght: spriteData.xFrames - 1,
-    yLenght: spriteData.yFrames - 1,
+    xLength: spriteData.xFrames - 1,
+    yLength: spriteData.yFrames - 1,
     xIndex: 0,
     yIndex: 0,
   };
@@ -77,7 +77,7 @@ export function animateSprite(
   sprite.framePosition.x = sprite.frameWidth * sprite.xIndex;
   if ((sprite.frameDelta += delta) > sprite.frameDuration) {
     sprite.frameDelta = 0;
-    if ((sprite.xIndex += 1) > sprite.xLenght) {
+    if ((sprite.xIndex += 1) > sprite.xLength) {
       sprite.xIndex = 0;
     }
   }
