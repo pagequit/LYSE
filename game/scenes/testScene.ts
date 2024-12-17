@@ -21,6 +21,7 @@ import {
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
 import type { CollisionShape } from "../../engine/lib/Shape.ts";
+import type { KinematicBody } from "../../engine/lib/KinematicBody.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -67,7 +68,7 @@ function destruct(): void {
   }
 }
 
-function processCollisions(cShapes: Array<CollisionShape>) {
+function processCollisions(cShapes: Array<KinematicBody>) {
   for (let i = 0; i < cShapes.length; i++) {
     for (let j = 0; j < cShapes.length; j++) {
       if (cShapes[i] === cShapes[j]) {
@@ -81,13 +82,16 @@ function processCollisions(cShapes: Array<CollisionShape>) {
 
       // all shapes a circles with a radius of 16
       if (distance <= 32) {
-        console.log("collision");
+        cShapes[i].velocity.x = cShapes[i].velocity.x + cShapes[j].velocity.x;
+        cShapes[i].velocity.y = cShapes[i].velocity.y + cShapes[j].velocity.y;
+        cShapes[j].velocity.x = cShapes[i].velocity.x;
+        cShapes[j].velocity.y = cShapes[i].velocity.y;
       }
     }
   }
 }
 
-const cShapes = [player.collisionShape, dummy.collisionShape];
+const cShapes = [player, dummy];
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   processCollisions(cShapes);
