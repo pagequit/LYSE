@@ -20,7 +20,6 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
-import type { CollisionShape } from "../../engine/lib/Shape.ts";
 import type { KinematicBody } from "../../engine/lib/KinematicBody.ts";
 
 const scene: Scene = createScene(process, {
@@ -46,7 +45,7 @@ setDirection(dummy, Direction.Left);
 
 const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
-const isTouchDevice = "ontouchstart" in self || navigator.maxTouchPoints > 0;
+const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
@@ -80,12 +79,15 @@ function processCollisions(cShapes: Array<KinematicBody>) {
 
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      // all shapes a circles with a radius of 16
+      // all shapes are circles with a radius of 16 for now
       if (distance <= 32) {
-        cShapes[i].velocity.x = cShapes[i].velocity.x + cShapes[j].velocity.x;
-        cShapes[i].velocity.y = cShapes[i].velocity.y + cShapes[j].velocity.y;
-        cShapes[j].velocity.x = cShapes[i].velocity.x;
-        cShapes[j].velocity.y = cShapes[i].velocity.y;
+        const velocityX = cShapes[i].velocity.x + cShapes[j].velocity.x;
+        const velocityY = cShapes[i].velocity.y + cShapes[j].velocity.y;
+        // this is nonsens
+        cShapes[i].velocity.x += velocityX;
+        cShapes[i].velocity.y += velocityY;
+        cShapes[j].velocity.x += velocityX;
+        cShapes[j].velocity.y += velocityY;
       }
     }
   }
