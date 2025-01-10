@@ -1,11 +1,9 @@
 import { type Vector } from "./Vector.ts";
 import { createRenderable, type Renderable } from "./Renderable.ts";
 
-export type Shape = {
+export type CollisionShape = {
   position: Vector;
-};
-
-export type CollisionShape = Shape & Renderable;
+} & Renderable;
 
 function render(this: CollisionShape, ctx: CanvasRenderingContext2D): void {
   ctx.fillStyle = "rgba(255, 0, 128, 0.5)";

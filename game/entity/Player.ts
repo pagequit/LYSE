@@ -10,7 +10,7 @@ import { input } from "../../engine/system/Input.ts";
 import {
   type CollisionShape,
   createCollisionShape,
-} from "../../engine/lib/Shape.ts";
+} from "../../engine/lib/CollisionShape.ts";
 
 export enum State {
   Idle,
@@ -29,6 +29,7 @@ export type Player = {
   state: State;
   direction: Direction;
   velocity: Vector;
+  speedMultiplier: number;
   animations: Record<State, Sprite>;
   collisionShape: CollisionShape;
 };
@@ -62,6 +63,7 @@ export function createPlayer(position: Vector): Player {
     state: State.Idle,
     direction: Direction.Right,
     velocity: { x: 0, y: 0 },
+    speedMultiplier: 0.25,
     animations,
     collisionShape: createCollisionShape(position),
   };
@@ -74,6 +76,7 @@ export function setState(player: Player, state: State): void {
 
   setXFrame(player.animations[player.state], 0);
   setXFrame(player.animations[state], 0);
+
   player.state = state;
 }
 
@@ -84,6 +87,7 @@ export function setDirection(player: Player, direction: Direction): void {
 
   setYFrame(player.animations[State.Idle], direction);
   setYFrame(player.animations[State.Walk], direction);
+
   player.direction = direction;
 }
 
@@ -98,12 +102,13 @@ export function animatePlayer(
   });
 }
 
-export function processPlayer(player: Player, delta: number): void {
+export function processPlayer(
+  player: Player,
+  collisionShapes: Array<CollisionShape>,
+  delta: number,
+): void {
   player.velocity.x = input.vector.x;
   player.velocity.y = input.vector.y;
-
-  player.position.x += 0.25 * player.velocity.x * delta;
-  player.position.y += 0.25 * player.velocity.y * delta;
 
   if (isZero(player.velocity)) {
     setState(player, State.Idle);
@@ -119,6 +124,21 @@ export function processPlayer(player: Player, delta: number): void {
       setDirection(player, Direction.Down);
     } else {
       setDirection(player, Direction.Left);
+    }
+
+    player.position.x += input.vector.x * delta * player.speedMultiplier;
+    player.position.y += input.vector.y * delta * player.speedMultiplier;
+
+    for (let i = 0; i < collisionShapes.length; i++) {
+      const dx = player.position.x - collisionShapes[i].position.x;
+      const dy = player.position.y - collisionShapes[i].position.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // all shapes are circles with a radius of 16 for now
+      if (distance <= 32) {
+        player.position.x += dx / 16;
+        player.position.y += dy / 16;
+      }
     }
   }
 }

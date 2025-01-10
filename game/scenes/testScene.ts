@@ -20,7 +20,6 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
-import type { KinematicBody } from "../../engine/lib/KinematicBody.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -47,6 +46,8 @@ const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
+const collisionShapes = [dummy.collisionShape];
+
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
     changeScene(nodeScene);
@@ -67,44 +68,14 @@ function destruct(): void {
   }
 }
 
-function processCollisions(cShapes: Array<KinematicBody>) {
-  for (let i = 0; i < cShapes.length; i++) {
-    for (let j = 0; j < cShapes.length; j++) {
-      if (cShapes[i] === cShapes[j]) {
-        continue;
-      }
-
-      const dx = Math.abs(cShapes[i].position.x - cShapes[j].position.x);
-      const dy = Math.abs(cShapes[i].position.y - cShapes[j].position.y);
-
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      // all shapes are circles with a radius of 16 for now
-      if (distance <= 32) {
-        const velocityX = cShapes[i].velocity.x + cShapes[j].velocity.x;
-        const velocityY = cShapes[i].velocity.y + cShapes[j].velocity.y;
-        // this is nonsens
-        cShapes[i].velocity.x += velocityX;
-        cShapes[i].velocity.y += velocityY;
-        cShapes[j].velocity.x += velocityX;
-        cShapes[j].velocity.y += velocityY;
-      }
-    }
-  }
-}
-
-const cShapes = [player, dummy];
-
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
-  processCollisions(cShapes);
-
   grid.render(ctx);
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
 
   animatePlayer(player, ctx, delta);
-  processPlayer(player, delta);
+  processPlayer(player, collisionShapes, delta);
 
   animatePlayer(dummy, ctx, delta);
 
