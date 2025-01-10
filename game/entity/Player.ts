@@ -107,38 +107,45 @@ export function processPlayer(
   collisionShapes: Array<CollisionShape>,
   delta: number,
 ): void {
-  player.velocity.x = input.vector.x;
-  player.velocity.y = input.vector.y;
-
-  if (isZero(player.velocity)) {
+  if (isZero(input.vector)) {
     setState(player, State.Idle);
   } else {
     setState(player, State.Walk);
 
-    const direction = getDirection(player.velocity) / Math.PI + 1;
-    if (direction > 0.25 && direction < 0.75) {
+    const angle = getDirection(input.vector) / Math.PI + 1;
+    if (angle > 0.25 && angle < 0.75) {
       setDirection(player, Direction.Up);
-    } else if (direction >= 0.75 && direction <= 1.25) {
+    } else if (angle >= 0.75 && angle <= 1.25) {
       setDirection(player, Direction.Right);
-    } else if (direction > 1.25 && direction < 1.75) {
+    } else if (angle > 1.25 && angle < 1.75) {
       setDirection(player, Direction.Down);
     } else {
       setDirection(player, Direction.Left);
     }
+  }
 
-    player.position.x += input.vector.x * delta * player.speedMultiplier;
-    player.position.y += input.vector.y * delta * player.speedMultiplier;
+  player.velocity.x = input.vector.x * delta * player.speedMultiplier;
+  player.velocity.y = input.vector.y * delta * player.speedMultiplier;
 
-    for (let i = 0; i < collisionShapes.length; i++) {
-      const dx = player.position.x - collisionShapes[i].position.x;
-      const dy = player.position.y - collisionShapes[i].position.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+  for (let i = 0; i < collisionShapes.length; i++) {
+    const dx =
+      player.position.x + player.velocity.x - collisionShapes[i].position.x;
+    const dy =
+      player.position.y + player.velocity.y - collisionShapes[i].position.y;
+    const distance = Math.hypot(dx, dy);
 
-      // all shapes are circles with a radius of 16 for now
-      if (distance <= 32) {
-        player.position.x += dx / 16;
-        player.position.y += dy / 16;
+    // all shapes are circles with a radius of 16 for now
+    if (distance <= 32) {
+      if (Math.abs(dx) > Math.abs(dy)) {
+        player.velocity.x += dx > 0 ? 2 : -2;
+        player.velocity.y += dy > 0 ? 1 : -1;
+      } else {
+        player.velocity.x += dx > 0 ? 1 : -1;
+        player.velocity.y += dy > 0 ? 2 : -2;
       }
     }
   }
+
+  player.position.x += player.velocity.x;
+  player.position.y += player.velocity.y;
 }

@@ -3,6 +3,13 @@ export type Vector = {
   y: number;
 };
 
+export function fromPolar(direction: number, magnitude: number): Vector {
+  return {
+    x: Math.cos(direction) * magnitude,
+    y: Math.sin(direction) * magnitude,
+  };
+}
+
 export function getDirection(vector: Vector): number {
   return Math.atan2(vector.y, vector.x);
 }
@@ -11,7 +18,7 @@ export function getMagnitude(vector: Vector): number {
   return Math.hypot(vector.x, vector.y);
 }
 
-export function getScalar(a: Vector, b: Vector): number {
+export function getDotProduct(a: Vector, b: Vector): number {
   return a.x * b.x + a.y * b.y;
 }
 

@@ -37,7 +37,7 @@ setDirection(player, Direction.Right);
 
 const dummy: Player = createPlayer({
   x: (scene.width - 64) / 2,
-  y: ((scene.height - 64) / 2) * 1.125,
+  y: ((scene.height - 64) / 2) * 1.125 - 120,
 });
 
 setDirection(dummy, Direction.Left);
@@ -75,12 +75,11 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
 
   animatePlayer(player, ctx, delta);
-  processPlayer(player, collisionShapes, delta);
-
   animatePlayer(dummy, ctx, delta);
-
   player.collisionShape.render(ctx);
   dummy.collisionShape.render(ctx);
+
+  processPlayer(player, collisionShapes, delta);
 
   setSceneCameraPosition(
     player.position.x - (self.innerWidth - 64) / 2,
