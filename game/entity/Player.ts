@@ -9,7 +9,7 @@ import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
 import { input } from "../../engine/system/Input.ts";
 import {
   type CollisionShape,
-  createCollisionShape,
+  createCollisionShapeCircle,
 } from "../../engine/lib/CollisionShape.ts";
 
 export enum State {
@@ -34,12 +34,16 @@ export type Player = {
   collisionShape: CollisionShape;
 };
 
-export function createPlayer(position: Vector): Player {
+export function createPlayer(
+  position: Vector,
+  width: number,
+  height: number,
+): Player {
   const animations: Record<State, Sprite> = {
     [State.Walk]: createSprite({
       imageSrc: "/player-walk.png",
-      width: 64,
-      height: 64,
+      width,
+      height,
       frameDuraton: 1000 / 4,
       frameWidth: 16,
       frameHeight: 16,
@@ -48,8 +52,8 @@ export function createPlayer(position: Vector): Player {
     }),
     [State.Idle]: createSprite({
       imageSrc: "/player-idle.png",
-      width: 64,
-      height: 64,
+      width,
+      height,
       frameDuraton: 1000 / 2,
       frameWidth: 16,
       frameHeight: 16,
@@ -65,7 +69,7 @@ export function createPlayer(position: Vector): Player {
     velocity: { x: 0, y: 0 },
     speedMultiplier: 0.25,
     animations,
-    collisionShape: createCollisionShape(position),
+    collisionShape: createCollisionShapeCircle(position, width / 2),
   };
 }
 
@@ -135,7 +139,7 @@ export function processPlayer(
     const distance = Math.hypot(dx, dy);
 
     // all shapes are circles with a radius of 16 for now
-    if (distance <= 32) {
+    if (distance <= collisionShapes[i].size + player.collisionShape.size) {
       if (Math.abs(dx) > Math.abs(dy)) {
         player.velocity.x += dx > 0 ? 2 : -2;
         player.velocity.y += dy > 0 ? 1 : -1;

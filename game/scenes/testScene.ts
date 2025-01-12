@@ -28,17 +28,25 @@ const scene: Scene = createScene(process, {
   destruct,
 });
 
-const player: Player = createPlayer({
-  x: (scene.width - 64) / 2,
-  y: ((scene.height - 64) / 2) * 0.725,
-});
+const player: Player = createPlayer(
+  {
+    x: (scene.width - 64) / 2,
+    y: ((scene.height - 64) / 2) * 0.725,
+  },
+  64,
+  64,
+);
 
 setDirection(player, Direction.Right);
 
-const dummy: Player = createPlayer({
-  x: (scene.width - 64) / 2,
-  y: ((scene.height - 64) / 2) * 1.125 - 120,
-});
+const dummy: Player = createPlayer(
+  {
+    x: (scene.width - 64) / 2,
+    y: ((scene.height - 64) / 2) * 1.125 - 120,
+  },
+  128,
+  128,
+);
 
 setDirection(dummy, Direction.Left);
 
