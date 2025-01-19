@@ -29,7 +29,7 @@ export function scale(vector: Vector, scalar: number): void {
 
 export function normalize(vector: Vector): void {
   const scalar = 1 / Math.hypot(vector.x, vector.y);
-  if (scalar !== Infinity) {
+  if (scalar !== Number.POSITIVE_INFINITY) {
     vector.x *= scalar;
     vector.y *= scalar;
   }

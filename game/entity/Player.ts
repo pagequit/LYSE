@@ -8,9 +8,9 @@ import {
 import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
 import { input } from "../../engine/system/Input.ts";
 import {
-  type Circle,
   type CollisionShape,
   CollisionShapeType,
+  type Circle,
   createCollisionShapeCircle,
 } from "../../engine/lib/CollisionShape.ts";
 
@@ -33,7 +33,7 @@ export type Player = {
   velocity: Vector;
   speedMultiplier: number;
   animations: Record<State, Sprite>;
-  collisionShape: CollisionShape<Circle>;
+  collisionShape: Circle;
 };
 
 export function createPlayer(
@@ -108,6 +108,37 @@ export function animatePlayer(
   });
 }
 
+function processCircleCollision(player: Player, circle: CollisionShape): void {
+  const dx = player.position.x + player.velocity.x - circle.position.x;
+  const dy = player.position.y + player.velocity.y - circle.position.y;
+  const distance = Math.hypot(dx, dy);
+
+  if (distance <= (circle as Circle).radius + player.collisionShape.radius) {
+    if (Math.abs(dx) > Math.abs(dy)) {
+      player.velocity.x += dx > 0 ? 2 : -2;
+      player.velocity.y += dy > 0 ? 1 : -1;
+    } else {
+      player.velocity.x += dx > 0 ? 1 : -1;
+      player.velocity.y += dy > 0 ? 2 : -2;
+    }
+  }
+}
+
+function processRectangleCollision(
+  player: Player,
+  rectangle: CollisionShape,
+): void {
+  console.log(player, rectangle);
+}
+
+const collisionShapeHandlers: Record<
+  CollisionShapeType,
+  (player: Player, collisionShape: CollisionShape) => void
+> = {
+  [CollisionShapeType.Circle]: processCircleCollision,
+  [CollisionShapeType.Rectangle]: processRectangleCollision,
+};
+
 export function processPlayer(
   player: Player,
   collisionShapes: Array<CollisionShape>,
@@ -134,29 +165,7 @@ export function processPlayer(
   player.velocity.y = input.vector.y * delta * player.speedMultiplier;
 
   for (let i = 0; i < collisionShapes.length; i++) {
-    switch (collisionShapes[i].type) {
-      case CollisionShapeType.Circle: {
-        const dx =
-          player.position.x + player.velocity.x - collisionShapes[i].position.x;
-        const dy =
-          player.position.y + player.velocity.y - collisionShapes[i].position.y;
-        const distance = Math.hypot(dx, dy);
-
-        if (
-          distance <=
-          collisionShapes[i].radius + player.collisionShape.radius
-        ) {
-          if (Math.abs(dx) > Math.abs(dy)) {
-            player.velocity.x += dx > 0 ? 2 : -2;
-            player.velocity.y += dy > 0 ? 1 : -1;
-          } else {
-            player.velocity.x += dx > 0 ? 1 : -1;
-            player.velocity.y += dy > 0 ? 2 : -2;
-          }
-        }
-        break;
-      }
-    }
+    collisionShapeHandlers[collisionShapes[i].type](player, collisionShapes[i]);
   }
 
   player.position.x += player.velocity.x;
