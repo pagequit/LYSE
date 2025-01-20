@@ -7,7 +7,10 @@ import {
   setSceneCameraPosition,
 } from "../../engine/system/Scene.ts";
 import { type Vector } from "../../engine/lib/Vector.ts";
-import { getSegmentIntersection } from "../../engine/lib/Segment.ts";
+import {
+  createSegmentIntersection,
+  setSegmentIntersection,
+} from "../../engine/lib/Segment.ts";
 import {
   createNode,
   getNodeByPosition,
@@ -103,6 +106,7 @@ const pointerNode = createNode(pointer.position);
 const dragOrigin: Vector = { x: 0, y: 0 };
 const dragVector: Vector = { x: 0, y: 0 };
 
+const segmentIntersection = createSegmentIntersection();
 let isDragging = false;
 let isIntersecting = false;
 
@@ -151,11 +155,13 @@ function onPointerMove(): void {
     for (const edge of edges.filter(
       (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
     )) {
-      isIntersecting = !!getSegmentIntersection(
+      setSegmentIntersection(
+        segmentIntersection,
         [activeNode.position, pointer.position],
         [edge[0].position, edge[1].position],
       );
 
+      isIntersecting = !Number.isNaN(segmentIntersection.offset);
       if (isIntersecting) {
         break;
       }

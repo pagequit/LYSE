@@ -31,3 +31,24 @@ export function createCollisionShapeCircle(
     renderCircle,
   );
 }
+
+function renderRectangle(this: Rectangle, ctx: CanvasRenderingContext2D): void {
+  ctx.fillStyle = "rgba(255, 0, 128, 0.5)";
+  ctx.fillRect(
+    this.position.x - this.a / 2,
+    this.position.y - this.b / 2,
+    this.a,
+    this.b,
+  );
+}
+
+export function createCollisionShapeRectangle(
+  position: Vector,
+  a: number,
+  b: number,
+): Rectangle & Renderable {
+  return createRenderable(
+    { type: CollisionShapeType.Rectangle, position, a, b },
+    renderRectangle,
+  );
+}

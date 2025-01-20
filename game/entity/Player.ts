@@ -5,14 +5,24 @@ import {
   setYFrame,
   type Sprite,
 } from "../../engine/system/Sprite.ts";
-import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
+import {
+  getDirection,
+  getDotProduct,
+  getMagnitude,
+  isZero,
+  type Vector,
+} from "../../engine/lib/Vector.ts";
 import { input } from "../../engine/system/Input.ts";
 import {
   type CollisionShape,
   CollisionShapeType,
   type Circle,
   createCollisionShapeCircle,
+  type Rectangle,
 } from "../../engine/lib/CollisionShape.ts";
+import type { Renderable } from "../../engine/lib/Renderable.ts";
+import { createNode, paintNode } from "./Node.ts";
+import { paintSegment, type Segment } from "../../engine/lib/Segment.ts";
 
 export enum State {
   Idle,
@@ -33,7 +43,7 @@ export type Player = {
   velocity: Vector;
   speedMultiplier: number;
   animations: Record<State, Sprite>;
-  collisionShape: Circle;
+  collisionShape: Circle & Renderable;
 };
 
 export function createPlayer(
@@ -108,7 +118,11 @@ export function animatePlayer(
   });
 }
 
-function processCircleCollision(player: Player, circle: CollisionShape): void {
+function processCircleCollision(
+  ctx: CanvasRenderingContext2D, // DELETME
+  player: Player,
+  circle: CollisionShape,
+): void {
   const dx = player.position.x + player.velocity.x - circle.position.x;
   const dy = player.position.y + player.velocity.y - circle.position.y;
   const distance = Math.hypot(dx, dy);
@@ -125,21 +139,124 @@ function processCircleCollision(player: Player, circle: CollisionShape): void {
 }
 
 function processRectangleCollision(
+  ctx: CanvasRenderingContext2D,
   player: Player,
   rectangle: CollisionShape,
 ): void {
-  console.log(player, rectangle);
+  const ltx = rectangle.position.x - (rectangle as Rectangle).a * 0.5;
+  const lty = rectangle.position.y - (rectangle as Rectangle).b * 0.5;
+
+  const rtx = ltx + (rectangle as Rectangle).a;
+  const rty = lty;
+
+  const rbx = rtx;
+  const rby = rty + (rectangle as Rectangle).b;
+
+  const lbx = ltx;
+  const lby = rby;
+
+  const segmentA: Segment = [
+    { x: ltx, y: lty },
+    { x: rtx, y: rty },
+  ];
+
+  const segmentB: Segment = [
+    { x: rtx, y: rty },
+    { x: rbx, y: rby },
+  ];
+
+  const segmentC: Segment = [
+    { x: rbx, y: rby },
+    { x: lbx, y: lby },
+  ];
+
+  const segmentD: Segment = [
+    { x: ltx, y: lty },
+    { x: lbx, y: lby },
+  ];
+
+  const dx = player.position.x + player.velocity.x - rectangle.position.x;
+  const dy = player.position.y + player.velocity.y - rectangle.position.y;
+
+  const segmentX = dx > 0 ? segmentB : segmentD;
+  const segmentY = dy > 0 ? segmentC : segmentA;
+
+  paintSegment(segmentX, ctx, "rgba(255, 255, 255, 0.5)");
+  paintSegment(segmentY, ctx, "rgba(255, 255, 255, 0.5)");
+
+  const ab: Vector = {
+    x: segmentX[1].x - segmentX[0].x,
+    y: segmentX[1].y - segmentX[0].y,
+  };
+
+  const am: Vector = {
+    x: player.position.x - segmentX[0].x,
+    y: player.position.y - segmentX[0].y,
+  };
+
+  const normalizedAb: Vector = {
+    x: ab.x / Math.hypot(ab.x, ab.y),
+    y: ab.y / Math.hypot(ab.x, ab.y),
+  };
+
+  const t =
+    getDotProduct(normalizedAb, am) /
+    Math.hypot(segmentX[1].x - segmentX[0].x, segmentX[1].y - segmentX[0].y);
+
+  const scalar = getDotProduct(am, normalizedAb);
+
+  const point: Vector = {
+    x: segmentX[0].x + normalizedAb.x * scalar,
+    y: segmentX[0].y + normalizedAb.y * scalar,
+  };
+
+  paintNode(createNode(point), ctx, "rgba(255, 255, 255, 0.5)");
+  paintSegment([point, player.position], ctx, "rgba(255, 255, 255, 0.5)");
+
+  const cd: Vector = {
+    x: segmentY[1].x - segmentY[0].x,
+    y: segmentY[1].y - segmentY[0].y,
+  };
+
+  const cm: Vector = {
+    x: player.position.x - segmentY[0].x,
+    y: player.position.y - segmentY[0].y,
+  };
+
+  const normalizedCd: Vector = {
+    x: cd.x / Math.hypot(cd.x, cd.y),
+    y: cd.y / Math.hypot(cd.x, cd.y),
+  };
+
+  const s =
+    getDotProduct(normalizedCd, cm) /
+    Math.hypot(segmentY[1].x - segmentY[0].x, segmentY[1].y - segmentY[0].y);
+
+  const scalar2 = getDotProduct(cm, normalizedCd);
+
+  const point2: Vector = {
+    x: segmentY[0].x + normalizedCd.x * scalar2,
+    y: segmentY[0].y + normalizedCd.y * scalar2,
+  };
+
+  paintNode(createNode(point2), ctx, "rgba(255, 255, 255, 0.5)");
+  paintSegment([point2, player.position], ctx, "rgba(255, 255, 255, 0.5)");
 }
 
 const collisionShapeHandlers: Record<
   CollisionShapeType,
-  (player: Player, collisionShape: CollisionShape) => void
+  (
+    ctx: CanvasRenderingContext2D,
+    player: Player,
+    collisionShape: CollisionShape,
+  ) => void
 > = {
   [CollisionShapeType.Circle]: processCircleCollision,
   [CollisionShapeType.Rectangle]: processRectangleCollision,
 };
 
 export function processPlayer(
+  ctx: CanvasRenderingContext2D,
   player: Player,
   collisionShapes: Array<CollisionShape>,
   delta: number,
@@ -165,7 +282,11 @@ export function processPlayer(
   player.velocity.y = input.vector.y * delta * player.speedMultiplier;
 
   for (let i = 0; i < collisionShapes.length; i++) {
-    collisionShapeHandlers[collisionShapes[i].type](player, collisionShapes[i]);
+    collisionShapeHandlers[collisionShapes[i].type](
+      ctx,
+      player,
+      collisionShapes[i],
+    );
   }
 
   player.position.x += player.velocity.x;
