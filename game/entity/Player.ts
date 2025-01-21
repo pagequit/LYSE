@@ -8,7 +8,6 @@ import {
 import {
   getDirection,
   getDotProduct,
-  getMagnitude,
   isZero,
   type Vector,
 } from "../../engine/lib/Vector.ts";
@@ -21,7 +20,6 @@ import {
   type Rectangle,
 } from "../../engine/lib/CollisionShape.ts";
 import type { Renderable } from "../../engine/lib/Renderable.ts";
-import { createNode, paintNode } from "./Node.ts";
 import { paintSegment, type Segment } from "../../engine/lib/Segment.ts";
 
 export enum State {
@@ -122,6 +120,7 @@ function processCircleCollision(
   ctx: CanvasRenderingContext2D, // DELETME
   player: Player,
   circle: CollisionShape,
+  delta: number,
 ): void {
   const dx = player.position.x + player.velocity.x - circle.position.x;
   const dy = player.position.y + player.velocity.y - circle.position.y;
@@ -129,11 +128,11 @@ function processCircleCollision(
 
   if (distance <= (circle as Circle).radius + player.collisionShape.radius) {
     if (Math.abs(dx) > Math.abs(dy)) {
-      player.velocity.x += dx > 0 ? 2 : -2;
-      player.velocity.y += dy > 0 ? 1 : -1;
+      player.velocity.x += dx > 0 ? delta * 0.25 : delta * -0.25;
+      player.velocity.y += dy > 0 ? delta * 0.125 : delta * -0.125;
     } else {
-      player.velocity.x += dx > 0 ? 1 : -1;
-      player.velocity.y += dy > 0 ? 2 : -2;
+      player.velocity.x += dx > 0 ? delta * 0.125 : delta * -0.125;
+      player.velocity.y += dy > 0 ? delta * 0.25 : delta * -0.25;
     }
   }
 }
@@ -142,6 +141,7 @@ function processRectangleCollision(
   ctx: CanvasRenderingContext2D,
   player: Player,
   rectangle: CollisionShape,
+  delta: number,
 ): void {
   const ltx = rectangle.position.x - (rectangle as Rectangle).a * 0.5;
   const lty = rectangle.position.y - (rectangle as Rectangle).b * 0.5;
@@ -295,6 +295,7 @@ const collisionShapeHandlers: Record<
     ctx: CanvasRenderingContext2D,
     player: Player,
     collisionShape: CollisionShape,
+    delta: number,
   ) => void
 > = {
   [CollisionShapeType.Circle]: processCircleCollision,
@@ -332,6 +333,7 @@ export function processPlayer(
       ctx,
       player,
       collisionShapes[i],
+      delta,
     );
   }
 
