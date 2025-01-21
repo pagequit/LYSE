@@ -181,7 +181,7 @@ function processRectangleCollision(
   const segmentX = dx > 0 ? segmentB : segmentD;
   const segmentY = dy > 0 ? segmentC : segmentA;
 
-  paintSegment(segmentX, ctx, "rgba(255, 255, 255, 0.5)");
+  paintSegment(segmentX, ctx, "rgba(255, 255, 0, 0.5)");
   paintSegment(segmentY, ctx, "rgba(255, 255, 255, 0.5)");
 
   const ab: Vector = {
@@ -205,13 +205,10 @@ function processRectangleCollision(
 
   const scalar = getDotProduct(am, normalizedAb);
 
-  const point: Vector = {
+  const pointX: Vector = {
     x: segmentX[0].x + normalizedAb.x * scalar,
     y: segmentX[0].y + normalizedAb.y * scalar,
   };
-
-  paintNode(createNode(point), ctx, "rgba(255, 255, 255, 0.5)");
-  paintSegment([point, player.position], ctx, "rgba(255, 255, 255, 0.5)");
 
   const cd: Vector = {
     x: segmentY[1].x - segmentY[0].x,
@@ -234,13 +231,62 @@ function processRectangleCollision(
 
   const scalar2 = getDotProduct(cm, normalizedCd);
 
-  const point2: Vector = {
+  const pointY: Vector = {
     x: segmentY[0].x + normalizedCd.x * scalar2,
     y: segmentY[0].y + normalizedCd.y * scalar2,
   };
 
-  paintNode(createNode(point2), ctx, "rgba(255, 255, 255, 0.5)");
-  paintSegment([point2, player.position], ctx, "rgba(255, 255, 255, 0.5)");
+  if (t > 0 && t < 1) {
+    paintSegment([pointX, player.position], ctx, "rgba(255, 255, 0, 0.5)");
+  } else {
+    const d2lt = Math.hypot(
+      segmentX[0].x - player.position.x,
+      segmentX[0].y - player.position.y,
+    );
+    const d2rt = Math.hypot(
+      segmentX[1].x - player.position.x,
+      segmentX[1].y - player.position.y,
+    );
+    if (d2lt > d2rt) {
+      paintSegment(
+        [segmentX[1], player.position],
+        ctx,
+        "rgba(255, 255, 0, 0.5)",
+      );
+    } else {
+      paintSegment(
+        [segmentX[0], player.position],
+        ctx,
+        "rgba(255, 255, 0, 0.5)",
+      );
+    }
+  }
+
+  if (s > 0 && s < 1) {
+    paintSegment([pointY, player.position], ctx, "rgba(255, 255, 255, 0.5)");
+  } else {
+    const d2lb = Math.hypot(
+      segmentY[0].x - player.position.x,
+      segmentY[0].y - player.position.y,
+    );
+    const d2rb = Math.hypot(
+      segmentY[1].x - player.position.x,
+      segmentY[1].y - player.position.y,
+    );
+    if (d2lb > d2rb) {
+      paintSegment(
+        [segmentY[1], player.position],
+        ctx,
+        "rgba(255, 255, 255, 0.5)",
+      );
+    } else {
+      paintSegment(
+        [segmentY[0], player.position],
+        ctx,
+        "rgba(255, 255, 255, 0.5)",
+      );
+    }
+  }
 }
 
 const collisionShapeHandlers: Record<
