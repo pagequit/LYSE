@@ -236,8 +236,15 @@ function processRectangleCollision(
     y: segmentY[0].y + normalizedCd.y * scalar2,
   };
 
+  let distanceX = 0;
+  let distanceY = 0;
+
   if (t > 0 && t < 1) {
     paintSegment([pointX, player.position], ctx, "rgba(255, 255, 0, 0.5)");
+    distanceX = Math.hypot(
+      pointX.x - player.position.x,
+      pointX.y - player.position.y,
+    );
   } else {
     const d2lt = Math.hypot(
       segmentX[0].x - player.position.x,
@@ -247,6 +254,10 @@ function processRectangleCollision(
       segmentX[1].x - player.position.x,
       segmentX[1].y - player.position.y,
     );
+
+    const vx = d2lt > d2rt ? segmentX[0] : segmentX[1];
+    distanceX = Math.hypot(vx.x - player.position.x, vx.y - player.position.y);
+
     if (d2lt > d2rt) {
       paintSegment(
         [segmentX[1], player.position],
@@ -264,6 +275,10 @@ function processRectangleCollision(
 
   if (s > 0 && s < 1) {
     paintSegment([pointY, player.position], ctx, "rgba(255, 255, 255, 0.5)");
+    distanceY = Math.hypot(
+      pointY.x - player.position.x,
+      pointY.y - player.position.y,
+    );
   } else {
     const d2lb = Math.hypot(
       segmentY[0].x - player.position.x,
@@ -273,6 +288,10 @@ function processRectangleCollision(
       segmentY[1].x - player.position.x,
       segmentY[1].y - player.position.y,
     );
+
+    const vy = d2lb > d2rb ? segmentY[0] : segmentY[1];
+    distanceY = Math.hypot(vy.x - player.position.x, vy.y - player.position.y);
+
     if (d2lb > d2rb) {
       paintSegment(
         [segmentY[1], player.position],
@@ -286,6 +305,14 @@ function processRectangleCollision(
         "rgba(255, 255, 255, 0.5)",
       );
     }
+  }
+
+  if (distanceX < player.collisionShape.radius) {
+    player.velocity.x = player.velocity.x < 0 ? 1 : -1;
+  }
+
+  if (distanceY < player.collisionShape.radius) {
+    player.velocity.y = player.velocity.y < 0 ? 1 : -1;
   }
 }
 
