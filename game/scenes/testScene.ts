@@ -20,7 +20,7 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
-import { createCollisionShapeRectangle } from "../../engine/lib/CollisionShape.ts";
+import { createRectangle } from "../../engine/lib/CollisionShape.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -30,10 +30,7 @@ const scene: Scene = createScene(process, {
 });
 
 const player: Player = createPlayer(
-  {
-    x: (scene.width - 64) / 2,
-    y: ((scene.height - 64) / 2) * 0.725,
-  },
+  { x: (scene.width - 64) / 2, y: ((scene.height - 64) / 2) * 0.725 },
   64,
   64,
 );
@@ -41,10 +38,7 @@ const player: Player = createPlayer(
 setDirection(player, Direction.Right);
 
 const dummy: Player = createPlayer(
-  {
-    x: (scene.width - 64) / 2,
-    y: ((scene.height - 64) / 2) * 1.125 - 120,
-  },
+  { x: (scene.width - 64) / 2, y: ((scene.height - 64) / 2) * 1.125 - 120 },
   128,
   128,
 );
@@ -55,7 +49,7 @@ const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
-const rectangle = createCollisionShapeRectangle(
+const rectangle = createRectangle(
   { x: scene.width / 2, y: scene.height / 2 + 64 },
   64,
   64,
@@ -86,6 +80,8 @@ function destruct(): void {
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
+  processPlayer(ctx, player, collisionShapes, delta);
+
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
 
@@ -95,8 +91,6 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   dummy.collisionShape.render(ctx);
 
   rectangle.render(ctx);
-
-  processPlayer(ctx, player, collisionShapes, delta);
 
   setSceneCameraPosition(
     player.position.x - (self.innerWidth - 64) / 2,

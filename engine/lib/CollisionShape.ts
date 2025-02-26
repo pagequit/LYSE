@@ -1,10 +1,7 @@
 import { type Vector } from "./Vector.ts";
 import { createRenderable, type Renderable } from "./Renderable.ts";
 
-export type CollisionShape = {
-  type: CollisionShapeType;
-  position: Vector;
-};
+export type CollisionShape = { type: CollisionShapeType; position: Vector };
 
 export type Circle = { radius: number } & CollisionShape;
 
@@ -22,7 +19,7 @@ function renderCircle(this: Circle, ctx: CanvasRenderingContext2D): void {
   ctx.fill();
 }
 
-export function createCollisionShapeCircle(
+export function createCircle(
   position: Vector,
   radius: number,
 ): Circle & Renderable {
@@ -42,7 +39,7 @@ function renderRectangle(this: Rectangle, ctx: CanvasRenderingContext2D): void {
   );
 }
 
-export function createCollisionShapeRectangle(
+export function createRectangle(
   position: Vector,
   a: number,
   b: number,
@@ -51,4 +48,12 @@ export function createCollisionShapeRectangle(
     { type: CollisionShapeType.Rectangle, position, a, b },
     renderRectangle,
   );
+}
+
+export function isCircleToCircleCollision(a: Circle, b: Circle): boolean {
+  const dx = a.position.x - b.position.x;
+  const dy = a.position.y - b.position.y;
+  const distanceSquared = dx * dx + dy * dy;
+
+  return distanceSquared <= (a.radius + b.radius) ** 2;
 }

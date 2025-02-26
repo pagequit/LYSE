@@ -16,8 +16,9 @@ import {
   type CollisionShape,
   CollisionShapeType,
   type Circle,
-  createCollisionShapeCircle,
+  createCircle,
   type Rectangle,
+  isCircleToCircleCollision,
 } from "../../engine/lib/CollisionShape.ts";
 import type { Renderable } from "../../engine/lib/Renderable.ts";
 import { paintSegment, type Segment } from "../../engine/lib/Segment.ts";
@@ -79,7 +80,7 @@ export function createPlayer(
     velocity: { x: 0, y: 0 },
     speedMultiplier: 0.25,
     animations,
-    collisionShape: createCollisionShapeCircle(position, width / 2),
+    collisionShape: createCircle(position, width / 2),
   };
 }
 
@@ -117,16 +118,16 @@ export function animatePlayer(
 }
 
 function processCircleCollision(
-  ctx: CanvasRenderingContext2D, // DELETME
+  ctx: CanvasRenderingContext2D,
   player: Player,
   circle: CollisionShape,
   delta: number,
 ): void {
   const dx = player.position.x + player.velocity.x - circle.position.x;
   const dy = player.position.y + player.velocity.y - circle.position.y;
-  const distance = Math.hypot(dx, dy);
+  // const distance = Math.hypot(dx, dy);
 
-  if (distance <= (circle as Circle).radius + player.collisionShape.radius) {
+  if (isCircleToCircleCollision(player.collisionShape, circle as Circle)) {
     if (Math.abs(dx) > Math.abs(dy)) {
       player.velocity.x += dx > 0 ? delta * 0.25 : delta * -0.25;
       player.velocity.y += dy > 0 ? delta * 0.125 : delta * -0.125;
@@ -307,11 +308,14 @@ function processRectangleCollision(
     }
   }
 
-  if (distanceX < player.collisionShape.radius) {
-    player.velocity.x = player.velocity.x < 0 ? 1 : -1;
+  if (distanceX <= player.collisionShape.radius) {
+    const direction = player.velocity.x < 0 ? 1 : -1;
+    player.position.x =
+      segmentX[0].x + player.collisionShape.radius * direction;
+    player.velocity.x = 0;
   }
 
-  if (distanceY < player.collisionShape.radius) {
+  if (distanceY <= player.collisionShape.radius) {
     player.velocity.y = player.velocity.y < 0 ? 1 : -1;
   }
 }
