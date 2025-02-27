@@ -18,7 +18,6 @@ import {
   type Circle,
   createCircle,
   type Rectangle,
-  isCircleToCircleCollision,
 } from "../../engine/lib/CollisionShape.ts";
 import type { Renderable } from "../../engine/lib/Renderable.ts";
 import { paintSegment, type Segment } from "../../engine/lib/Segment.ts";
@@ -125,9 +124,12 @@ function processCircleCollision(
 ): void {
   const dx = player.position.x + player.velocity.x - circle.position.x;
   const dy = player.position.y + player.velocity.y - circle.position.y;
-  // const distance = Math.hypot(dx, dy);
+  const distanceSquared = dx * dx + dy * dy;
 
-  if (isCircleToCircleCollision(player.collisionShape, circle as Circle)) {
+  if (
+    distanceSquared <=
+    (player.collisionShape.radius + (circle as Circle).radius) ** 2
+  ) {
     if (Math.abs(dx) > Math.abs(dy)) {
       player.velocity.x += dx > 0 ? delta * 0.25 : delta * -0.25;
       player.velocity.y += dy > 0 ? delta * 0.125 : delta * -0.125;
