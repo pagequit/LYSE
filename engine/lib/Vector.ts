@@ -15,7 +15,21 @@ export function getDirection(vector: Vector): number {
 }
 
 export function getMagnitude(vector: Vector): number {
-  return Math.hypot(vector.x, vector.y);
+  return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+}
+
+export function getDistanceSquared(a: Vector, b: Vector): number {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+
+  return dx * dx + dy * dy;
+}
+
+export function getDistance(a: Vector, b: Vector): number {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 export function getDotProduct(a: Vector, b: Vector): number {

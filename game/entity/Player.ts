@@ -7,6 +7,7 @@ import {
 } from "../../engine/system/Sprite.ts";
 import {
   getDirection,
+  getDistanceSquared,
   getDotProduct,
   isZero,
   type Vector,
@@ -18,6 +19,7 @@ import {
   type Circle,
   createCircle,
   type Rectangle,
+  getNormal,
 } from "../../engine/lib/CollisionShape.ts";
 import type { Renderable } from "../../engine/lib/Renderable.ts";
 import { paintSegment, type Segment } from "../../engine/lib/Segment.ts";
@@ -122,21 +124,39 @@ function processCircleCollision(
   circle: CollisionShape,
   delta: number,
 ): void {
-  const dx = player.position.x + player.velocity.x - circle.position.x;
-  const dy = player.position.y + player.velocity.y - circle.position.y;
-  const distanceSquared = dx * dx + dy * dy;
+  // const dx = player.position.x + player.velocity.x - circle.position.x;
+  // const dy = player.position.y + player.velocity.y - circle.position.y;
+  const distanceSquared = getDistanceSquared(
+    {
+      x: player.position.x + player.velocity.x,
+      y: player.position.y + player.velocity.y,
+    },
+    circle.position,
+  );
 
   if (
     distanceSquared <=
     (player.collisionShape.radius + (circle as Circle).radius) ** 2
   ) {
-    if (Math.abs(dx) > Math.abs(dy)) {
-      player.velocity.x += dx > 0 ? delta * 0.25 : delta * -0.25;
-      player.velocity.y += dy > 0 ? delta * 0.125 : delta * -0.125;
-    } else {
-      player.velocity.x += dx > 0 ? delta * 0.125 : delta * -0.125;
-      player.velocity.y += dy > 0 ? delta * 0.25 : delta * -0.25;
-    }
+    // if (Math.abs(dx) > Math.abs(dy)) {
+    //   player.velocity.x += dx > 0 ? delta * 0.25 : delta * -0.25;
+    //   player.velocity.y += dy > 0 ? delta * 0.125 : delta * -0.125;
+    // } else {
+    //   player.velocity.x += dx > 0 ? delta * 0.125 : delta * -0.125;
+    //   player.velocity.y += dy > 0 ? delta * 0.25 : delta * -0.25;
+    // }
+    const normal = getNormal(
+      {
+        x: player.position.x + player.velocity.x,
+        y: player.position.y + player.velocity.y,
+      },
+      circle.position,
+    );
+
+    const dot = getDotProduct(player.velocity, normal);
+
+    circle.position.x += normal.x * dot;
+    circle.position.y += normal.y * dot;
   }
 }
 
