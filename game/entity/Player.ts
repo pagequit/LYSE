@@ -7,6 +7,7 @@ import {
 } from "../../engine/system/Sprite.ts";
 import {
   getDirection,
+  getDistance,
   getDistanceSquared,
   getDotProduct,
   isZero,
@@ -153,10 +154,14 @@ function processCircleCollision(
       circle.position,
     );
 
-    const dot = getDotProduct(player.velocity, normal);
+    // const dot = getDotProduct(player.velocity, normal);
+    const overlap =
+      getDistance(player.position, circle.position) -
+      (circle as Circle).radius -
+      player.collisionShape.radius;
 
-    circle.position.x += normal.x * dot;
-    circle.position.y += normal.y * dot;
+    player.position.x -= normal.x * overlap;
+    player.position.y -= normal.y * overlap;
   }
 }
 
