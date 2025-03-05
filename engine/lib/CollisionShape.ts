@@ -74,3 +74,21 @@ export function checkRectangleRectangleCollision(
     a.position.y + a.height > b.position.y
   );
 }
+
+export function checkCircleRectangleCollision(
+  circle: Circle,
+  rectangle: Rectangle,
+): boolean {
+  const nearestX = Math.max(
+    rectangle.position.x,
+    Math.min(circle.position.x, rectangle.position.x + rectangle.width),
+  );
+  const nearestY = Math.max(
+    rectangle.position.y,
+    Math.min(circle.position.y, rectangle.position.y + rectangle.height),
+  );
+  const dx = circle.position.x - nearestX;
+  const dy = circle.position.y - nearestY;
+
+  return dx * dx + dy * dy < circle.radius * circle.radius;
+}
