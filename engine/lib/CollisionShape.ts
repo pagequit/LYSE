@@ -1,4 +1,4 @@
-import { getDistanceSquared, type Vector } from "./Vector.ts";
+import { getDistance, type Vector } from "./Vector.ts";
 import { createRenderable, type Renderable } from "./Renderable.ts";
 
 export type CollisionShape = {
@@ -59,10 +59,4 @@ export function getNormal(a: Vector, b: Vector): Vector {
   const distance = Math.sqrt(dx * dx + dy * dy);
 
   return { x: dx / distance, y: dy / distance };
-}
-
-export function isCircleToCircleCollision(a: Circle, b: Circle): boolean {
-  return (
-    getDistanceSquared(a.position, b.position) <= (a.radius + b.radius) ** 2
-  );
 }

@@ -18,13 +18,6 @@ export function getMagnitude(vector: Vector): number {
   return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
 }
 
-export function getDistanceSquared(a: Vector, b: Vector): number {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
-
-  return dx * dx + dy * dy;
-}
-
 export function getDistance(a: Vector, b: Vector): number {
   const dx = a.x - b.x;
   const dy = a.y - b.y;

@@ -20,7 +20,6 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
-import { createRectangle } from "../../engine/lib/CollisionShape.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -83,7 +82,7 @@ function destruct(): void {
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
-  processPlayer(ctx, player, collisionShapes, delta);
+  processPlayer(player, collisionShapes, delta);
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");

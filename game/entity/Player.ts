@@ -5,19 +5,12 @@ import {
   setYFrame,
   type Sprite,
 } from "../../engine/system/Sprite.ts";
-import {
-  getDirection,
-  getDistance,
-  getDistanceSquared,
-  isZero,
-  type Vector,
-} from "../../engine/lib/Vector.ts";
+import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
 import { input } from "../../engine/system/Input.ts";
 import {
   type CollisionShape,
   type Circle,
   createCircle,
-  getNormal,
 } from "../../engine/lib/CollisionShape.ts";
 import type { Renderable } from "../../engine/lib/Renderable.ts";
 
@@ -115,45 +108,23 @@ export function animatePlayer(
   });
 }
 
-function processCircleCollision(
-  ctx: CanvasRenderingContext2D,
-  player: Player,
-  circle: CollisionShape,
-): void {
-  // const dx = player.position.x + player.velocity.x - circle.position.x;
-  // const dy = player.position.y + player.velocity.y - circle.position.y;
-  const distanceSquared = getDistanceSquared(
-    {
-      x: player.position.x + player.velocity.x,
-      y: player.position.y + player.velocity.y,
-    },
-    circle.position,
-  );
+function processCircleCollision(player: Player, circle: CollisionShape): void {
+  const dx = player.position.x + player.velocity.x - circle.position.x;
+  const dy = player.position.y + player.velocity.y - circle.position.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (
-    distanceSquared <=
-    (player.collisionShape.radius + (circle as Circle).radius) ** 2
-  ) {
-    const normal = getNormal(
-      {
-        x: player.position.x + player.velocity.x,
-        y: player.position.y + player.velocity.y,
-      },
-      circle.position,
-    );
-
+  if (distance <= player.collisionShape.radius + (circle as Circle).radius) {
+    const normalX = dx / distance;
+    const normalY = dy / distance;
     const overlap =
-      getDistance(player.position, circle.position) -
-      (circle as Circle).radius -
-      player.collisionShape.radius;
+      distance - (circle as Circle).radius - player.collisionShape.radius;
 
-    player.position.x -= normal.x * overlap;
-    player.position.y -= normal.y * overlap;
+    player.position.x -= normalX * overlap;
+    player.position.y -= normalY * overlap;
   }
 }
 
 export function processPlayer(
-  ctx: CanvasRenderingContext2D,
   player: Player,
   collisionShapes: Array<CollisionShape>,
   delta: number,
@@ -179,7 +150,7 @@ export function processPlayer(
   player.velocity.y = input.vector.y * delta * player.speedMultiplier;
 
   for (let i = 0; i < collisionShapes.length; i++) {
-    processCircleCollision(ctx, player, collisionShapes[1]);
+    processCircleCollision(player, collisionShapes[i]);
   }
 
   player.position.x += player.velocity.x;
