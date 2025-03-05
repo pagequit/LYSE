@@ -1,4 +1,4 @@
-import { getDistance, type Vector } from "./Vector.ts";
+import { type Vector } from "./Vector.ts";
 import { createRenderable, type Renderable } from "./Renderable.ts";
 
 export type CollisionShape = {
