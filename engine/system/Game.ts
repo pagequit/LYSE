@@ -25,6 +25,9 @@ const cameraMonitor = document.createElement("div");
 monitor.appendChild(cameraMonitor);
 const windowMonitor = document.createElement("div");
 monitor.appendChild(windowMonitor);
+monitor.addEventListener("click", () => {
+  document.body.requestFullscreen();
+});
 
 let now: number = self.performance.now();
 let then: number = now;
