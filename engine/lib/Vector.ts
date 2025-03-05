@@ -25,6 +25,17 @@ export function getDistance(a: Vector, b: Vector): number {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
+export function setDistanceNormal(normal: Vector, a: Vector, b: Vector): void {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance > 0) {
+    normal.x = dx / distance;
+    normal.y = dy / distance;
+  }
+}
+
 export function getDotProduct(a: Vector, b: Vector): number {
   return a.x * b.x + a.y * b.y;
 }
@@ -35,7 +46,7 @@ export function scale(vector: Vector, scalar: number): void {
 }
 
 export function normalize(vector: Vector): void {
-  const scalar = 1 / Math.hypot(vector.x, vector.y);
+  const scalar = 1 / Math.sqrt(vector.x * vector.x + vector.y * vector.y);
   if (scalar !== Number.POSITIVE_INFINITY) {
     vector.x *= scalar;
     vector.y *= scalar;

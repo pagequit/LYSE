@@ -113,7 +113,10 @@ function processCircleCollision(player: Player, circle: CollisionShape): void {
   const dy = player.position.y + player.velocity.y - circle.position.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (distance <= player.collisionShape.radius + (circle as Circle).radius) {
+  if (
+    distance <= player.collisionShape.radius + (circle as Circle).radius &&
+    distance > 0
+  ) {
     const normalX = dx / distance;
     const normalY = dy / distance;
     const overlap =

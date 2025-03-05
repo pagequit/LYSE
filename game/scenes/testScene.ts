@@ -37,7 +37,7 @@ const player: Player = createPlayer(
 setDirection(player, Direction.Right);
 
 const dummy: Player = createPlayer(
-  { x: (scene.width - 64) / 2, y: ((scene.height - 64) / 2) * 1.125 - 120 },
+  { x: (scene.width - 64) / 2, y: ((scene.height - 64) / 2) * 1.125 },
   128,
   128,
 );
