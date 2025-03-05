@@ -1,17 +1,9 @@
 import { getDistanceSquared, type Vector } from "./Vector.ts";
 import { createRenderable, type Renderable } from "./Renderable.ts";
 
-export type Collision = {
-  self: CollisionShape;
-  other: CollisionShape;
-  normal: Vector;
-  distance: number;
-};
-
 export type CollisionShape = {
   type: CollisionShapeType;
   position: Vector;
-  // collisions: Array<Collision>;
 };
 
 export type Circle = { radius: number } & CollisionShape;
@@ -73,17 +65,4 @@ export function isCircleToCircleCollision(a: Circle, b: Circle): boolean {
   return (
     getDistanceSquared(a.position, b.position) <= (a.radius + b.radius) ** 2
   );
-}
-
-export function getCircleToCircleCollision(a: Circle, b: Circle): Collision {
-  const dx = a.position.x - b.position.x;
-  const dy = a.position.y - b.position.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  return {
-    self: a,
-    other: b,
-    normal: { x: dx / distance, y: dy / distance },
-    distance,
-  };
 }
