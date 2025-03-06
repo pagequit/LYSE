@@ -10,7 +10,9 @@ import { input } from "../../engine/system/Input.ts";
 import {
   type CollisionShape,
   type Circle,
+  type Rectangle,
   createCircle,
+  CollisionShapeType,
 } from "../../engine/lib/CollisionShape.ts";
 import type { Renderable } from "../../engine/lib/Renderable.ts";
 
@@ -32,7 +34,10 @@ export type Player = {
   direction: Direction;
   velocity: Vector;
   speedMultiplier: number;
-  animations: Record<State, Sprite>;
+  animations: {
+    [State.Walk]: Sprite;
+    [State.Idle]: Sprite;
+  };
   collisionShape: Circle & Renderable;
 };
 
@@ -41,36 +46,34 @@ export function createPlayer(
   width: number,
   height: number,
 ): Player {
-  const animations: Record<State, Sprite> = {
-    [State.Walk]: createSprite({
-      imageSrc: "/player-walk.png",
-      width,
-      height,
-      frameDuraton: 1000 / 4,
-      frameWidth: 16,
-      frameHeight: 16,
-      xFrames: 4,
-      yFrames: 4,
-    }),
-    [State.Idle]: createSprite({
-      imageSrc: "/player-idle.png",
-      width,
-      height,
-      frameDuraton: 1000 / 2,
-      frameWidth: 16,
-      frameHeight: 16,
-      xFrames: 2,
-      yFrames: 4,
-    }),
-  };
-
   return {
     position,
     state: State.Idle,
     direction: Direction.Right,
     velocity: { x: 0, y: 0 },
     speedMultiplier: 0.25,
-    animations,
+    animations: {
+      [State.Idle]: createSprite({
+        imageSrc: "/player-idle.png",
+        width,
+        height,
+        frameDuraton: 1000 / 2,
+        frameWidth: 16,
+        frameHeight: 16,
+        xFrames: 2,
+        yFrames: 4,
+      }),
+      [State.Walk]: createSprite({
+        imageSrc: "/player-walk.png",
+        width,
+        height,
+        frameDuraton: 1000 / 4,
+        frameWidth: 16,
+        frameHeight: 16,
+        xFrames: 4,
+        yFrames: 4,
+      }),
+    },
     collisionShape: createCircle(position, width / 2),
   };
 }
@@ -102,28 +105,59 @@ export function animatePlayer(
   ctx: CanvasRenderingContext2D,
   delta: number,
 ): void {
-  animateSprite(player.animations[player.state], ctx, delta, {
-    x: player.position.x - player.animations[player.state].width / 2,
-    y: player.position.y - player.animations[player.state].height / 2 - 8,
-  });
+  animateSprite(
+    player.animations[player.state],
+    {
+      x: player.position.x - player.animations[player.state].width / 2,
+      y: player.position.y - player.animations[player.state].height / 2,
+    },
+    ctx,
+    delta,
+  );
 }
 
-function processCircleCollision(player: Player, circle: CollisionShape): void {
+function processCircleCollision(player: Player, circle: Circle): void {
   const dx = player.position.x + player.velocity.x - circle.position.x;
   const dy = player.position.y + player.velocity.y - circle.position.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
   if (
-    distance <= player.collisionShape.radius + (circle as Circle).radius &&
+    distance <= player.collisionShape.radius + circle.radius &&
     distance > 0
   ) {
     const normalX = dx / distance;
     const normalY = dy / distance;
-    const overlap =
-      distance - (circle as Circle).radius - player.collisionShape.radius;
+    const overlap = distance - circle.radius - player.collisionShape.radius;
 
-    player.position.x -= normalX * overlap;
-    player.position.y -= normalY * overlap;
+    player.velocity.x -= normalX * overlap;
+    player.velocity.y -= normalY * overlap;
+  }
+}
+
+function processRectangleCollision(player: Player, rectangle: Rectangle): void {
+  const dx =
+    player.position.x +
+    player.velocity.x -
+    Math.max(
+      rectangle.position.x,
+      Math.min(player.position.x, rectangle.position.x + rectangle.width),
+    );
+  const dy =
+    player.position.y +
+    player.velocity.y -
+    Math.max(
+      rectangle.position.y,
+      Math.min(player.position.y, rectangle.position.y + rectangle.height),
+    );
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance <= player.collisionShape.radius && distance > 0) {
+    const normalX = dx / distance;
+    const normalY = dy / distance;
+    const overlap = distance - player.collisionShape.radius;
+
+    player.velocity.x -= normalX * overlap;
+    player.velocity.y -= normalY * overlap;
   }
 }
 
@@ -152,8 +186,17 @@ export function processPlayer(
   player.velocity.x = input.vector.x * delta * player.speedMultiplier;
   player.velocity.y = input.vector.y * delta * player.speedMultiplier;
 
-  for (let i = 0; i < collisionShapes.length; i++) {
-    processCircleCollision(player, collisionShapes[i]);
+  for (const shape of collisionShapes) {
+    switch (shape.type) {
+      case CollisionShapeType.Circle: {
+        processCircleCollision(player, shape as Circle);
+        break;
+      }
+      case CollisionShapeType.Rectangle: {
+        processRectangleCollision(player, shape as Rectangle);
+        break;
+      }
+    }
   }
 
   player.position.x += player.velocity.x;

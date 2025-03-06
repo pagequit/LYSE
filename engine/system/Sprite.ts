@@ -58,9 +58,9 @@ export function setYFrame(sprite: Sprite, index: number): void {
 
 export function animateSprite(
   sprite: Sprite,
+  position: Vector,
   ctx: CanvasRenderingContext2D,
   delta: number,
-  position: Vector,
 ): void {
   ctx.drawImage(
     sprite.image,

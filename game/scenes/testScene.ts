@@ -20,6 +20,7 @@ import {
 } from "../../engine/system/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entity/Node.ts";
+import { createRectangle } from "../../engine/lib/CollisionShape.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -48,16 +49,13 @@ const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
-// const rectangle = createRectangle(
-//   { x: scene.width / 2, y: scene.height / 2 + 64 },
-//   64,
-//   64,
-// );
+const rectangle = createRectangle(
+  { x: scene.width / 2 - 96, y: (scene.height / 2) * 0.75 },
+  128,
+  64,
+);
 
-const collisionShapes = [
-  dummy.collisionShape,
-  // rectangle,
-];
+const collisionShapes = [dummy.collisionShape, rectangle];
 
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
@@ -92,7 +90,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   player.collisionShape.render(ctx);
   dummy.collisionShape.render(ctx);
 
-  // rectangle.render(ctx);
+  rectangle.render(ctx);
 
   setSceneCameraPosition(
     player.position.x - (self.innerWidth - 64) / 2,

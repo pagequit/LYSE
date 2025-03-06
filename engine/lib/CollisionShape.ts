@@ -34,12 +34,7 @@ export function createCircle(
 
 function renderRectangle(this: Rectangle, ctx: CanvasRenderingContext2D): void {
   ctx.fillStyle = "rgba(255, 0, 128, 0.5)";
-  ctx.fillRect(
-    this.position.x - this.width / 2,
-    this.position.y - this.height / 2,
-    this.width,
-    this.height,
-  );
+  ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
 }
 
 export function createRectangle(
@@ -52,8 +47,6 @@ export function createRectangle(
     renderRectangle,
   );
 }
-
-// TODO: TEST THE FOLLOWING
 
 export function checkCircleCircleCollision(a: Circle, b: Circle): boolean {
   const dx = a.position.x - b.position.x;
