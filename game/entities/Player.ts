@@ -8,13 +8,12 @@ import {
 import { getDirection, isZero, type Vector } from "../../engine/Vector.ts";
 import { input } from "../../engine/Input.ts";
 import {
-  type CollisionShape,
+  type CollisionBody,
   type Circle,
   type Rectangle,
-  createCircle,
-  CollisionShapeType,
-} from "../../engine/CollisionShape.ts";
-import type { Renderable } from "../../engine/Renderable.ts";
+  createCollisionCircle,
+  ShapeType,
+} from "../../engine/CollisionBody.ts";
 
 export enum State {
   Idle,
@@ -38,7 +37,7 @@ export type Player = {
     [State.Walk]: Sprite;
     [State.Idle]: Sprite;
   };
-  collisionShape: Circle & Renderable;
+  collisionBody: CollisionBody<Circle>;
 };
 
 export function createPlayer(
@@ -74,7 +73,7 @@ export function createPlayer(
         yFrames: 4,
       }),
     },
-    collisionShape: createCircle(position, width / 2),
+    collisionBody: createCollisionCircle(width / 2, position),
   };
 }
 
@@ -116,45 +115,52 @@ export function animatePlayer(
   );
 }
 
-function processCircleCollision(player: Player, circle: Circle): void {
-  const dx = player.position.x + player.velocity.x - circle.position.x;
-  const dy = player.position.y + player.velocity.y - circle.position.y;
+function processCircleCollision(
+  player: Player,
+  circle: CollisionBody<Circle>,
+): void {
+  const dx = player.position.x + player.velocity.x - circle.origin.x;
+  const dy = player.position.y + player.velocity.y - circle.origin.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
   if (
-    distance <= player.collisionShape.radius + circle.radius &&
+    distance <= player.collisionBody.shape.radius + circle.shape.radius &&
     distance > 0
   ) {
     const normalX = dx / distance;
     const normalY = dy / distance;
-    const overlap = distance - circle.radius - player.collisionShape.radius;
+    const overlap =
+      distance - circle.shape.radius - player.collisionBody.shape.radius;
 
     player.velocity.x -= normalX * overlap;
     player.velocity.y -= normalY * overlap;
   }
 }
 
-function processRectangleCollision(player: Player, rectangle: Rectangle): void {
+function processRectangleCollision(
+  player: Player,
+  rectangle: CollisionBody<Rectangle>,
+): void {
   const dx =
     player.position.x +
     player.velocity.x -
     Math.max(
-      rectangle.position.x,
-      Math.min(player.position.x, rectangle.position.x + rectangle.width),
+      rectangle.origin.x,
+      Math.min(player.position.x, rectangle.origin.x + rectangle.shape.width),
     );
   const dy =
     player.position.y +
     player.velocity.y -
     Math.max(
-      rectangle.position.y,
-      Math.min(player.position.y, rectangle.position.y + rectangle.height),
+      rectangle.origin.y,
+      Math.min(player.position.y, rectangle.origin.y + rectangle.shape.height),
     );
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (distance <= player.collisionShape.radius && distance > 0) {
+  if (distance <= player.collisionBody.shape.radius && distance > 0) {
     const normalX = dx / distance;
     const normalY = dy / distance;
-    const overlap = distance - player.collisionShape.radius;
+    const overlap = distance - player.collisionBody.shape.radius;
 
     player.velocity.x -= normalX * overlap;
     player.velocity.y -= normalY * overlap;
@@ -163,7 +169,7 @@ function processRectangleCollision(player: Player, rectangle: Rectangle): void {
 
 export function processPlayer(
   player: Player,
-  collisionShapes: Array<CollisionShape>,
+  collisionBodies: Array<CollisionBody>, // I need a bucket for each shape
   delta: number,
 ): void {
   if (isZero(input.vector)) {
@@ -186,14 +192,14 @@ export function processPlayer(
   player.velocity.x = input.vector.x * delta * player.speedMultiplier;
   player.velocity.y = input.vector.y * delta * player.speedMultiplier;
 
-  for (const shape of collisionShapes) {
+  for (const shape of collisionBodies) {
     switch (shape.type) {
-      case CollisionShapeType.Circle: {
-        processCircleCollision(player, shape as Circle);
+      case ShapeType.Circle: {
+        processCircleCollision(player, shape);
         break;
       }
-      case CollisionShapeType.Rectangle: {
-        processRectangleCollision(player, shape as Rectangle);
+      case ShapeType.Rectangle: {
+        processRectangleCollision(player, shape);
         break;
       }
     }

@@ -20,7 +20,7 @@ import {
 } from "../../engine/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
-import { createRectangle } from "../../engine/CollisionShape.ts";
+import { createRectangle } from "../../engine/CollisionBody.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -55,7 +55,7 @@ const rectangle = createRectangle(
   64,
 );
 
-const collisionShapes = [dummy.collisionShape, rectangle];
+const collisionShapes = [dummy.collisionBody, rectangle];
 
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
@@ -87,8 +87,8 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   animatePlayer(player, ctx, delta);
   animatePlayer(dummy, ctx, delta);
-  player.collisionShape.render(ctx);
-  dummy.collisionShape.render(ctx);
+  player.collisionBody.render(ctx);
+  dummy.collisionBody.render(ctx);
 
   rectangle.render(ctx);
 
