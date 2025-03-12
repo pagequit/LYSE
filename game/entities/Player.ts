@@ -4,17 +4,17 @@ import {
   setXFrame,
   setYFrame,
   type Sprite,
-} from "../../engine/system/Sprite.ts";
-import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
-import { input } from "../../engine/system/Input.ts";
+} from "../../engine/Sprite.ts";
+import { getDirection, isZero, type Vector } from "../../engine/Vector.ts";
+import { input } from "../../engine/Input.ts";
 import {
   type CollisionShape,
   type Circle,
   type Rectangle,
   createCircle,
   CollisionShapeType,
-} from "../../engine/lib/CollisionShape.ts";
-import type { Renderable } from "../../engine/lib/Renderable.ts";
+} from "../../engine/CollisionShape.ts";
+import type { Renderable } from "../../engine/Renderable.ts";
 
 export enum State {
   Idle,

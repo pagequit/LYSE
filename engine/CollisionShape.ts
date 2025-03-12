@@ -1,5 +1,5 @@
 import { type Vector } from "./Vector.ts";
-import { createRenderable, type Renderable } from "./Renderable.ts";
+import { type Renderable } from "./Renderable.ts";
 
 export type CollisionShape = {
   type: CollisionShapeType;
@@ -26,10 +26,12 @@ export function createCircle(
   position: Vector,
   radius: number,
 ): Circle & Renderable {
-  return createRenderable(
-    { type: CollisionShapeType.Circle, position, radius },
-    renderCircle,
-  );
+  return {
+    type: CollisionShapeType.Circle,
+    position,
+    radius,
+    render: renderCircle,
+  };
 }
 
 function renderRectangle(this: Rectangle, ctx: CanvasRenderingContext2D): void {
@@ -42,10 +44,13 @@ export function createRectangle(
   width: number,
   height: number,
 ): Rectangle & Renderable {
-  return createRenderable(
-    { type: CollisionShapeType.Rectangle, position, width, height },
-    renderRectangle,
-  );
+  return {
+    type: CollisionShapeType.Rectangle,
+    position,
+    width,
+    height,
+    render: renderRectangle,
+  };
 }
 
 export function checkCircleCircleCollision(a: Circle, b: Circle): boolean {

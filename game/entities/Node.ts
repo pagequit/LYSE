@@ -1,9 +1,6 @@
 import { colors } from "../style.ts"; // TODO: decouple styling
-import type { Vector } from "../../engine/lib/Vector.ts";
-import {
-  createRenderable,
-  type Renderable,
-} from "../../engine/lib/Renderable.ts";
+import { type Vector } from "../../engine/Vector.ts";
+import { type Renderable } from "../../engine/Renderable.ts";
 
 export type Node = {
   position: Vector;
@@ -30,7 +27,7 @@ function render(this: Node, ctx: CanvasRenderingContext2D): void {
 }
 
 export function createNode(position: Vector): Node {
-  return createRenderable({ position }, render);
+  return { position, render };
 }
 
 export function getNodeByPosition(

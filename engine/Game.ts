@@ -2,7 +2,7 @@ import { applyCanvas, canvas, ctx } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { pointer } from "./Pointer.ts";
-import { applyMonitor, monitor } from "../gui/monitor.ts";
+import { applyMonitor, monitor } from "./monitor.ts";
 
 export type Game = {
   scene: Scene;

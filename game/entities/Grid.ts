@@ -1,4 +1,4 @@
-import { createRenderable, type Renderable } from "../../engine/lib/Renderable";
+import { type Renderable } from "../../engine/Renderable";
 
 export type Grid = {
   tileSize: number;
@@ -27,14 +27,12 @@ export function createGrid(
   height: number,
   tileSize: number,
 ): Grid {
-  return createRenderable(
-    {
-      tileSize,
-      width,
-      height,
-      x: width / tileSize,
-      y: height / tileSize,
-    },
+  return {
+    tileSize,
+    width,
+    height,
+    x: width / tileSize,
+    y: height / tileSize,
     render,
-  );
+  };
 }

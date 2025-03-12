@@ -1,7 +1,7 @@
-import { normalize, type Vector } from "../lib/Vector.ts";
-import { applyKeyboard, keyboardInput, removeKeyboard } from "./Keyboard";
-import { touchControls } from "../gui/TouchControls.ts";
-import { applyPointer, removePointer } from "./Pointer";
+import { normalize, type Vector } from "./Vector.ts";
+import { applyKeyboard, keyboardInput, removeKeyboard } from "./Keyboard.ts";
+import { touchControls } from "./TouchControls.ts";
+import { applyPointer, removePointer } from "./Pointer.ts";
 
 export type Input = {
   up: number;

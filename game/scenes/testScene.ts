@@ -1,8 +1,8 @@
 import {
   applyTouchControls,
   removeTouchControls,
-} from "../../engine/gui/TouchControls.ts";
-import { pointer } from "../../engine/system/Pointer.ts";
+} from "../../engine/TouchControls.ts";
+import { pointer } from "../../engine/Pointer.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -10,17 +10,17 @@ import {
   type Player,
   processPlayer,
   setDirection,
-} from "../entity/Player.ts";
-import { createGrid, type Grid } from "../entity/Grid.ts";
+} from "../entities/Player.ts";
+import { createGrid, type Grid } from "../entities/Grid.ts";
 import {
   changeScene,
   createScene,
   type Scene,
   setSceneCameraPosition,
-} from "../../engine/system/Scene.ts";
+} from "../../engine/Scene.ts";
 import nodeScene from "./nodeScene.ts";
-import { createNode, paintNode } from "../entity/Node.ts";
-import { createRectangle } from "../../engine/lib/CollisionShape.ts";
+import { createNode, paintNode } from "../entities/Node.ts";
+import { createRectangle } from "../../engine/CollisionShape.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,

@@ -1,24 +1,24 @@
 import { colors } from "../style.ts";
-import { pointer } from "../../engine/system/Pointer.ts";
+import { pointer } from "../../engine/Pointer.ts";
 import {
   changeScene,
   createScene,
   type Scene,
   setSceneCameraPosition,
-} from "../../engine/system/Scene.ts";
-import { type Vector } from "../../engine/lib/Vector.ts";
+} from "../../engine/Scene.ts";
+import { type Vector } from "../../engine/Vector.ts";
 import {
   createSegmentIntersection,
   setSegmentIntersection,
-} from "../../engine/lib/Segment.ts";
+} from "../../engine/Segment.ts";
 import {
   createNode,
   getNodeByPosition,
   type Node,
   paintNode,
-} from "../entity/Node.ts";
-import { createEdge, type Edge, paintEdge } from "../entity/Edge.ts";
-import { createGraph, type Graph, originDFS } from "../entity/Graph";
+} from "../entities/Node.ts";
+import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
+import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
 import testScene from "./testScene.ts";
 
 function handleEscape({ key }: KeyboardEvent): void {
@@ -153,12 +153,12 @@ function onPointerMove(): void {
 
   if (activeNode !== null) {
     for (const edge of edges.filter(
-      (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
+      (edge) => edge.nodes[0] !== activeNode && edge.nodes[1] !== activeNode,
     )) {
       setSegmentIntersection(
         segmentIntersection,
         [activeNode.position, pointer.position],
-        [edge[0].position, edge[1].position],
+        [edge.nodes[0].position, edge.nodes[1].position],
       );
 
       isIntersecting = !Number.isNaN(segmentIntersection.offset);
@@ -187,8 +187,8 @@ function onPointerMove(): void {
     const existingEdge: Edge | undefined = edges.find((edge, index) => {
       existingIndex = index;
       return (
-        (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
-        (edge[0] === nextEdge[1] && edge[1] === nextEdge[0])
+        (edge.nodes[0] === nextEdge[0] && edge.nodes[1] === nextEdge[1]) ||
+        (edge.nodes[0] === nextEdge[1] && edge.nodes[1] === nextEdge[0])
       );
     });
 
