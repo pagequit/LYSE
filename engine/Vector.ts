@@ -46,8 +46,10 @@ export function scale(vector: Vector, scalar: number): void {
 }
 
 export function normalize(vector: Vector): void {
-  const scalar = 1 / Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-  if (scalar !== Number.POSITIVE_INFINITY) {
+  const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+
+  if (magnitude > 0) {
+    const scalar = 1 / magnitude;
     vector.x *= scalar;
     vector.y *= scalar;
   }
