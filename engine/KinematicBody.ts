@@ -1,7 +1,10 @@
 import {
   renderCircle,
+  renderRectangle,
+  ShapeType,
   type CollisionBody,
   type Circle,
+  type Rectangle,
 } from "./CollisionBody.ts";
 import { type Vector } from "./Vector.ts";
 
@@ -19,33 +22,37 @@ export function renderKinemeticCircle(
   renderCircle(body, ctx, fillStyle);
 }
 
+export function renderKinemeticRectangle(
+  body: KinematicBody<Rectangle>,
+  ctx: CanvasRenderingContext2D,
+  fillStyle: string = defaultFillStyle,
+): void {
+  renderRectangle(body, ctx, fillStyle);
+}
+
 export function createKinemeticCircle(
+  origin: Vector,
   radius: number,
-  position: Vector,
   velocity: Vector = { x: 0, y: 0 },
 ): KinematicBody<Circle> {
   return {
+    type: ShapeType.Circle,
     shape: { radius },
-    position,
+    origin,
     velocity,
   };
 }
 
-function renderRectangle(this: Rectangle, ctx: CanvasRenderingContext2D): void {
-  ctx.fillStyle = "rgba(255, 0, 128, 0.5)";
-  ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-}
-
-export function createRectangle(
-  position: Vector,
+export function createKinemeticRectangle(
+  origin: Vector,
   width: number,
   height: number,
-): Rectangle & Renderable {
+  velocity: Vector = { x: 0, y: 0 },
+): KinematicBody<Rectangle> {
   return {
-    type: CollisionShapeType.Rectangle,
-    position,
-    width,
-    height,
-    render: renderRectangle,
+    type: ShapeType.Rectangle,
+    shape: { width, height },
+    origin,
+    velocity,
   };
 }

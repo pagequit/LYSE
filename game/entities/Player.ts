@@ -73,7 +73,7 @@ export function createPlayer(
         yFrames: 4,
       }),
     },
-    collisionBody: createCollisionCircle(width / 2, position),
+    collisionBody: createCollisionCircle(position, width / 2),
   };
 }
 
@@ -169,7 +169,7 @@ function processRectangleCollision(
 
 export function processPlayer(
   player: Player,
-  collisionBodies: Array<CollisionBody>, // I need a bucket for each shape
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
   delta: number,
 ): void {
   if (isZero(input.vector)) {
@@ -195,11 +195,11 @@ export function processPlayer(
   for (const shape of collisionBodies) {
     switch (shape.type) {
       case ShapeType.Circle: {
-        processCircleCollision(player, shape);
+        processCircleCollision(player, shape as CollisionBody<Circle>);
         break;
       }
       case ShapeType.Rectangle: {
-        processRectangleCollision(player, shape);
+        processRectangleCollision(player, shape as CollisionBody<Rectangle>);
         break;
       }
     }

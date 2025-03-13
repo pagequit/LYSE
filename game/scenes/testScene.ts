@@ -20,7 +20,11 @@ import {
 } from "../../engine/Scene.ts";
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
-import { createRectangle } from "../../engine/CollisionBody.ts";
+import {
+  createCollisionRectangle,
+  renderCircle,
+  renderRectangle,
+} from "../../engine/CollisionBody.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -49,7 +53,7 @@ const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
-const rectangle = createRectangle(
+const rectangle = createCollisionRectangle(
   { x: scene.width / 2 - 96, y: (scene.height / 2) * 0.75 },
   128,
   64,
@@ -82,15 +86,15 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   processPlayer(player, collisionShapes, delta);
 
-  pointerNode.position = pointer.position;
-  paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
-
   animatePlayer(player, ctx, delta);
   animatePlayer(dummy, ctx, delta);
-  player.collisionBody.render(ctx);
-  dummy.collisionBody.render(ctx);
 
-  rectangle.render(ctx);
+  renderCircle(player.collisionBody, ctx);
+  renderCircle(dummy.collisionBody, ctx);
+  renderRectangle(rectangle, ctx);
+
+  pointerNode.position = pointer.position;
+  paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
 
   setSceneCameraPosition(
     player.position.x - (self.innerWidth - 64) / 2,

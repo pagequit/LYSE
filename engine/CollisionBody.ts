@@ -48,8 +48,8 @@ export function renderRectangle(
 }
 
 export function createCollisionCircle(
-  radius: number,
   origin: Vector,
+  radius: number,
 ): CollisionBody<Circle> {
   return {
     type: ShapeType.Circle,
@@ -59,9 +59,9 @@ export function createCollisionCircle(
 }
 
 export function createCollisionRectangle(
+  origin: Vector,
   width: number,
   height: number,
-  origin: Vector,
 ): CollisionBody<Rectangle> {
   return {
     type: ShapeType.Rectangle,
