@@ -109,7 +109,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     kinematicRectangle,
   );
   for (const body of kinematicBodies) {
-    updateKinematicBody(body, delta);
+    updateKinematicBody(body, delta, 0.99);
   }
 
   animatePlayer(player, ctx, delta);

@@ -131,9 +131,10 @@ export function processCircleRectangleCollisionKinematics(
 export function updateKinematicBody(
   body: KinematicBody<Circle | Rectangle>,
   delta: number,
+  friction: number = 1,
 ): void {
   body.origin.x += body.velocity.x * delta * 0.25;
   body.origin.y += body.velocity.y * delta * 0.25;
-  body.velocity.x *= 0.25;
-  body.velocity.y *= 0.25;
+  body.velocity.x *= friction;
+  body.velocity.y *= friction;
 }
