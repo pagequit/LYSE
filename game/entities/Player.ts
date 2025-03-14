@@ -14,6 +14,12 @@ import {
   createCollisionCircle,
   ShapeType,
 } from "../../engine/CollisionBody.ts";
+import {
+  createKinemeticCircle,
+  type KinematicBody,
+  processCircleCollisionKinematics,
+  processCircleRectangleCollisionKinematics,
+} from "../../engine/KinematicBody.ts";
 
 export enum State {
   Idle,
@@ -38,6 +44,7 @@ export type Player = {
     [State.Idle]: Sprite;
   };
   collisionBody: CollisionBody<Circle>;
+  kinematicBody: KinematicBody<Circle>;
 };
 
 export function createPlayer(
@@ -45,11 +52,12 @@ export function createPlayer(
   width: number,
   height: number,
 ): Player {
+  const velocity = { x: 0, y: 0 };
   return {
     position,
     state: State.Idle,
     direction: Direction.Right,
-    velocity: { x: 0, y: 0 },
+    velocity,
     speedMultiplier: 0.25,
     animations: {
       [State.Idle]: createSprite({
@@ -74,6 +82,7 @@ export function createPlayer(
       }),
     },
     collisionBody: createCollisionCircle(position, width / 2),
+    kinematicBody: createKinemeticCircle(position, width / 2, velocity),
   };
 }
 
@@ -170,6 +179,7 @@ function processRectangleCollision(
 export function processPlayer(
   player: Player,
   collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
   delta: number,
 ): void {
   if (isZero(input.vector)) {
@@ -207,4 +217,23 @@ export function processPlayer(
 
   player.position.x += player.velocity.x;
   player.position.y += player.velocity.y;
+
+  for (const shape of kinematicBodies) {
+    switch (shape.type) {
+      case ShapeType.Circle: {
+        processCircleCollisionKinematics(
+          player.kinematicBody,
+          shape as KinematicBody<Circle>,
+        );
+        break;
+      }
+      case ShapeType.Rectangle: {
+        processCircleRectangleCollisionKinematics(
+          player.kinematicBody,
+          shape as KinematicBody<Rectangle>,
+        );
+        break;
+      }
+    }
+  }
 }
