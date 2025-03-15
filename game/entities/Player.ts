@@ -7,12 +7,10 @@ import {
 } from "../../engine/Sprite.ts";
 import { getDirection, isZero, type Vector } from "../../engine/Vector.ts";
 import { input } from "../../engine/Input.ts";
-import {
-  type Circle,
-  createCollisionCircle,
-} from "../../engine/CollisionBody.ts";
+import { type Circle, type Rectangle } from "../../engine/CollisionBody.ts";
 import {
   createKinemeticCircle,
+  createKinemeticRectangle,
   type KinematicBody,
 } from "../../engine/KinematicBody.ts";
 
@@ -38,7 +36,7 @@ export type Player = {
     [State.Walk]: Sprite;
     [State.Idle]: Sprite;
   };
-  kinematicBody: KinematicBody<Circle>;
+  kinematicBody: KinematicBody<Rectangle>;
 };
 
 export function createPlayer(
@@ -75,7 +73,7 @@ export function createPlayer(
         yFrames: 4,
       }),
     },
-    kinematicBody: createKinemeticCircle(position, width * 0.25, velocity),
+    kinematicBody: createKinemeticRectangle(position, width, height, velocity),
   };
 }
 
@@ -109,8 +107,8 @@ export function animatePlayer(
   animateSprite(
     player.animations[player.state],
     {
-      x: player.position.x - player.animations[player.state].width * 0.5,
-      y: player.position.y - player.animations[player.state].height * 0.625,
+      x: player.position.x,
+      y: player.position.y,
     },
     ctx,
     delta,

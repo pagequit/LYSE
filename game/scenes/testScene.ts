@@ -41,6 +41,7 @@ import {
   renderKinemeticRectangle,
   updateKinematicBody,
   type KinematicBody,
+  processRectangleCircleCollision,
 } from "../../engine/KinematicBody.ts";
 import { isZero } from "../../engine/Vector.ts";
 
@@ -197,6 +198,10 @@ function handleRectangleCollisions(
   for (const collisionBody of collisionBodies) {
     switch (collisionBody.type) {
       case ShapeType.Circle:
+        processRectangleCircleCollision(
+          rectangle,
+          collisionBody as CollisionBody<Circle>,
+        );
         break;
       case ShapeType.Rectangle:
         break;
