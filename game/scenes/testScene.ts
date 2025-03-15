@@ -33,12 +33,52 @@ import {
 import {
   createKinemeticCircle,
   createKinemeticRectangle,
+  processCircleCollisionKinematics,
   processCircleRectangleCollisionKinematics,
+  processCircleCollision,
+  processCircleRectangleCollision,
   renderKinemeticCircle,
   renderKinemeticRectangle,
   updateKinematicBody,
   type KinematicBody,
 } from "../../engine/KinematicBody.ts";
+import { isZero } from "../../engine/Vector.ts";
+
+function renderCollisionBodies(
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  ctx: CanvasRenderingContext2D,
+): void {
+  for (const body of collisionBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderCircle(body as CollisionBody<Circle>, ctx);
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderRectangle(body as CollisionBody<Rectangle>, ctx);
+        break;
+      }
+    }
+  }
+}
+
+function renderKinematicBodies(
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+  ctx: CanvasRenderingContext2D,
+): void {
+  for (const body of kinematicBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderKinemeticCircle(body as KinematicBody<Circle>, ctx);
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderKinemeticRectangle(body as KinematicBody<Rectangle>, ctx);
+        break;
+      }
+    }
+  }
+}
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -101,46 +141,137 @@ const kiniematicCircle = createKinemeticCircle(
 );
 
 const collisionBodies = [collisionRectangle, collisionCircle];
-const kinematicBodies = [kinematicRectangle, kiniematicCircle];
+const kinematicBodies = [
+  player.kinematicBody,
+  kinematicRectangle,
+  kiniematicCircle,
+];
+
+const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
+
+function handleCircleCollisions(
+  circle: KinematicBody<Circle>,
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+): void {
+  for (const collisionBody of collisionBodies) {
+    switch (collisionBody.type) {
+      case ShapeType.Circle:
+        processCircleCollision(circle, collisionBody as CollisionBody<Circle>);
+        break;
+      case ShapeType.Rectangle:
+        processCircleRectangleCollision(
+          circle,
+          collisionBody as CollisionBody<Rectangle>,
+        );
+        break;
+    }
+  }
+}
+
+function handleKinematicCircleCollisions(
+  circle: KinematicBody<Circle>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+): void {
+  for (const kinematicBody of kinematicBodies) {
+    switch (kinematicBody.type) {
+      case ShapeType.Circle:
+        processCircleCollisionKinematics(
+          circle,
+          kinematicBody as KinematicBody<Circle>,
+        );
+        break;
+      case ShapeType.Rectangle:
+        processCircleRectangleCollisionKinematics(
+          circle,
+          kinematicBody as KinematicBody<Rectangle>,
+        );
+        break;
+    }
+  }
+}
+
+function handleRectangleCollisions(
+  rectangle: KinematicBody<Rectangle>,
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+): void {
+  return;
+}
+
+function handleKinematicRectangleCollisions(
+  rectangle: KinematicBody<Rectangle>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+): void {
+  for (const kinematicBody of kinematicBodies) {
+    switch (kinematicBody.type) {
+      case ShapeType.Circle:
+        processCircleRectangleCollisionKinematics(
+          kinematicBody as KinematicBody<Circle>,
+          rectangle,
+        );
+        break;
+      case ShapeType.Rectangle:
+        break;
+    }
+  }
+}
+
+function processKinematicBodies(
+  activeBodies: Array<KinematicBody<Circle | Rectangle>>,
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+): void {
+  for (const activeBody of activeBodies) {
+    switch (activeBody.type) {
+      case ShapeType.Circle: {
+        handleCircleCollisions(
+          activeBody as KinematicBody<Circle>,
+          collisionBodies,
+        );
+        handleKinematicCircleCollisions(
+          activeBody as KinematicBody<Circle>,
+          kinematicBodies,
+        );
+        break;
+      }
+      case ShapeType.Rectangle: {
+        handleRectangleCollisions(
+          activeBody as KinematicBody<Rectangle>,
+          collisionBodies,
+        );
+        handleKinematicRectangleCollisions(
+          activeBody as KinematicBody<Rectangle>,
+          kinematicBodies,
+        );
+        break;
+      }
+    }
+  }
+}
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
-  processPlayer(player, collisionBodies, kinematicBodies, delta);
+  processPlayer(player);
 
-  processCircleRectangleCollisionKinematics(
-    kiniematicCircle,
-    kinematicRectangle,
+  activeKinematicBodies.length = 0;
+  for (const body of kinematicBodies) {
+    if (!isZero(body.velocity)) {
+      activeKinematicBodies.push(body);
+    }
+  }
+
+  processKinematicBodies(
+    activeKinematicBodies,
+    collisionBodies,
+    kinematicBodies,
   );
+
   for (const body of kinematicBodies) {
     updateKinematicBody(body, delta, 1);
   }
 
-  for (const body of collisionBodies) {
-    switch (body.type) {
-      case ShapeType.Circle: {
-        renderCircle(body as CollisionBody<Circle>, ctx);
-        break;
-      }
-      case ShapeType.Rectangle: {
-        renderRectangle(body as CollisionBody<Rectangle>, ctx);
-        break;
-      }
-    }
-  }
-
-  for (const body of kinematicBodies) {
-    switch (body.type) {
-      case ShapeType.Circle: {
-        renderKinemeticCircle(body as KinematicBody<Circle>, ctx);
-        break;
-      }
-      case ShapeType.Rectangle: {
-        renderKinemeticRectangle(body as KinematicBody<Rectangle>, ctx);
-        break;
-      }
-    }
-  }
+  renderCollisionBodies(collisionBodies, ctx);
+  renderKinematicBodies(kinematicBodies, ctx);
 
   animatePlayer(player, ctx, delta);
 

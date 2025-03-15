@@ -8,17 +8,12 @@ import {
 import { getDirection, isZero, type Vector } from "../../engine/Vector.ts";
 import { input } from "../../engine/Input.ts";
 import {
-  type CollisionBody,
   type Circle,
-  type Rectangle,
   createCollisionCircle,
-  ShapeType,
 } from "../../engine/CollisionBody.ts";
 import {
   createKinemeticCircle,
   type KinematicBody,
-  processCircleCollisionKinematics,
-  processCircleRectangleCollisionKinematics,
 } from "../../engine/KinematicBody.ts";
 
 export enum State {
@@ -43,7 +38,6 @@ export type Player = {
     [State.Walk]: Sprite;
     [State.Idle]: Sprite;
   };
-  collisionBody: CollisionBody<Circle>;
   kinematicBody: KinematicBody<Circle>;
 };
 
@@ -81,7 +75,6 @@ export function createPlayer(
         yFrames: 4,
       }),
     },
-    collisionBody: createCollisionCircle(position, width * 0.25),
     kinematicBody: createKinemeticCircle(position, width * 0.25, velocity),
   };
 }
@@ -124,64 +117,7 @@ export function animatePlayer(
   );
 }
 
-function processCircleCollision(
-  player: Player,
-  circle: CollisionBody<Circle>,
-): void {
-  const dx = player.position.x + player.velocity.x - circle.origin.x;
-  const dy = player.position.y + player.velocity.y - circle.origin.y;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  if (
-    distance <= player.collisionBody.shape.radius + circle.shape.radius &&
-    distance > 0
-  ) {
-    const normalX = dx / distance;
-    const normalY = dy / distance;
-    const overlap =
-      distance - circle.shape.radius - player.collisionBody.shape.radius;
-
-    player.velocity.x -= normalX * overlap;
-    player.velocity.y -= normalY * overlap;
-  }
-}
-
-function processRectangleCollision(
-  player: Player,
-  rectangle: CollisionBody<Rectangle>,
-): void {
-  const dx =
-    player.position.x +
-    player.velocity.x -
-    Math.max(
-      rectangle.origin.x,
-      Math.min(player.position.x, rectangle.origin.x + rectangle.shape.width),
-    );
-  const dy =
-    player.position.y +
-    player.velocity.y -
-    Math.max(
-      rectangle.origin.y,
-      Math.min(player.position.y, rectangle.origin.y + rectangle.shape.height),
-    );
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  if (distance <= player.collisionBody.shape.radius && distance > 0) {
-    const normalX = dx / distance;
-    const normalY = dy / distance;
-    const overlap = distance - player.collisionBody.shape.radius;
-
-    player.velocity.x -= normalX * overlap;
-    player.velocity.y -= normalY * overlap;
-  }
-}
-
-export function processPlayer(
-  player: Player,
-  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
-  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
-  delta: number,
-): void {
+export function processPlayer(player: Player): void {
   if (isZero(input.vector)) {
     setState(player, State.Idle);
   } else {
@@ -199,41 +135,6 @@ export function processPlayer(
     }
   }
 
-  player.velocity.x = input.vector.x * delta * player.speedMultiplier;
-  player.velocity.y = input.vector.y * delta * player.speedMultiplier;
-
-  for (const shape of collisionBodies) {
-    switch (shape.type) {
-      case ShapeType.Circle: {
-        processCircleCollision(player, shape as CollisionBody<Circle>);
-        break;
-      }
-      case ShapeType.Rectangle: {
-        processRectangleCollision(player, shape as CollisionBody<Rectangle>);
-        break;
-      }
-    }
-  }
-
-  player.position.x += player.velocity.x;
-  player.position.y += player.velocity.y;
-
-  for (const shape of kinematicBodies) {
-    switch (shape.type) {
-      case ShapeType.Circle: {
-        processCircleCollisionKinematics(
-          player.kinematicBody,
-          shape as KinematicBody<Circle>,
-        );
-        break;
-      }
-      case ShapeType.Rectangle: {
-        processCircleRectangleCollisionKinematics(
-          player.kinematicBody,
-          shape as KinematicBody<Rectangle>,
-        );
-        break;
-      }
-    }
-  }
+  player.velocity.x = input.vector.x;
+  player.velocity.y = input.vector.y;
 }

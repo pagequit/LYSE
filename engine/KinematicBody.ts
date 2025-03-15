@@ -140,3 +140,51 @@ export function updateKinematicBody(
   body.velocity.y =
     Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y * friction;
 }
+
+export function processCircleCollision(
+  circleA: KinematicBody<Circle>,
+  circleB: CollisionBody<Circle>,
+): void {
+  const dx = circleA.origin.x + circleA.velocity.x - circleB.origin.x;
+  const dy = circleA.origin.y + circleA.velocity.y - circleB.origin.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance <= circleA.shape.radius + circleB.shape.radius && distance > 0) {
+    const normalX = dx / distance;
+    const normalY = dy / distance;
+    const overlap = distance - circleB.shape.radius - circleA.shape.radius;
+
+    circleA.velocity.x -= normalX * overlap;
+    circleA.velocity.y -= normalY * overlap;
+  }
+}
+
+export function processCircleRectangleCollision(
+  circle: KinematicBody<Circle>,
+  rectangle: CollisionBody<Rectangle>,
+): void {
+  const dx =
+    circle.origin.x +
+    circle.velocity.x -
+    Math.max(
+      rectangle.origin.x,
+      Math.min(circle.origin.x, rectangle.origin.x + rectangle.shape.width),
+    );
+  const dy =
+    circle.origin.y +
+    circle.velocity.y -
+    Math.max(
+      rectangle.origin.y,
+      Math.min(circle.origin.y, rectangle.origin.y + rectangle.shape.height),
+    );
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance <= circle.shape.radius && distance > 0) {
+    const normalX = dx / distance;
+    const normalY = dy / distance;
+    const overlap = distance - circle.shape.radius;
+
+    circle.velocity.x -= normalX * overlap;
+    circle.velocity.y -= normalY * overlap;
+  }
+}
