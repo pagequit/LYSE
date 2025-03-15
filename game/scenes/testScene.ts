@@ -194,7 +194,14 @@ function handleRectangleCollisions(
   rectangle: KinematicBody<Rectangle>,
   collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
 ): void {
-  return;
+  for (const collisionBody of collisionBodies) {
+    switch (collisionBody.type) {
+      case ShapeType.Circle:
+        break;
+      case ShapeType.Rectangle:
+        break;
+    }
+  }
 }
 
 function handleKinematicRectangleCollisions(
@@ -267,7 +274,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   );
 
   for (const body of kinematicBodies) {
-    updateKinematicBody(body, delta, 1);
+    updateKinematicBody(body, delta, 0.99);
   }
 
   renderCollisionBodies(collisionBodies, ctx);
