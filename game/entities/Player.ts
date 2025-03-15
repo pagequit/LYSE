@@ -81,8 +81,8 @@ export function createPlayer(
         yFrames: 4,
       }),
     },
-    collisionBody: createCollisionCircle(position, width / 2),
-    kinematicBody: createKinemeticCircle(position, width / 2, velocity),
+    collisionBody: createCollisionCircle(position, width * 0.25),
+    kinematicBody: createKinemeticCircle(position, width * 0.25, velocity),
   };
 }
 
@@ -116,8 +116,8 @@ export function animatePlayer(
   animateSprite(
     player.animations[player.state],
     {
-      x: player.position.x - player.animations[player.state].width / 2,
-      y: player.position.y - player.animations[player.state].height / 2,
+      x: player.position.x - player.animations[player.state].width * 0.5,
+      y: player.position.y - player.animations[player.state].height * 0.625,
     },
     ctx,
     delta,

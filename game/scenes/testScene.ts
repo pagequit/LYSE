@@ -21,9 +21,14 @@ import {
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
+  createCollisionCircle,
   createCollisionRectangle,
   renderCircle,
   renderRectangle,
+  ShapeType,
+  type Circle,
+  type CollisionBody,
+  type Rectangle,
 } from "../../engine/CollisionBody.ts";
 import {
   createKinemeticCircle,
@@ -32,6 +37,7 @@ import {
   renderKinemeticCircle,
   renderKinemeticRectangle,
   updateKinematicBody,
+  type KinematicBody,
 } from "../../engine/KinematicBody.ts";
 
 const scene: Scene = createScene(process, {
@@ -66,37 +72,35 @@ function destruct(): void {
 }
 
 const player: Player = createPlayer(
-  { x: (scene.width - 64) / 2, y: ((scene.height - 64) / 2) * 0.725 },
+  { x: (scene.width - 64) / 2, y: (scene.height - 64) / 2 + 16 },
   64,
   64,
 );
 setDirection(player, Direction.Right);
 
-const dummy: Player = createPlayer(
-  { x: (scene.width - 64) / 2, y: ((scene.height - 64) / 2) * 1.125 },
-  128,
-  128,
+const collisionCircle = createCollisionCircle(
+  { x: scene.width / 2, y: scene.height / 2 - 128 },
+  32,
 );
-setDirection(dummy, Direction.Left);
 
 const collisionRectangle = createCollisionRectangle(
-  { x: scene.width / 2, y: (scene.height / 2) * 0.725 },
+  { x: scene.width / 2, y: scene.height / 2 - 128 },
   64,
   64,
 );
 
 const kinematicRectangle = createKinemeticRectangle(
-  { x: scene.width / 2 - 96, y: (scene.height / 2) * 0.75 },
+  { x: scene.width / 2 - 96, y: scene.height / 2 + 64 },
   128,
   64,
 );
 
 const kiniematicCircle = createKinemeticCircle(
-  { x: scene.width / 2, y: (scene.height / 2) * 1.175 },
+  { x: scene.width / 2, y: scene.height / 2 + 256 },
   32,
 );
 
-const collisionBodies = [collisionRectangle];
+const collisionBodies = [collisionRectangle, collisionCircle];
 const kinematicBodies = [kinematicRectangle, kiniematicCircle];
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
@@ -109,18 +113,36 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     kinematicRectangle,
   );
   for (const body of kinematicBodies) {
-    updateKinematicBody(body, delta, 0.99);
+    updateKinematicBody(body, delta, 1);
+  }
+
+  for (const body of collisionBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderCircle(body as CollisionBody<Circle>, ctx);
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderRectangle(body as CollisionBody<Rectangle>, ctx);
+        break;
+      }
+    }
+  }
+
+  for (const body of kinematicBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderKinemeticCircle(body as KinematicBody<Circle>, ctx);
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderKinemeticRectangle(body as KinematicBody<Rectangle>, ctx);
+        break;
+      }
+    }
   }
 
   animatePlayer(player, ctx, delta);
-  animatePlayer(dummy, ctx, delta);
-
-  renderCircle(player.collisionBody, ctx);
-  renderCircle(dummy.collisionBody, ctx);
-  renderRectangle(collisionRectangle, ctx);
-
-  renderKinemeticRectangle(kinematicRectangle, ctx);
-  renderKinemeticCircle(kiniematicCircle, ctx);
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");

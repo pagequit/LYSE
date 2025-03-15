@@ -135,6 +135,8 @@ export function updateKinematicBody(
 ): void {
   body.origin.x += body.velocity.x * delta * 0.25;
   body.origin.y += body.velocity.y * delta * 0.25;
-  body.velocity.x *= friction;
-  body.velocity.y *= friction;
+  body.velocity.x =
+    Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x * friction;
+  body.velocity.y =
+    Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y * friction;
 }
