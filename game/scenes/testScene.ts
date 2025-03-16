@@ -42,6 +42,8 @@ import {
   updateKinematicBody,
   type KinematicBody,
   processRectangleCircleCollision,
+  processRectangleCollision,
+  processRectangleCollisionKinematics,
 } from "../../engine/KinematicBody.ts";
 import { isZero } from "../../engine/Vector.ts";
 
@@ -136,6 +138,12 @@ const kinematicRectangle = createKinemeticRectangle(
   64,
 );
 
+const kinematicSquare = createKinemeticRectangle(
+  { x: scene.width / 2 - 96, y: scene.height / 2 + 128 },
+  64,
+  64,
+);
+
 const kiniematicCircle = createKinemeticCircle(
   { x: scene.width / 2, y: scene.height / 2 + 256 },
   32,
@@ -146,6 +154,7 @@ const kinematicBodies = [
   player.kinematicBody,
   kinematicRectangle,
   kiniematicCircle,
+  kinematicSquare,
 ];
 
 const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
@@ -204,6 +213,10 @@ function handleRectangleCollisions(
         );
         break;
       case ShapeType.Rectangle:
+        processRectangleCollision(
+          rectangle,
+          collisionBody as CollisionBody<Rectangle>,
+        );
         break;
     }
   }
@@ -222,6 +235,10 @@ function handleKinematicRectangleCollisions(
         );
         break;
       case ShapeType.Rectangle:
+        processRectangleCollisionKinematics(
+          rectangle,
+          kinematicBody as KinematicBody<Rectangle>,
+        );
         break;
     }
   }
@@ -279,7 +296,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   );
 
   for (const body of kinematicBodies) {
-    updateKinematicBody(body, delta, 0.99);
+    updateKinematicBody(body, delta, 0.9);
   }
 
   renderCollisionBodies(collisionBodies, ctx);

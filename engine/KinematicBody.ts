@@ -87,6 +87,48 @@ export function processCircleCollisionKinematics(
   }
 }
 
+export function processRectangleCollisionKinematics(
+  rectangleA: KinematicBody<Rectangle>,
+  rectangleB: KinematicBody<Rectangle>,
+): void {
+  const rectangleAX = rectangleA.origin.x + rectangleA.velocity.x;
+  const rectangleAY = rectangleA.origin.y + rectangleA.velocity.y;
+
+  const rectangleBX = rectangleB.origin.x + rectangleB.velocity.x;
+  const rectangleBY = rectangleB.origin.y + rectangleB.velocity.y;
+
+  const rectangleARight = rectangleAX + rectangleA.shape.width;
+  const rectangleABottom = rectangleAY + rectangleA.shape.height;
+
+  const rectangleBRight = rectangleBX + rectangleB.shape.width;
+  const rectangleBBottom = rectangleBY + rectangleB.shape.height;
+
+  if (
+    rectangleAX < rectangleBRight &&
+    rectangleBX < rectangleARight &&
+    rectangleAY < rectangleBBottom &&
+    rectangleBY < rectangleABottom
+  ) {
+    const overlapXRight = rectangleARight - rectangleB.origin.x;
+    const overlapXLeft = rectangleBRight - rectangleAX;
+    const overlapX =
+      overlapXRight < overlapXLeft ? -overlapXRight : overlapXLeft;
+
+    const overlapYBottom = rectangleABottom - rectangleB.origin.y;
+    const overlapYTop = rectangleBBottom - rectangleAY;
+    const overlapY =
+      overlapYBottom < overlapYTop ? -overlapYBottom : overlapYTop;
+
+    if (Math.abs(overlapX) > Math.abs(overlapY)) {
+      rectangleA.velocity.y += overlapY / 2;
+      rectangleB.velocity.y -= overlapY / 2;
+    } else {
+      rectangleA.velocity.x += overlapX / 2;
+      rectangleB.velocity.x -= overlapX / 2;
+    }
+  }
+}
+
 export function processCircleRectangleCollisionKinematics(
   circle: KinematicBody<Circle>,
   rectangle: KinematicBody<Rectangle>,
@@ -154,8 +196,45 @@ export function processCircleCollision(
     const normalY = dy / distance;
     const overlap = distance - circleB.shape.radius - circleA.shape.radius;
 
-    circleA.origin.x -= normalX * overlap;
-    circleA.origin.y -= normalY * overlap;
+    circleA.velocity.x -= normalX * overlap;
+    circleA.velocity.y -= normalY * overlap;
+  }
+}
+
+export function processRectangleCollision(
+  rectangleA: KinematicBody<Rectangle>,
+  rectangleB: CollisionBody<Rectangle>,
+): void {
+  const rectangleAX = rectangleA.origin.x + rectangleA.velocity.x;
+  const rectangleAY = rectangleA.origin.y + rectangleA.velocity.y;
+
+  const rectangleARight = rectangleAX + rectangleA.shape.width;
+  const rectangleABottom = rectangleAY + rectangleA.shape.height;
+
+  const rectangleBRight = rectangleB.origin.x + rectangleB.shape.width;
+  const rectangleBBottom = rectangleB.origin.y + rectangleB.shape.height;
+
+  if (
+    rectangleAX < rectangleBRight &&
+    rectangleARight > rectangleB.origin.x &&
+    rectangleAY < rectangleBBottom &&
+    rectangleABottom > rectangleB.origin.y
+  ) {
+    const overlapXRight = rectangleARight - rectangleB.origin.x;
+    const overlapXLeft = rectangleBRight - rectangleAX;
+    const overlapX =
+      overlapXRight < overlapXLeft ? -overlapXRight : overlapXLeft;
+
+    const overlapYBottom = rectangleABottom - rectangleB.origin.y;
+    const overlapYTop = rectangleBBottom - rectangleAY;
+    const overlapY =
+      overlapYBottom < overlapYTop ? -overlapYBottom : overlapYTop;
+
+    if (Math.abs(overlapX) > Math.abs(overlapY)) {
+      rectangleA.velocity.y += overlapY;
+    } else {
+      rectangleA.velocity.x += overlapX;
+    }
   }
 }
 
@@ -184,8 +263,8 @@ export function processCircleRectangleCollision(
     const normalY = dy / distance;
     const overlap = distance - circle.shape.radius;
 
-    circle.origin.x -= normalX * overlap;
-    circle.origin.y -= normalY * overlap;
+    circle.velocity.x -= normalX * overlap;
+    circle.velocity.y -= normalY * overlap;
   }
 }
 
@@ -215,7 +294,7 @@ export function processRectangleCircleCollision(
     const normalY = dy / distance;
     const overlap = distance - circle.shape.radius;
 
-    rectangle.origin.x += normalX * overlap;
-    rectangle.origin.y += normalY * overlap;
+    rectangle.velocity.x += normalX * overlap;
+    rectangle.velocity.y += normalY * overlap;
   }
 }
