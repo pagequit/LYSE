@@ -30,6 +30,24 @@ export function renderKinemeticRectangle(
   renderRectangle(body, ctx, fillStyle);
 }
 
+export function renderKinematicBodies(
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+  ctx: CanvasRenderingContext2D,
+): void {
+  for (const body of kinematicBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderKinemeticCircle(body as KinematicBody<Circle>, ctx);
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderKinemeticRectangle(body as KinematicBody<Rectangle>, ctx);
+        break;
+      }
+    }
+  }
+}
+
 export function createKinemeticCircle(
   origin: Vector,
   radius: number,
@@ -57,7 +75,20 @@ export function createKinemeticRectangle(
   };
 }
 
-export function processCircleCollisionKinematics(
+export function updateKinematicBody(
+  body: KinematicBody<Circle | Rectangle>,
+  delta: number,
+  friction: number = 1,
+): void {
+  body.origin.x += body.velocity.x * delta * 0.25;
+  body.origin.y += body.velocity.y * delta * 0.25;
+  body.velocity.x =
+    Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x * friction;
+  body.velocity.y =
+    Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y * friction;
+}
+
+export function processCircleCollision(
   circleA: KinematicBody<Circle>,
   circleB: KinematicBody<Circle>,
 ): void {
@@ -87,7 +118,7 @@ export function processCircleCollisionKinematics(
   }
 }
 
-export function processRectangleCollisionKinematics(
+export function processRectangleCollision(
   rectangleA: KinematicBody<Rectangle>,
   rectangleB: KinematicBody<Rectangle>,
 ): void {
@@ -129,7 +160,7 @@ export function processRectangleCollisionKinematics(
   }
 }
 
-export function processCircleRectangleCollisionKinematics(
+export function processCircleAndRectangleCollision(
   circle: KinematicBody<Circle>,
   rectangle: KinematicBody<Rectangle>,
 ): void {
@@ -170,20 +201,7 @@ export function processCircleRectangleCollisionKinematics(
   }
 }
 
-export function updateKinematicBody(
-  body: KinematicBody<Circle | Rectangle>,
-  delta: number,
-  friction: number = 1,
-): void {
-  body.origin.x += body.velocity.x * delta * 0.25;
-  body.origin.y += body.velocity.y * delta * 0.25;
-  body.velocity.x =
-    Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x * friction;
-  body.velocity.y =
-    Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y * friction;
-}
-
-export function processCircleCollision(
+export function processCircleOnStaticCircleCollision(
   circleA: KinematicBody<Circle>,
   circleB: CollisionBody<Circle>,
 ): void {
@@ -201,7 +219,7 @@ export function processCircleCollision(
   }
 }
 
-export function processRectangleCollision(
+export function processRectangleOnStaticRectiangleCollision(
   rectangleA: KinematicBody<Rectangle>,
   rectangleB: CollisionBody<Rectangle>,
 ): void {
@@ -238,7 +256,7 @@ export function processRectangleCollision(
   }
 }
 
-export function processCircleRectangleCollision(
+export function processCircleOnStaticRectangleCollision(
   circle: KinematicBody<Circle>,
   rectangle: CollisionBody<Rectangle>,
 ): void {
@@ -268,7 +286,7 @@ export function processCircleRectangleCollision(
   }
 }
 
-export function processRectangleCircleCollision(
+export function processRectangleOnStaticCircleCollision(
   rectangle: KinematicBody<Rectangle>,
   circle: CollisionBody<Circle>,
 ): void {
@@ -296,5 +314,123 @@ export function processRectangleCircleCollision(
 
     rectangle.velocity.x += normalX * overlap;
     rectangle.velocity.y += normalY * overlap;
+  }
+}
+
+export function handleCircleCollisions(
+  circle: KinematicBody<Circle>,
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+): void {
+  for (const collisionBody of collisionBodies) {
+    switch (collisionBody.type) {
+      case ShapeType.Circle:
+        processCircleOnStaticCircleCollision(
+          circle,
+          collisionBody as CollisionBody<Circle>,
+        );
+        break;
+      case ShapeType.Rectangle:
+        processCircleOnStaticRectangleCollision(
+          circle,
+          collisionBody as CollisionBody<Rectangle>,
+        );
+        break;
+    }
+  }
+}
+
+export function handleKinematicCircleCollisions(
+  circle: KinematicBody<Circle>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+): void {
+  for (const kinematicBody of kinematicBodies) {
+    switch (kinematicBody.type) {
+      case ShapeType.Circle:
+        processCircleCollision(circle, kinematicBody as KinematicBody<Circle>);
+        break;
+      case ShapeType.Rectangle:
+        processCircleAndRectangleCollision(
+          circle,
+          kinematicBody as KinematicBody<Rectangle>,
+        );
+        break;
+    }
+  }
+}
+
+export function handleRectangleCollisions(
+  rectangle: KinematicBody<Rectangle>,
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+): void {
+  for (const collisionBody of collisionBodies) {
+    switch (collisionBody.type) {
+      case ShapeType.Circle:
+        processRectangleOnStaticCircleCollision(
+          rectangle,
+          collisionBody as CollisionBody<Circle>,
+        );
+        break;
+      case ShapeType.Rectangle:
+        processRectangleOnStaticRectiangleCollision(
+          rectangle,
+          collisionBody as CollisionBody<Rectangle>,
+        );
+        break;
+    }
+  }
+}
+
+export function handleKinematicRectangleCollisions(
+  rectangle: KinematicBody<Rectangle>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+): void {
+  for (const kinematicBody of kinematicBodies) {
+    switch (kinematicBody.type) {
+      case ShapeType.Circle:
+        processCircleAndRectangleCollision(
+          kinematicBody as KinematicBody<Circle>,
+          rectangle,
+        );
+        break;
+      case ShapeType.Rectangle:
+        processRectangleCollision(
+          rectangle,
+          kinematicBody as KinematicBody<Rectangle>,
+        );
+        break;
+    }
+  }
+}
+
+export function processKinematicBodies(
+  activeBodies: Array<KinematicBody<Circle | Rectangle>>,
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+): void {
+  for (const activeBody of activeBodies) {
+    switch (activeBody.type) {
+      case ShapeType.Circle: {
+        handleCircleCollisions(
+          activeBody as KinematicBody<Circle>,
+          collisionBodies,
+        );
+        handleKinematicCircleCollisions(
+          activeBody as KinematicBody<Circle>,
+          kinematicBodies,
+        );
+        break;
+      }
+      case ShapeType.Rectangle: {
+        handleRectangleCollisions(
+          activeBody as KinematicBody<Rectangle>,
+          collisionBodies,
+        );
+        handleKinematicRectangleCollisions(
+          activeBody as KinematicBody<Rectangle>,
+          kinematicBodies,
+        );
+        break;
+      }
+    }
   }
 }

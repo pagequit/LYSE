@@ -47,6 +47,24 @@ export function renderRectangle(
   );
 }
 
+export function renderCollisionBodies(
+  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  ctx: CanvasRenderingContext2D,
+): void {
+  for (const body of collisionBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderCircle(body as CollisionBody<Circle>, ctx);
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderRectangle(body as CollisionBody<Rectangle>, ctx);
+        break;
+      }
+    }
+  }
+}
+
 export function createCollisionCircle(
   origin: Vector,
   radius: number,

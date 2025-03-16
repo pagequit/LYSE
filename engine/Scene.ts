@@ -1,4 +1,5 @@
 import { game } from "./Game.ts";
+import type { Vector } from "./Vector.ts";
 import { type Camera, createCamera, resizeCanvas } from "./View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
@@ -48,5 +49,12 @@ export function setSceneCameraPosition(x: number, y: number): void {
   game.scene.camera.position.y = Math.max(
     0,
     Math.min(y, game.scene.height - self.innerHeight),
+  );
+}
+
+export function focusSceneCameraToPosition(position: Vector): void {
+  setSceneCameraPosition(
+    position.x - self.innerWidth * 0.5,
+    position.y - self.innerHeight * 0.5,
   );
 }
