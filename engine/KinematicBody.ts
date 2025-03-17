@@ -353,20 +353,20 @@ export function processRectangleOnStaticCircleCollision(
 
 export function handleCircleCollisions(
   circle: KinematicBody<Circle>,
-  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  staticBodies: Array<CollisionBody<Circle | Rectangle>>,
 ): void {
-  for (const collisionBody of collisionBodies) {
-    switch (collisionBody.type) {
+  for (const staticBody of staticBodies) {
+    switch (staticBody.type) {
       case ShapeType.Circle:
         processCircleOnStaticCircleCollision(
           circle,
-          collisionBody as CollisionBody<Circle>,
+          staticBody as CollisionBody<Circle>,
         );
         break;
       case ShapeType.Rectangle:
         processCircleOnStaticRectangleCollision(
           circle,
-          collisionBody as CollisionBody<Rectangle>,
+          staticBody as CollisionBody<Rectangle>,
         );
         break;
     }
@@ -394,20 +394,20 @@ export function handleKinematicCircleCollisions(
 
 export function handleRectangleCollisions(
   rectangle: KinematicBody<Rectangle>,
-  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  staticBodies: Array<CollisionBody<Circle | Rectangle>>,
 ): void {
-  for (const collisionBody of collisionBodies) {
-    switch (collisionBody.type) {
+  for (const staticBody of staticBodies) {
+    switch (staticBody.type) {
       case ShapeType.Circle:
         processRectangleOnStaticCircleCollision(
           rectangle,
-          collisionBody as CollisionBody<Circle>,
+          staticBody as CollisionBody<Circle>,
         );
         break;
       case ShapeType.Rectangle:
         processRectangleOnStaticRectiangleCollision(
           rectangle,
-          collisionBody as CollisionBody<Rectangle>,
+          staticBody as CollisionBody<Rectangle>,
         );
         break;
     }
@@ -438,7 +438,7 @@ export function handleKinematicRectangleCollisions(
 
 export function processKinematicBodies(
   activeBodies: Array<KinematicBody<Circle | Rectangle>>,
-  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+  staticBodies: Array<CollisionBody<Circle | Rectangle>>,
   kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
 ): void {
   for (const activeBody of activeBodies) {
@@ -446,7 +446,7 @@ export function processKinematicBodies(
       case ShapeType.Circle: {
         handleCircleCollisions(
           activeBody as KinematicBody<Circle>,
-          collisionBodies,
+          staticBodies,
         );
         handleKinematicCircleCollisions(
           activeBody as KinematicBody<Circle>,
@@ -457,7 +457,7 @@ export function processKinematicBodies(
       case ShapeType.Rectangle: {
         handleRectangleCollisions(
           activeBody as KinematicBody<Rectangle>,
-          collisionBodies,
+          staticBodies,
         );
         handleKinematicRectangleCollisions(
           activeBody as KinematicBody<Rectangle>,
