@@ -21,9 +21,13 @@ import {
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
+  checkCircleRectangleCollision,
+  checkRectangleCollision,
   createCollisionCircle,
   createCollisionRectangle,
   renderCollisionBodies,
+  renderRectangle,
+  ShapeType,
   type Circle,
   type Rectangle,
 } from "../../engine/CollisionBody.ts";
@@ -105,7 +109,15 @@ const kiniematicCircle = createKinemeticCircle(
   32,
 );
 
-const collisionBodies = [collisionRectangle, collisionCircle];
+const iceFloor = createCollisionRectangle(
+  { x: 256, y: scene.height - 512 },
+  512,
+  256,
+);
+
+const wall = createCollisionRectangle({ x: 256, y: 512 }, 16, scene.height / 2);
+
+const collisionBodies = [collisionRectangle, collisionCircle, wall];
 const kinematicBodies = [
   player.kinematicBody,
   kinematicRectangle,
@@ -118,7 +130,10 @@ const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
-  processPlayer(player);
+  processPlayer(
+    player,
+    checkCircleRectangleCollision(player.kinematicBody, iceFloor) ? 0.015 : 1,
+  );
 
   // I don't think that I want to do this in any scene separately
   activeKinematicBodies.length = 0;
@@ -136,19 +151,44 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   );
 
   // both, filter for active bodies and process them, might belong to the update function, don't ya?
-  for (const body of kinematicBodies) {
-    updateKinematicBody(body, delta, 0.9);
+  for (const body of activeKinematicBodies) {
+    let onIce = false;
+    switch (body.type) {
+      case ShapeType.Circle: {
+        onIce = checkCircleRectangleCollision(
+          body as KinematicBody<Circle>,
+          iceFloor,
+        );
+        break;
+      }
+      case ShapeType.Rectangle: {
+        onIce = checkRectangleCollision(
+          body as KinematicBody<Rectangle>,
+          iceFloor,
+        );
+        break;
+      }
+    }
+
+    if (onIce) {
+      updateKinematicBody(body, delta, 0.985);
+    } else {
+      updateKinematicBody(body, delta, 0.1);
+    }
   }
+
+  focusSceneCameraToPosition(player.position);
+
+  renderRectangle(iceFloor, ctx, "rgba(255, 255, 255, 0.5)");
 
   renderCollisionBodies(collisionBodies, ctx);
   renderKinematicBodies(kinematicBodies, ctx);
+  renderKinematicBodies(activeKinematicBodies, ctx);
 
   animatePlayer(player, ctx, delta);
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
-
-  focusSceneCameraToPosition(player.position);
 }
 
 export default scene;

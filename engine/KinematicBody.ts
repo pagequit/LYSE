@@ -80,8 +80,10 @@ export function updateKinematicBody(
   delta: number,
   friction: number = 1,
 ): void {
-  body.origin.x += body.velocity.x * delta * 0.25;
-  body.origin.y += body.velocity.y * delta * 0.25;
+  const speedMultiplier = 0.25;
+  body.origin.x += body.velocity.x * delta * speedMultiplier;
+  body.origin.y += body.velocity.y * delta * speedMultiplier;
+
   body.velocity.x =
     Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x * friction;
   body.velocity.y =

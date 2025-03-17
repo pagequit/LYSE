@@ -49,7 +49,7 @@ export function createPlayer(
     state: State.Idle,
     direction: Direction.Right,
     velocity,
-    speedMultiplier: 0.25,
+    speedMultiplier: 1,
     animations: {
       [State.Idle]: createSprite({
         imageSrc: "/player-idle.png",
@@ -114,7 +114,7 @@ export function animatePlayer(
   );
 }
 
-export function processPlayer(player: Player): void {
+export function processPlayer(player: Player, friction: number = 1): void {
   if (isZero(input.vector)) {
     setState(player, State.Idle);
   } else {
@@ -132,6 +132,9 @@ export function processPlayer(player: Player): void {
     }
   }
 
-  player.velocity.x = input.vector.x;
-  player.velocity.y = input.vector.y;
+  const velocityX = input.vector.x * player.speedMultiplier * friction;
+  const velocityY = input.vector.y * player.speedMultiplier * friction;
+
+  player.velocity.x += velocityX;
+  player.velocity.y += velocityY;
 }
