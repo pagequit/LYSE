@@ -126,21 +126,19 @@ export function processRectangleCollision(
 ): void {
   const rectangleAX = rectangleA.origin.x + rectangleA.velocity.x;
   const rectangleAY = rectangleA.origin.y + rectangleA.velocity.y;
-
   const rectangleBX = rectangleB.origin.x + rectangleB.velocity.x;
   const rectangleBY = rectangleB.origin.y + rectangleB.velocity.y;
 
   const rectangleARight = rectangleAX + rectangleA.shape.width;
   const rectangleABottom = rectangleAY + rectangleA.shape.height;
-
   const rectangleBRight = rectangleBX + rectangleB.shape.width;
   const rectangleBBottom = rectangleBY + rectangleB.shape.height;
 
   if (
-    rectangleAX < rectangleBRight &&
-    rectangleBX < rectangleARight &&
-    rectangleAY < rectangleBBottom &&
-    rectangleBY < rectangleABottom
+    rectangleAX <= rectangleBRight &&
+    rectangleBX <= rectangleARight &&
+    rectangleAY <= rectangleBBottom &&
+    rectangleBY <= rectangleABottom
   ) {
     const overlapXRight = rectangleARight - rectangleB.origin.x;
     const overlapXLeft = rectangleBRight - rectangleAX;
@@ -246,15 +244,14 @@ export function processRectangleOnStaticRectiangleCollision(
 
   const rectangleARight = rectangleAX + rectangleA.shape.width;
   const rectangleABottom = rectangleAY + rectangleA.shape.height;
-
   const rectangleBRight = rectangleB.origin.x + rectangleB.shape.width;
   const rectangleBBottom = rectangleB.origin.y + rectangleB.shape.height;
 
   if (
-    rectangleAX < rectangleBRight &&
-    rectangleARight > rectangleB.origin.x &&
-    rectangleAY < rectangleBBottom &&
-    rectangleABottom > rectangleB.origin.y
+    rectangleAX <= rectangleBRight &&
+    rectangleARight >= rectangleB.origin.x &&
+    rectangleAY <= rectangleBBottom &&
+    rectangleABottom >= rectangleB.origin.y
   ) {
     const overlapXRight = rectangleARight - rectangleB.origin.x;
     const overlapXLeft = rectangleBRight - rectangleAX;

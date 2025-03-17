@@ -21,10 +21,15 @@ import {
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
+  checkCircleCollision,
+  checkCircleContainsCircle,
+  checkCircleContainsRectangle,
   checkCircleRectangleCollision,
   checkRectangleCollision,
+  checkRectangleContainsRectangle,
   createCollisionCircle,
   createCollisionRectangle,
+  renderCircle,
   renderCollisionBodies,
   renderRectangle,
   ShapeType,
@@ -115,6 +120,8 @@ const iceFloor = createCollisionRectangle(
   256,
 );
 
+const swamp = createCollisionCircle({ x: 512, y: scene.height - 512 }, 128);
+
 const wall = createCollisionRectangle({ x: 256, y: 512 }, 16, scene.height / 2);
 
 const collisionBodies = [collisionRectangle, collisionCircle, wall];
@@ -130,10 +137,20 @@ const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
-  processPlayer(
-    player,
-    checkCircleRectangleCollision(player.kinematicBody, iceFloor) ? 0.015 : 1,
-  );
+  const playerFrictionModSwamp = checkCircleContainsCircle(
+    swamp,
+    player.kinematicBody,
+  )
+    ? 0.5
+    : 1;
+  const playerFrictionModIce = checkCircleRectangleCollision(
+    player.kinematicBody,
+    iceFloor,
+  )
+    ? 0.015
+    : 1;
+
+  processPlayer(player, playerFrictionModSwamp * playerFrictionModIce);
 
   // I don't think that I want to do this in any scene separately
   activeKinematicBodies.length = 0;
@@ -159,6 +176,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
           body as KinematicBody<Circle>,
           iceFloor,
         );
+
         break;
       }
       case ShapeType.Rectangle: {
@@ -166,6 +184,22 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
           body as KinematicBody<Rectangle>,
           iceFloor,
         );
+
+        if (
+          checkRectangleContainsRectangle(
+            iceFloor,
+            body as KinematicBody<Rectangle>,
+          )
+        ) {
+          console.log("on ice");
+        }
+
+        if (
+          checkCircleContainsRectangle(swamp, body as KinematicBody<Rectangle>)
+        ) {
+          console.log("in swamp");
+        }
+
         break;
       }
     }
@@ -180,6 +214,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   focusSceneCameraToPosition(player.position);
 
   renderRectangle(iceFloor, ctx, "rgba(255, 255, 255, 0.5)");
+  renderCircle(swamp, ctx, "rgba(0, 0, 0, 0.5)");
 
   renderCollisionBodies(collisionBodies, ctx);
   renderKinematicBodies(kinematicBodies, ctx);

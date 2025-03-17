@@ -104,10 +104,10 @@ export function checkRectangleCollision(
   rectangleB: CollisionBody<Rectangle>,
 ): boolean {
   return (
-    rectangleA.origin.x < rectangleB.origin.x + rectangleB.shape.width &&
-    rectangleA.origin.x + rectangleA.shape.width > rectangleB.origin.x &&
-    rectangleA.origin.y < rectangleB.origin.y + rectangleB.shape.height &&
-    rectangleA.origin.y + rectangleA.shape.height > rectangleB.origin.y
+    rectangleA.origin.x <= rectangleB.origin.x + rectangleB.shape.width &&
+    rectangleA.origin.x + rectangleA.shape.width >= rectangleB.origin.x &&
+    rectangleA.origin.y <= rectangleB.origin.y + rectangleB.shape.height &&
+    rectangleA.origin.y + rectangleA.shape.height >= rectangleB.origin.y
   );
 }
 
@@ -127,4 +127,60 @@ export function checkCircleRectangleCollision(
   const dy = circle.origin.y - nearestY;
 
   return dx * dx + dy * dy < circle.shape.radius * circle.shape.radius;
+}
+
+export function checkCircleContainsCircle(
+  circleA: CollisionBody<Circle>,
+  circleB: CollisionBody<Circle>,
+): boolean {
+  const dx = circleA.origin.x - circleB.origin.x;
+  const dy = circleA.origin.y - circleB.origin.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  return distance + circleB.shape.radius <= circleA.shape.radius;
+}
+
+export function checkRectangleContainsRectangle(
+  rectangleA: CollisionBody<Rectangle>,
+  rectangleB: CollisionBody<Rectangle>,
+): boolean {
+  return (
+    rectangleA.origin.x <= rectangleB.origin.x &&
+    rectangleA.origin.x + rectangleA.shape.width >=
+      rectangleB.origin.x + rectangleB.shape.width &&
+    rectangleA.origin.y <= rectangleB.origin.y &&
+    rectangleA.origin.y + rectangleA.shape.height >=
+      rectangleB.origin.y + rectangleB.shape.height
+  );
+}
+
+export function checkCircleContainsRectangle(
+  circle: CollisionBody<Circle>,
+  rectangle: CollisionBody<Rectangle>,
+): boolean {
+  const dAX = rectangle.origin.x - circle.origin.x;
+  const dAY = rectangle.origin.y - circle.origin.y;
+
+  const dBX = rectangle.origin.x + rectangle.shape.width - circle.origin.x;
+  const dBY = rectangle.origin.y - circle.origin.y;
+
+  const dCX = rectangle.origin.x - circle.origin.x;
+  const dCY = rectangle.origin.y + rectangle.shape.height - circle.origin.y;
+
+  const dDX = rectangle.origin.x + rectangle.shape.width - circle.origin.x;
+  const dDY = rectangle.origin.y + rectangle.shape.height - circle.origin.y;
+
+  const dASquare = dAX * dAX + dAY * dAY;
+  const dBsquare = dBX * dBX + dBY * dBY;
+  const dCSquare = dCX * dCX + dCY * dCY;
+  const dDSquare = dDX * dDX + dDY * dDY;
+
+  const radiusSquare = circle.shape.radius ** 2;
+
+  return (
+    dASquare <= radiusSquare &&
+    dBsquare <= radiusSquare &&
+    dCSquare <= radiusSquare &&
+    dDSquare <= radiusSquare
+  );
 }
