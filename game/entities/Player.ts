@@ -72,7 +72,7 @@ export function createPlayer(
         yFrames: 4,
       }),
     },
-    kinematicBody: createKinemeticCircle(position, width * 0.5, velocity),
+    kinematicBody: createKinemeticCircle(position, width * 0.25, velocity),
   };
 }
 

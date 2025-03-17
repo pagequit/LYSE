@@ -38,10 +38,12 @@ export function renderKinematicBodies(
     switch (body.type) {
       case ShapeType.Circle: {
         renderKinemeticCircle(body as KinematicBody<Circle>, ctx);
+
         break;
       }
       case ShapeType.Rectangle: {
         renderKinemeticRectangle(body as KinematicBody<Rectangle>, ctx);
+
         break;
       }
     }
@@ -359,12 +361,14 @@ export function handleCircleCollisions(
           circle,
           staticBody as CollisionBody<Circle>,
         );
+
         break;
       case ShapeType.Rectangle:
         processCircleOnStaticRectangleCollision(
           circle,
           staticBody as CollisionBody<Rectangle>,
         );
+
         break;
     }
   }
@@ -378,12 +382,14 @@ export function handleKinematicCircleCollisions(
     switch (kinematicBody.type) {
       case ShapeType.Circle:
         processCircleCollision(circle, kinematicBody as KinematicBody<Circle>);
+
         break;
       case ShapeType.Rectangle:
         processCircleAndRectangleCollision(
           circle,
           kinematicBody as KinematicBody<Rectangle>,
         );
+
         break;
     }
   }
@@ -400,12 +406,14 @@ export function handleRectangleCollisions(
           rectangle,
           staticBody as CollisionBody<Circle>,
         );
+
         break;
       case ShapeType.Rectangle:
         processRectangleOnStaticRectiangleCollision(
           rectangle,
           staticBody as CollisionBody<Rectangle>,
         );
+
         break;
     }
   }
@@ -422,12 +430,14 @@ export function handleKinematicRectangleCollisions(
           kinematicBody as KinematicBody<Circle>,
           rectangle,
         );
+
         break;
       case ShapeType.Rectangle:
         processRectangleCollision(
           rectangle,
           kinematicBody as KinematicBody<Rectangle>,
         );
+
         break;
     }
   }
@@ -449,6 +459,7 @@ export function processKinematicBodies(
           activeBody as KinematicBody<Circle>,
           kinematicBodies,
         );
+
         break;
       }
       case ShapeType.Rectangle: {
@@ -460,6 +471,7 @@ export function processKinematicBodies(
           activeBody as KinematicBody<Rectangle>,
           kinematicBodies,
         );
+
         break;
       }
     }

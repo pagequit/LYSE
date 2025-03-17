@@ -21,11 +21,8 @@ import {
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
-  checkCircleCollision,
   checkCircleContainsCircle,
-  checkCircleContainsRectangle,
-  checkCircleRectangleCollision,
-  checkRectangleCollision,
+  checkRectangleContainsCircle,
   checkRectangleContainsRectangle,
   createCollisionCircle,
   createCollisionRectangle,
@@ -120,7 +117,7 @@ const iceFloor = createCollisionRectangle(
   256,
 );
 
-const swamp = createCollisionCircle({ x: 512, y: scene.height - 512 }, 128);
+const swamp = createCollisionCircle({ x: 512, y: scene.height - 768 }, 128);
 
 const wall = createCollisionRectangle({ x: 256, y: 512 }, 16, scene.height / 2);
 
@@ -143,9 +140,9 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   )
     ? 0.5
     : 1;
-  const playerFrictionModIce = checkCircleRectangleCollision(
-    player.kinematicBody,
+  const playerFrictionModIce = checkRectangleContainsCircle(
     iceFloor,
+    player.kinematicBody,
   )
     ? 0.015
     : 1;
@@ -172,33 +169,18 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     let onIce = false;
     switch (body.type) {
       case ShapeType.Circle: {
-        onIce = checkCircleRectangleCollision(
-          body as KinematicBody<Circle>,
+        onIce = checkRectangleContainsCircle(
           iceFloor,
+          body as KinematicBody<Circle>,
         );
 
         break;
       }
       case ShapeType.Rectangle: {
-        onIce = checkRectangleCollision(
-          body as KinematicBody<Rectangle>,
+        onIce = checkRectangleContainsRectangle(
           iceFloor,
+          body as KinematicBody<Rectangle>,
         );
-
-        if (
-          checkRectangleContainsRectangle(
-            iceFloor,
-            body as KinematicBody<Rectangle>,
-          )
-        ) {
-          console.log("on ice");
-        }
-
-        if (
-          checkCircleContainsRectangle(swamp, body as KinematicBody<Rectangle>)
-        ) {
-          console.log("in swamp");
-        }
 
         break;
       }

@@ -184,3 +184,17 @@ export function checkCircleContainsRectangle(
     dDSquare <= radiusSquare
   );
 }
+
+export function checkRectangleContainsCircle(
+  rectangle: CollisionBody<Rectangle>,
+  circle: CollisionBody<Circle>,
+): boolean {
+  return (
+    rectangle.origin.x <= circle.origin.x - circle.shape.radius &&
+    rectangle.origin.x + rectangle.shape.width >=
+      circle.origin.x + circle.shape.radius &&
+    rectangle.origin.y <= circle.origin.y - circle.shape.radius &&
+    rectangle.origin.y + rectangle.shape.height >=
+      circle.origin.y + circle.shape.radius
+  );
+}
