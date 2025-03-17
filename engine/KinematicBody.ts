@@ -153,11 +153,23 @@ export function processRectangleCollision(
       overlapYBottom < overlapYTop ? -overlapYBottom : overlapYTop;
 
     if (Math.abs(overlapX) > Math.abs(overlapY)) {
-      rectangleA.velocity.y += overlapY / 2;
-      rectangleB.velocity.y -= overlapY / 2;
+      const overlap = overlapY / 2;
+      rectangleA.origin.y += overlap;
+      rectangleB.origin.y -= overlap;
+
+      const dvy = rectangleA.velocity.y - rectangleB.velocity.y;
+      const absOverlap = Math.abs(overlap);
+      rectangleA.velocity.y -= dvy * absOverlap ** 2;
+      rectangleB.velocity.y += dvy * absOverlap ** 2;
     } else {
-      rectangleA.velocity.x += overlapX / 2;
-      rectangleB.velocity.x -= overlapX / 2;
+      const overlap = overlapX / 2;
+      rectangleA.origin.x += overlap;
+      rectangleB.origin.x -= overlap;
+
+      const dvx = rectangleA.velocity.x - rectangleB.velocity.x;
+      const absOverlap = Math.abs(overlap);
+      rectangleA.velocity.x -= dvx * absOverlap ** 2;
+      rectangleB.velocity.x += dvx * absOverlap ** 2;
     }
   }
 }
@@ -216,8 +228,12 @@ export function processCircleOnStaticCircleCollision(
     const normalY = dy / distance;
     const overlap = distance - circleB.shape.radius - circleA.shape.radius;
 
-    circleA.velocity.x -= normalX * overlap;
-    circleA.velocity.y -= normalY * overlap;
+    circleA.origin.x -= normalX * overlap;
+    circleA.origin.y -= normalY * overlap;
+
+    const dot = circleA.velocity.x * normalX + circleA.velocity.y * normalY;
+    circleA.velocity.x -= dot * normalX;
+    circleA.velocity.y -= dot * normalY;
   }
 }
 
@@ -251,9 +267,17 @@ export function processRectangleOnStaticRectiangleCollision(
       overlapYBottom < overlapYTop ? -overlapYBottom : overlapYTop;
 
     if (Math.abs(overlapX) > Math.abs(overlapY)) {
-      rectangleA.velocity.y += overlapY;
+      const overlap = overlapY / 2;
+      rectangleA.origin.y += overlap;
+
+      const absOverlap = Math.abs(overlap);
+      rectangleA.velocity.y -= rectangleA.velocity.y * absOverlap ** 2;
     } else {
-      rectangleA.velocity.x += overlapX;
+      const overlap = overlapX / 2;
+      rectangleA.origin.x += overlap;
+
+      const absOverlap = Math.abs(overlap);
+      rectangleA.velocity.x -= rectangleA.velocity.x * absOverlap ** 2;
     }
   }
 }
@@ -283,8 +307,12 @@ export function processCircleOnStaticRectangleCollision(
     const normalY = dy / distance;
     const overlap = distance - circle.shape.radius;
 
-    circle.velocity.x -= normalX * overlap;
-    circle.velocity.y -= normalY * overlap;
+    circle.origin.x -= normalX * overlap;
+    circle.origin.y -= normalY * overlap;
+
+    const dot = circle.velocity.x * normalX + circle.velocity.y * normalY;
+    circle.velocity.x -= dot * normalX;
+    circle.velocity.y -= dot * normalY;
   }
 }
 
@@ -314,8 +342,12 @@ export function processRectangleOnStaticCircleCollision(
     const normalY = dy / distance;
     const overlap = distance - circle.shape.radius;
 
-    rectangle.velocity.x += normalX * overlap;
-    rectangle.velocity.y += normalY * overlap;
+    rectangle.origin.x += normalX * overlap;
+    rectangle.origin.y += normalY * overlap;
+
+    const dot = rectangle.velocity.x * normalX + rectangle.velocity.y * normalY;
+    rectangle.velocity.x -= dot * normalX;
+    rectangle.velocity.y -= dot * normalY;
   }
 }
 
