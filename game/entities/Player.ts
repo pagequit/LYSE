@@ -7,7 +7,7 @@ import {
 } from "../../engine/Sprite.ts";
 import { getDirection, isZero, type Vector } from "../../engine/Vector.ts";
 import { input } from "../../engine/Input.ts";
-import { type Circle } from "../../engine/CollisionBody.ts";
+import { type Circle } from "../../engine/StaticBody.ts";
 import {
   createKinemeticCircle,
   type KinematicBody,

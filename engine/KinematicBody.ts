@@ -2,15 +2,15 @@ import {
   renderCircle,
   renderRectangle,
   ShapeType,
-  type CollisionBody,
+  type StaticBody,
   type Circle,
   type Rectangle,
-} from "./CollisionBody.ts";
+} from "./StaticBody.ts";
 import { type Vector } from "./Vector.ts";
 
 const defaultFillStyle = "rgba(64, 64, 255, 0.5)";
 
-export type KinematicBody<Shape> = CollisionBody<Shape> & {
+export type KinematicBody<Shape> = StaticBody<Shape> & {
   velocity: Vector;
 };
 
@@ -217,7 +217,7 @@ export function processCircleAndRectangleCollision(
 
 export function processCircleOnStaticCircleCollision(
   circleA: KinematicBody<Circle>,
-  circleB: CollisionBody<Circle>,
+  circleB: StaticBody<Circle>,
 ): void {
   const dx = circleA.origin.x + circleA.velocity.x - circleB.origin.x;
   const dy = circleA.origin.y + circleA.velocity.y - circleB.origin.y;
@@ -239,7 +239,7 @@ export function processCircleOnStaticCircleCollision(
 
 export function processRectangleOnStaticRectiangleCollision(
   rectangleA: KinematicBody<Rectangle>,
-  rectangleB: CollisionBody<Rectangle>,
+  rectangleB: StaticBody<Rectangle>,
 ): void {
   const rectangleAX = rectangleA.origin.x + rectangleA.velocity.x;
   const rectangleAY = rectangleA.origin.y + rectangleA.velocity.y;
@@ -283,7 +283,7 @@ export function processRectangleOnStaticRectiangleCollision(
 
 export function processCircleOnStaticRectangleCollision(
   circle: KinematicBody<Circle>,
-  rectangle: CollisionBody<Rectangle>,
+  rectangle: StaticBody<Rectangle>,
 ): void {
   const dx =
     circle.origin.x +
@@ -317,7 +317,7 @@ export function processCircleOnStaticRectangleCollision(
 
 export function processRectangleOnStaticCircleCollision(
   rectangle: KinematicBody<Rectangle>,
-  circle: CollisionBody<Circle>,
+  circle: StaticBody<Circle>,
 ): void {
   const rectangleX = rectangle.origin.x + rectangle.velocity.x;
   const rectangleY = rectangle.origin.y + rectangle.velocity.y;
@@ -352,21 +352,21 @@ export function processRectangleOnStaticCircleCollision(
 
 export function handleCircleCollisions(
   circle: KinematicBody<Circle>,
-  staticBodies: Array<CollisionBody<Circle | Rectangle>>,
+  staticBodies: Array<StaticBody<Circle | Rectangle>>,
 ): void {
   for (const staticBody of staticBodies) {
     switch (staticBody.type) {
       case ShapeType.Circle:
         processCircleOnStaticCircleCollision(
           circle,
-          staticBody as CollisionBody<Circle>,
+          staticBody as StaticBody<Circle>,
         );
 
         break;
       case ShapeType.Rectangle:
         processCircleOnStaticRectangleCollision(
           circle,
-          staticBody as CollisionBody<Rectangle>,
+          staticBody as StaticBody<Rectangle>,
         );
 
         break;
@@ -397,21 +397,21 @@ export function handleKinematicCircleCollisions(
 
 export function handleRectangleCollisions(
   rectangle: KinematicBody<Rectangle>,
-  staticBodies: Array<CollisionBody<Circle | Rectangle>>,
+  staticBodies: Array<StaticBody<Circle | Rectangle>>,
 ): void {
   for (const staticBody of staticBodies) {
     switch (staticBody.type) {
       case ShapeType.Circle:
         processRectangleOnStaticCircleCollision(
           rectangle,
-          staticBody as CollisionBody<Circle>,
+          staticBody as StaticBody<Circle>,
         );
 
         break;
       case ShapeType.Rectangle:
         processRectangleOnStaticRectiangleCollision(
           rectangle,
-          staticBody as CollisionBody<Rectangle>,
+          staticBody as StaticBody<Rectangle>,
         );
 
         break;
@@ -445,7 +445,7 @@ export function handleKinematicRectangleCollisions(
 
 export function processKinematicBodies(
   activeBodies: Array<KinematicBody<Circle | Rectangle>>,
-  staticBodies: Array<CollisionBody<Circle | Rectangle>>,
+  staticBodies: Array<StaticBody<Circle | Rectangle>>,
   kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
 ): void {
   for (const activeBody of activeBodies) {

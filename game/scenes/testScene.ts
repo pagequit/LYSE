@@ -21,18 +21,18 @@ import {
 import nodeScene from "./nodeScene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
-  checkCircleContainsCircle,
-  checkRectangleContainsCircle,
-  checkRectangleContainsRectangle,
-  createCollisionCircle,
-  createCollisionRectangle,
+  circleContainsCircle,
+  rectangleContainsCircle,
+  rectangleContainsRectangle,
+  createStaticCircle,
+  createStaticRectangle,
   renderCircle,
-  renderCollisionBodies,
+  renderStaticBodies,
   renderRectangle,
   ShapeType,
   type Circle,
   type Rectangle,
-} from "../../engine/CollisionBody.ts";
+} from "../../engine/StaticBody.ts";
 import {
   createKinemeticCircle,
   createKinemeticRectangle,
@@ -83,12 +83,12 @@ const player: Player = createPlayer(
 );
 setDirection(player, Direction.Right);
 
-const collisionCircle = createCollisionCircle(
+const collisionCircle = createStaticCircle(
   { x: scene.width / 2, y: scene.height / 2 - 128 },
   32,
 );
 
-const collisionRectangle = createCollisionRectangle(
+const collisionRectangle = createStaticRectangle(
   { x: scene.width / 2, y: scene.height / 2 - 128 },
   64,
   64,
@@ -111,15 +111,15 @@ const kiniematicCircle = createKinemeticCircle(
   32,
 );
 
-const iceFloor = createCollisionRectangle(
+const iceFloor = createStaticRectangle(
   { x: 256, y: scene.height - 512 },
   512,
   256,
 );
 
-const swamp = createCollisionCircle({ x: 512, y: scene.height - 768 }, 128);
+const swamp = createStaticCircle({ x: 512, y: scene.height - 768 }, 128);
 
-const wall = createCollisionRectangle({ x: 256, y: 512 }, 16, scene.height / 2);
+const wall = createStaticRectangle({ x: 256, y: 512 }, 16, scene.height / 2);
 
 const collisionBodies = [collisionRectangle, collisionCircle, wall];
 const kinematicBodies = [
@@ -134,13 +134,13 @@ const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
-  const playerFrictionModSwamp = checkCircleContainsCircle(
+  const playerFrictionModSwamp = circleContainsCircle(
     swamp,
     player.kinematicBody,
   )
     ? 0.5
     : 1;
-  const playerFrictionModIce = checkRectangleContainsCircle(
+  const playerFrictionModIce = rectangleContainsCircle(
     iceFloor,
     player.kinematicBody,
   )
@@ -169,7 +169,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     let onIce = false;
     switch (body.type) {
       case ShapeType.Circle: {
-        onIce = checkRectangleContainsCircle(
+        onIce = rectangleContainsCircle(
           iceFloor,
           body as KinematicBody<Circle>,
         );
@@ -177,7 +177,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
         break;
       }
       case ShapeType.Rectangle: {
-        onIce = checkRectangleContainsRectangle(
+        onIce = rectangleContainsRectangle(
           iceFloor,
           body as KinematicBody<Rectangle>,
         );
@@ -198,7 +198,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   renderRectangle(iceFloor, ctx, "rgba(255, 255, 255, 0.5)");
   renderCircle(swamp, ctx, "rgba(0, 0, 0, 0.5)");
 
-  renderCollisionBodies(collisionBodies, ctx);
+  renderStaticBodies(collisionBodies, ctx);
   renderKinematicBodies(kinematicBodies, ctx);
   renderKinematicBodies(activeKinematicBodies, ctx);
 

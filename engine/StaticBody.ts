@@ -16,14 +16,14 @@ export enum ShapeType {
   Rectangle,
 }
 
-export type CollisionBody<Shape> = {
+export type StaticBody<Shape> = {
   type: ShapeType;
   shape: Shape;
   origin: Vector;
 };
 
 export function renderCircle(
-  body: CollisionBody<Circle>,
+  body: StaticBody<Circle>,
   ctx: CanvasRenderingContext2D,
   fillStyle: string = defaultFillStyle,
 ): void {
@@ -34,7 +34,7 @@ export function renderCircle(
 }
 
 export function renderRectangle(
-  body: CollisionBody<Rectangle>,
+  body: StaticBody<Rectangle>,
   ctx: CanvasRenderingContext2D,
   fillStyle: string = defaultFillStyle,
 ): void {
@@ -47,28 +47,28 @@ export function renderRectangle(
   );
 }
 
-export function renderCollisionBodies(
-  collisionBodies: Array<CollisionBody<Circle | Rectangle>>,
+export function renderStaticBodies(
+  staticBodies: Array<StaticBody<Circle | Rectangle>>,
   ctx: CanvasRenderingContext2D,
 ): void {
-  for (const body of collisionBodies) {
+  for (const body of staticBodies) {
     switch (body.type) {
       case ShapeType.Circle: {
-        renderCircle(body as CollisionBody<Circle>, ctx);
+        renderCircle(body as StaticBody<Circle>, ctx);
         break;
       }
       case ShapeType.Rectangle: {
-        renderRectangle(body as CollisionBody<Rectangle>, ctx);
+        renderRectangle(body as StaticBody<Rectangle>, ctx);
         break;
       }
     }
   }
 }
 
-export function createCollisionCircle(
+export function createStaticCircle(
   origin: Vector,
   radius: number,
-): CollisionBody<Circle> {
+): StaticBody<Circle> {
   return {
     type: ShapeType.Circle,
     shape: { radius },
@@ -76,11 +76,11 @@ export function createCollisionCircle(
   };
 }
 
-export function createCollisionRectangle(
+export function createStaticRectangle(
   origin: Vector,
   width: number,
   height: number,
-): CollisionBody<Rectangle> {
+): StaticBody<Rectangle> {
   return {
     type: ShapeType.Rectangle,
     shape: { width, height },
@@ -88,9 +88,9 @@ export function createCollisionRectangle(
   };
 }
 
-export function checkCircleCollision(
-  circleA: CollisionBody<Circle>,
-  circleB: CollisionBody<Circle>,
+export function circlesCollide(
+  circleA: StaticBody<Circle>,
+  circleB: StaticBody<Circle>,
 ): boolean {
   const dx = circleA.origin.x - circleB.origin.x;
   const dy = circleA.origin.y - circleB.origin.y;
@@ -99,9 +99,9 @@ export function checkCircleCollision(
   return distance <= circleA.shape.radius + circleB.shape.radius;
 }
 
-export function checkRectangleCollision(
-  rectangleA: CollisionBody<Rectangle>,
-  rectangleB: CollisionBody<Rectangle>,
+export function rectanglesCollide(
+  rectangleA: StaticBody<Rectangle>,
+  rectangleB: StaticBody<Rectangle>,
 ): boolean {
   return (
     rectangleA.origin.x <= rectangleB.origin.x + rectangleB.shape.width &&
@@ -111,9 +111,9 @@ export function checkRectangleCollision(
   );
 }
 
-export function checkCircleRectangleCollision(
-  circle: CollisionBody<Circle>,
-  rectangle: CollisionBody<Rectangle>,
+export function circleAndRectangleCollide(
+  circle: StaticBody<Circle>,
+  rectangle: StaticBody<Rectangle>,
 ): boolean {
   const nearestX = Math.max(
     rectangle.origin.x,
@@ -129,9 +129,9 @@ export function checkCircleRectangleCollision(
   return dx * dx + dy * dy < circle.shape.radius * circle.shape.radius;
 }
 
-export function checkCircleContainsCircle(
-  circleA: CollisionBody<Circle>,
-  circleB: CollisionBody<Circle>,
+export function circleContainsCircle(
+  circleA: StaticBody<Circle>,
+  circleB: StaticBody<Circle>,
 ): boolean {
   const dx = circleA.origin.x - circleB.origin.x;
   const dy = circleA.origin.y - circleB.origin.y;
@@ -140,9 +140,9 @@ export function checkCircleContainsCircle(
   return distance + circleB.shape.radius <= circleA.shape.radius;
 }
 
-export function checkRectangleContainsRectangle(
-  rectangleA: CollisionBody<Rectangle>,
-  rectangleB: CollisionBody<Rectangle>,
+export function rectangleContainsRectangle(
+  rectangleA: StaticBody<Rectangle>,
+  rectangleB: StaticBody<Rectangle>,
 ): boolean {
   return (
     rectangleA.origin.x <= rectangleB.origin.x &&
@@ -154,9 +154,9 @@ export function checkRectangleContainsRectangle(
   );
 }
 
-export function checkCircleContainsRectangle(
-  circle: CollisionBody<Circle>,
-  rectangle: CollisionBody<Rectangle>,
+export function circleContainsRectangle(
+  circle: StaticBody<Circle>,
+  rectangle: StaticBody<Rectangle>,
 ): boolean {
   const dAX = rectangle.origin.x - circle.origin.x;
   const dAY = rectangle.origin.y - circle.origin.y;
@@ -185,9 +185,9 @@ export function checkCircleContainsRectangle(
   );
 }
 
-export function checkRectangleContainsCircle(
-  rectangle: CollisionBody<Rectangle>,
-  circle: CollisionBody<Circle>,
+export function rectangleContainsCircle(
+  rectangle: StaticBody<Rectangle>,
+  circle: StaticBody<Circle>,
 ): boolean {
   return (
     rectangle.origin.x <= circle.origin.x - circle.shape.radius &&
