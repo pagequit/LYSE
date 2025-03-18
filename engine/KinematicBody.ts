@@ -6,7 +6,7 @@ import {
   type Circle,
   type Rectangle,
 } from "./StaticBody.ts";
-import { type Vector } from "./Vector.ts";
+import { isZero, type Vector } from "./Vector.ts";
 
 const defaultFillStyle = "rgba(64, 64, 255, 0.5)";
 
@@ -474,6 +474,18 @@ export function processKinematicBodies(
 
         break;
       }
+    }
+  }
+}
+
+export function setActiveKinematicBodies(
+  activeBodies: Array<KinematicBody<Circle | Rectangle>>,
+  kinematicBodies: Array<KinematicBody<Circle | Rectangle>>,
+): void {
+  activeBodies.length = 0;
+  for (const kinematicBody of kinematicBodies) {
+    if (!isZero(kinematicBody.velocity)) {
+      activeBodies.push(kinematicBody);
     }
   }
 }

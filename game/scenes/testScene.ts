@@ -40,6 +40,7 @@ import {
   renderKinematicBodies,
   processKinematicBodies,
   type KinematicBody,
+  setActiveKinematicBodies,
 } from "../../engine/KinematicBody.ts";
 import { isZero } from "../../engine/Vector.ts";
 
@@ -149,22 +150,14 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   processPlayer(player, playerFrictionModSwamp * playerFrictionModIce);
 
-  // I don't think that I want to do this in any scene separately
-  activeKinematicBodies.length = 0;
-  for (const body of kinematicBodies) {
-    if (!isZero(body.velocity)) {
-      activeKinematicBodies.push(body);
-    }
-  }
+  setActiveKinematicBodies(activeKinematicBodies, kinematicBodies);
 
-  // anyway, I want to be able to control the active bodies, don't I?
   processKinematicBodies(
     activeKinematicBodies,
     collisionBodies,
     kinematicBodies,
   );
 
-  // both, filter for active bodies and process them, might belong to the update function, don't ya?
   for (const body of activeKinematicBodies) {
     let onIce = false;
     switch (body.type) {
