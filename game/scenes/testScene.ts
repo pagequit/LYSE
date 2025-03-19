@@ -42,6 +42,8 @@ import {
   type KinematicBody,
   setActiveKinematicBodies,
 } from "../../engine/KinematicBody.ts";
+import { monitor } from "../../engine/monitor.ts";
+import type { Vector } from "../../engine/Vector.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
@@ -131,6 +133,28 @@ const kinematicBodies = [
 
 const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 
+const playerMonitor = document.createElement("div");
+monitor.appendChild(playerMonitor);
+
+const deltaPosition: Vector = {
+  x: player.position.x,
+  y: player.position.y,
+};
+
+function focusSceneCameraToPlayerPosition(): void {
+  focusSceneCameraToPosition(
+    player.position.x ** 2 +
+      player.position.y ** 2 -
+      (deltaPosition.x ** 2 + deltaPosition.y ** 2) >
+      1
+      ? player.position
+      : deltaPosition,
+  );
+
+  deltaPosition.x = player.position.x;
+  deltaPosition.y = player.position.y;
+}
+
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
@@ -185,8 +209,6 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     }
   }
 
-  focusSceneCameraToPosition(player.position);
-
   renderRectangle(iceFloor, ctx, "rgba(255, 255, 255, 0.5)");
   renderCircle(swamp, ctx, "rgba(0, 0, 0, 0.5)");
 
@@ -196,8 +218,12 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   animatePlayer(player, ctx, delta);
 
+  focusSceneCameraToPlayerPosition();
+
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
+
+  playerMonitor.innerText = `player: (${player.velocity.x}, ${player.velocity.y})`;
 }
 
 export default scene;
