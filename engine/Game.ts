@@ -23,8 +23,7 @@ const pointerMonitor = document.createElement("div");
 monitor.appendChild(pointerMonitor);
 const cameraMonitor = document.createElement("div");
 monitor.appendChild(cameraMonitor);
-const windowMonitor = document.createElement("div");
-monitor.appendChild(windowMonitor);
+
 monitor.addEventListener("click", () => {
   document.body.requestFullscreen();
 });
@@ -53,7 +52,6 @@ function animate(timestamp: number): void {
   fpsMonitor.innerText = `FPS: ${Math.round(1000 / delta)}`;
   pointerMonitor.innerText = `pointer: (${pointer.position.x}, ${pointer.position.y})`;
   cameraMonitor.innerText = `camera: (${game.scene.camera.position.x}, ${game.scene.camera.position.y})`;
-  windowMonitor.innerText = `window: (${self.innerWidth}, ${self.innerHeight})`;
 }
 
 export function startGame(scene: Scene): void {

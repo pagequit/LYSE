@@ -100,7 +100,7 @@ export function processCircleCollision(
   const dy = circleA.origin.y - circleB.origin.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (distance <= circleA.shape.radius + circleB.shape.radius && distance > 0) {
+  if (distance < circleA.shape.radius + circleB.shape.radius && distance > 0) {
     const normalX = dx / distance;
     const normalY = dy / distance;
     const overlap =
@@ -126,29 +126,24 @@ export function processRectangleCollision(
   rectangleA: KinematicBody<Rectangle>,
   rectangleB: KinematicBody<Rectangle>,
 ): void {
-  const rectangleAX = rectangleA.origin.x + rectangleA.velocity.x;
-  const rectangleAY = rectangleA.origin.y + rectangleA.velocity.y;
-  const rectangleBX = rectangleB.origin.x + rectangleB.velocity.x;
-  const rectangleBY = rectangleB.origin.y + rectangleB.velocity.y;
-
-  const rectangleARight = rectangleAX + rectangleA.shape.width;
-  const rectangleABottom = rectangleAY + rectangleA.shape.height;
-  const rectangleBRight = rectangleBX + rectangleB.shape.width;
-  const rectangleBBottom = rectangleBY + rectangleB.shape.height;
+  const rectangleARight = rectangleA.origin.x + rectangleA.shape.width;
+  const rectangleABottom = rectangleA.origin.y + rectangleA.shape.height;
+  const rectangleBRight = rectangleB.origin.x + rectangleB.shape.width;
+  const rectangleBBottom = rectangleB.origin.y + rectangleB.shape.height;
 
   if (
-    rectangleAX <= rectangleBRight &&
-    rectangleBX <= rectangleARight &&
-    rectangleAY <= rectangleBBottom &&
-    rectangleBY <= rectangleABottom
+    rectangleA.origin.x <= rectangleBRight &&
+    rectangleB.origin.x <= rectangleARight &&
+    rectangleA.origin.y <= rectangleBBottom &&
+    rectangleB.origin.y <= rectangleABottom
   ) {
     const overlapXRight = rectangleARight - rectangleB.origin.x;
-    const overlapXLeft = rectangleBRight - rectangleAX;
+    const overlapXLeft = rectangleBRight - rectangleA.origin.x;
     const overlapX =
       overlapXRight < overlapXLeft ? -overlapXRight : overlapXLeft;
 
     const overlapYBottom = rectangleABottom - rectangleB.origin.y;
-    const overlapYTop = rectangleBBottom - rectangleAY;
+    const overlapYTop = rectangleBBottom - rectangleA.origin.y;
     const overlapY =
       overlapYBottom < overlapYTop ? -overlapYBottom : overlapYTop;
 
@@ -179,22 +174,20 @@ export function processCircleAndRectangleCollision(
   rectangle: KinematicBody<Rectangle>,
 ): void {
   const dx =
-    circle.origin.x +
-    circle.velocity.x -
+    circle.origin.x -
     Math.max(
       rectangle.origin.x,
       Math.min(circle.origin.x, rectangle.origin.x + rectangle.shape.width),
     );
   const dy =
-    circle.origin.y +
-    circle.velocity.y -
+    circle.origin.y -
     Math.max(
       rectangle.origin.y,
       Math.min(circle.origin.y, rectangle.origin.y + rectangle.shape.height),
     );
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (distance <= circle.shape.radius && distance > 0) {
+  if (distance < circle.shape.radius && distance > 0) {
     const normalX = dx / distance;
     const normalY = dy / distance;
     const overlap = (distance - circle.shape.radius) / 2;

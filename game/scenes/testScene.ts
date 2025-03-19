@@ -42,7 +42,6 @@ import {
   type KinematicBody,
   setActiveKinematicBodies,
 } from "../../engine/KinematicBody.ts";
-import { isZero } from "../../engine/Vector.ts";
 
 const scene: Scene = createScene(process, {
   width: 2048,
