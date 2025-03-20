@@ -79,17 +79,16 @@ export function createKinemeticRectangle(
 
 export function updateKinematicBody(
   body: KinematicBody<Circle | Rectangle>,
-  delta: number,
   friction: number = 1,
 ): void {
-  const speedMultiplier = 0.25;
-  body.origin.x += body.velocity.x * delta * speedMultiplier;
-  body.origin.y += body.velocity.y * delta * speedMultiplier;
+  body.velocity.x *= friction;
+  body.velocity.y *= friction;
 
-  body.velocity.x =
-    Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x * friction;
-  body.velocity.y =
-    Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y * friction;
+  body.velocity.x = Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x;
+  body.velocity.y = Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y;
+
+  body.origin.x += body.velocity.x;
+  body.origin.y += body.velocity.y;
 }
 
 export function processCircleCollision(

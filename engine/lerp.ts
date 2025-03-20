@@ -1,7 +1,7 @@
 export function lerp(a: number, b: number, t: number): number {
-  return a + t * (b - a);
+  return a + (b - a) * t;
 }
 
 export function lerpPrecice(a: number, b: number, t: number): number {
-  return (1 - t) * a + t * b;
+  return a * (1 - t) + b * t;
 }

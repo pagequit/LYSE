@@ -132,9 +132,6 @@ export function processPlayer(player: Player, friction: number = 1): void {
     }
   }
 
-  const velocityX = input.vector.x * player.speedMultiplier * friction;
-  const velocityY = input.vector.y * player.speedMultiplier * friction;
-
-  player.velocity.x += velocityX;
-  player.velocity.y += velocityY;
+  player.velocity.x += input.vector.x * friction * player.speedMultiplier;
+  player.velocity.y += input.vector.y * friction * player.speedMultiplier;
 }

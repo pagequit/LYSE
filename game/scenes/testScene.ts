@@ -203,9 +203,9 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     }
 
     if (onIce) {
-      updateKinematicBody(body, delta, 0.985);
+      updateKinematicBody(body, 0.99);
     } else {
-      updateKinematicBody(body, delta, 0.1);
+      updateKinematicBody(body, 0.5);
     }
   }
 
