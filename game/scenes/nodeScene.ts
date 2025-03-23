@@ -4,7 +4,7 @@ import {
   changeScene,
   createScene,
   type Scene,
-  setSceneCameraPosition,
+  setViewportOffset,
 } from "../../engine/Scene.ts";
 import { type Vector } from "../../engine/Vector.ts";
 import {
@@ -138,9 +138,9 @@ function onPointerMove(): void {
   if (isDragging) {
     dragVector.x = dragOrigin.x - pointer.position.x;
     dragVector.y = dragOrigin.y - pointer.position.y;
-    setSceneCameraPosition(
-      scene.camera.position.x + dragVector.x,
-      scene.camera.position.y + dragVector.y,
+    setViewportOffset(
+      scene.viewport.offset.x + dragVector.x,
+      scene.viewport.offset.y + dragVector.y,
     );
 
     return;

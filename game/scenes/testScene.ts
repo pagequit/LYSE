@@ -15,7 +15,7 @@ import { createGrid, type Grid } from "../entities/Grid.ts";
 import {
   changeScene,
   createScene,
-  focusSceneCameraToPosition,
+  focusViewportToPosition,
   type Scene,
 } from "../../engine/Scene.ts";
 import nodeScene from "./nodeScene.ts";
@@ -142,7 +142,7 @@ const deltaPosition: Vector = {
 };
 
 function focusSceneCameraToPlayerPosition(): void {
-  focusSceneCameraToPosition(
+  focusViewportToPosition(
     player.position.x ** 2 +
       player.position.y ** 2 -
       (deltaPosition.x ** 2 + deltaPosition.y ** 2) >

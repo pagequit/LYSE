@@ -12,38 +12,46 @@ export const pointer: Pointer = {
   position: { x: 0, y: 0 },
 };
 
-function onMouseDown(event: MouseEvent): void {
+function adjustPointerPosition(
+  pointer: Pointer,
+  eventX: number,
+  eventY: number,
+): void {
   pointer.position.x =
-    event.clientX + game.scene.camera.position.x - canvas.offsetLeft;
+    (eventX - canvas.offsetLeft + game.scene.viewport.offset.x) /
+    game.scene.viewport.zoom;
   pointer.position.y =
-    event.clientY + game.scene.camera.position.y - canvas.offsetTop;
-  pointer.isDown = true;
+    (eventY - canvas.offsetTop + game.scene.viewport.offset.y) /
+    game.scene.viewport.zoom;
+}
+
+function onMouseDown(event: MouseEvent): void {
+  pointer.isDown = event.button === 0 ? true : pointer.isDown;
 }
 
 function onTouchStart(event: TouchEvent): void {
-  pointer.position.x =
-    event.touches[0].clientX + game.scene.camera.position.x - canvas.offsetLeft;
-  pointer.position.y =
-    event.touches[0].clientY + game.scene.camera.position.y - canvas.offsetTop;
+  adjustPointerPosition(
+    pointer,
+    event.touches[0].clientX,
+    event.touches[0].clientY,
+  );
   pointer.isDown = true;
 }
 
 function onMouseMove(event: MouseEvent): void {
-  pointer.position.x =
-    event.clientX + game.scene.camera.position.x - canvas.offsetLeft;
-  pointer.position.y =
-    event.clientY + game.scene.camera.position.y - canvas.offsetTop;
+  adjustPointerPosition(pointer, event.clientX, event.clientY);
 }
 
 function onTouchMove(event: TouchEvent): void {
-  pointer.position.x =
-    event.touches[0].clientX + game.scene.camera.position.x - canvas.offsetLeft;
-  pointer.position.y =
-    event.touches[0].clientY + game.scene.camera.position.y - canvas.offsetTop;
+  adjustPointerPosition(
+    pointer,
+    event.touches[0].clientX,
+    event.touches[0].clientY,
+  );
 }
 
-function onMouseUp(): void {
-  pointer.isDown = false;
+function onMouseUp(event: MouseEvent): void {
+  pointer.isDown = event.button === 0 ? false : pointer.isDown;
 }
 
 function onTouchEnd(): void {

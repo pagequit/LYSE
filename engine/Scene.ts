@@ -1,13 +1,13 @@
 import { game } from "./Game.ts";
 import type { Vector } from "./Vector.ts";
-import { type Camera, createCamera, resizeCanvas } from "./View.ts";
+import { type Viewport, createViewport, resizeCanvas } from "./View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
 
 export type Scene = {
   width: number;
   height: number;
-  camera: Camera;
+  viewport: Viewport;
   process: Process;
   construct: () => void;
   destruct: () => void;
@@ -27,7 +27,7 @@ export function createScene(
   return {
     width,
     height,
-    camera: createCamera(),
+    viewport: createViewport(),
     process,
     construct: construct ? construct : () => {},
     destruct: destruct ? destruct : () => {},
@@ -41,20 +41,23 @@ export function changeScene(scene: Scene): void {
   game.scene.construct();
 }
 
-export function setSceneCameraPosition(x: number, y: number): void {
-  game.scene.camera.position.x = Math.max(
+export function setViewportOffset(x: number, y: number): void {
+  game.scene.viewport.offset.x = Math.max(
     0,
-    Math.min(x, game.scene.width - self.innerWidth),
+    Math.min(x, game.scene.width * game.scene.viewport.zoom - self.innerWidth),
   );
-  game.scene.camera.position.y = Math.max(
+  game.scene.viewport.offset.y = Math.max(
     0,
-    Math.min(y, game.scene.height - self.innerHeight),
+    Math.min(
+      y,
+      game.scene.height * game.scene.viewport.zoom - self.innerHeight,
+    ),
   );
 }
 
-export function focusSceneCameraToPosition(position: Vector): void {
-  setSceneCameraPosition(
-    position.x - self.innerWidth * 0.5,
-    position.y - self.innerHeight * 0.5,
+export function focusViewportToPosition(position: Vector): void {
+  setViewportOffset(
+    position.x - self.innerWidth / 2,
+    position.y - self.innerHeight / 2,
   );
 }

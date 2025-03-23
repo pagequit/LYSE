@@ -1,8 +1,8 @@
-import { applyCanvas, canvas, ctx } from "./View.ts";
+import { adoptCanvas, ctx, resetViewport } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { pointer } from "./Pointer.ts";
-import { applyMonitor, monitor } from "./monitor.ts";
+import { adoptMonitor, monitor } from "./monitor.ts";
 
 export type Game = {
   scene: Scene;
@@ -21,8 +21,8 @@ const fpsMonitor = document.createElement("div");
 monitor.appendChild(fpsMonitor);
 const pointerMonitor = document.createElement("div");
 monitor.appendChild(pointerMonitor);
-const cameraMonitor = document.createElement("div");
-monitor.appendChild(cameraMonitor);
+const viewportMonitor = document.createElement("div");
+monitor.appendChild(viewportMonitor);
 
 monitor.addEventListener("click", () => {
   document.body.requestFullscreen();
@@ -34,11 +34,7 @@ let delta: number = 0;
 
 function animate(timestamp: number): void {
   requestAnimationFrame(animate);
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.translate(-game.scene.camera.position.x, -game.scene.camera.position.y);
-
+  resetViewport(ctx);
   processInputs();
 
   game.scene.process(ctx, delta);
@@ -47,17 +43,15 @@ function animate(timestamp: number): void {
   now = timestamp;
   delta = now - then;
 
-  ctx.restore();
-
   fpsMonitor.innerText = `FPS: ${Math.round(1000 / delta)}`;
   pointerMonitor.innerText = `pointer: (${pointer.position.x}, ${pointer.position.y})`;
-  cameraMonitor.innerText = `camera: (${game.scene.camera.position.x}, ${game.scene.camera.position.y})`;
+  viewportMonitor.innerText = `viewport: (${game.scene.viewport.offset.x}, ${game.scene.viewport.offset.y})`;
 }
 
 export function startGame(scene: Scene): void {
-  applyCanvas();
+  adoptCanvas();
   applyInputs();
-  applyMonitor();
+  adoptMonitor();
 
   changeScene(scene);
   animate(now);

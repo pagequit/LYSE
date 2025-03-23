@@ -8,7 +8,7 @@ monitor.style.fontFamily = "monospace";
 monitor.style.padding = "10px";
 monitor.style.background = "rgba(0, 0, 0, 0.5)";
 
-export function applyMonitor(): void {
+export function adoptMonitor(): void {
   document.body.appendChild(monitor);
 }
 
