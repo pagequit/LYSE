@@ -46,6 +46,7 @@ export function setViewportOffset(x: number, y: number): void {
     0,
     Math.min(x, game.scene.width * game.scene.viewport.zoom - self.innerWidth),
   );
+
   game.scene.viewport.offset.y = Math.max(
     0,
     Math.min(

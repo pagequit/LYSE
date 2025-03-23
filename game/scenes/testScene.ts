@@ -46,8 +46,8 @@ import { monitor } from "../../engine/monitor.ts";
 import type { Vector } from "../../engine/Vector.ts";
 
 const scene: Scene = createScene(process, {
-  width: 2048,
-  height: 1152,
+  width: 1536,
+  height: 1024,
   construct,
   destruct,
 });

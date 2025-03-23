@@ -1,4 +1,4 @@
-import { adoptCanvas, ctx, resetViewport } from "./View.ts";
+import { adoptView, ctx, resetViewport } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { pointer } from "./Pointer.ts";
@@ -49,7 +49,7 @@ function animate(timestamp: number): void {
 }
 
 export function startGame(scene: Scene): void {
-  adoptCanvas();
+  adoptView();
   applyInputs();
   adoptMonitor();
 
