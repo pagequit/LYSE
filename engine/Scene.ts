@@ -57,7 +57,7 @@ export function setViewportOffset(x: number, y: number): void {
 
 export function focusViewportToPosition(position: Vector): void {
   setViewportOffset(
-    position.x - self.innerWidth / 2,
-    position.y - self.innerHeight / 2,
+    position.x * game.scene.viewport.zoom - self.innerWidth / 2,
+    position.y * game.scene.viewport.zoom - self.innerHeight / 2,
   );
 }
