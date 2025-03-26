@@ -1,8 +1,7 @@
 import { adoptView, ctx, resetViewport } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
-import { pointer } from "./Pointer.ts";
-import { adoptMonitor, monitor } from "./monitor.ts";
+import { fpsMonitor } from "../game/gui/menu/script.ts";
 
 export type Game = {
   scene: Scene;
@@ -16,17 +15,6 @@ export const game: Game = {
   }),
   state: {},
 };
-
-const fpsMonitor = document.createElement("div");
-monitor.appendChild(fpsMonitor);
-const pointerMonitor = document.createElement("div");
-monitor.appendChild(pointerMonitor);
-const viewportMonitor = document.createElement("div");
-monitor.appendChild(viewportMonitor);
-
-monitor.addEventListener("click", () => {
-  document.body.requestFullscreen();
-});
 
 let now: number = self.performance.now();
 let then: number = now;
@@ -44,14 +32,11 @@ function animate(timestamp: number): void {
   delta = now - then;
 
   fpsMonitor.innerText = `FPS: ${Math.round(1000 / delta)}`;
-  pointerMonitor.innerText = `pointer: (${pointer.position.x}, ${pointer.position.y})`;
-  viewportMonitor.innerText = `viewport: (${game.scene.viewport.offset.x}, ${game.scene.viewport.offset.y})`;
 }
 
 export function startGame(scene: Scene): void {
   adoptView();
   applyInputs();
-  adoptMonitor();
 
   changeScene(scene);
   animate(now);

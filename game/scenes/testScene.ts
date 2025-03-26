@@ -42,7 +42,6 @@ import {
   type KinematicBody,
   setActiveKinematicBodies,
 } from "../../engine/KinematicBody.ts";
-import { monitor } from "../../engine/monitor.ts";
 import type { Vector } from "../../engine/Vector.ts";
 
 const scene: Scene = createScene(process, {
@@ -133,9 +132,6 @@ const kinematicBodies = [
 
 const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 
-const playerMonitor = document.createElement("div");
-monitor.appendChild(playerMonitor);
-
 const deltaPosition: Vector = {
   x: player.position.x,
   y: player.position.y,
@@ -222,8 +218,6 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
-
-  playerMonitor.innerText = `player: (${player.velocity.x}, ${player.velocity.y})`;
 }
 
 export default scene;
