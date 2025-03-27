@@ -15,3 +15,15 @@ export function mount(): void {
 export const fpsMonitor = templateElement.content.getElementById(
   "fps",
 ) as HTMLElement;
+
+const menuToggle = templateElement.content.getElementById(
+  "menu-toggle",
+) as HTMLElement;
+
+const mainMenu = templateElement.content.querySelector(
+  ".main-menu",
+) as HTMLElement;
+
+menuToggle.addEventListener("click", () => {
+  mainMenu.classList.toggle("open");
+});
