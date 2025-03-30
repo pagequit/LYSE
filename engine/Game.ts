@@ -31,7 +31,7 @@ function animate(timestamp: number): void {
   now = timestamp;
   delta = now - then;
 
-  fpsMonitor.innerText = `FPS: ${Math.round(1000 / delta)}`;
+  fpsMonitor.innerText = `${Math.round(1000 / delta)} FPS`;
 }
 
 export function startGame(scene: Scene): void {

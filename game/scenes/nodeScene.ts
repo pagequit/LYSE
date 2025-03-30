@@ -20,6 +20,8 @@ import {
 import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
 import testScene from "./testScene.ts";
+import { zoomInput } from "../gui/menu/script.ts";
+import { resizeCanvas } from "../../engine/View.ts";
 
 function handleEscape({ key }: KeyboardEvent): void {
   if (key === "Escape") {
@@ -34,6 +36,11 @@ const scene: Scene = createScene(process, {
   destruct,
 });
 
+function handleZoom(): void {
+  scene.viewport.zoom = parseFloat(zoomInput.value);
+  resizeCanvas();
+}
+
 function construct(): void {
   document.addEventListener("mousedown", onPointerDown);
   document.addEventListener("touchstart", onPointerDown);
@@ -43,6 +50,9 @@ function construct(): void {
   document.addEventListener("touchend", onPointerUp);
 
   self.addEventListener("keyup", handleEscape);
+
+  zoomInput.addEventListener("input", handleZoom);
+  zoomInput.value = scene.viewport.zoom.toString();
 }
 
 function destruct(): void {
@@ -54,6 +64,8 @@ function destruct(): void {
   document.removeEventListener("touchend", onPointerUp);
 
   self.removeEventListener("keyup", handleEscape);
+
+  zoomInput.removeEventListener("input", handleZoom);
 }
 
 const nodes: Array<Node> = [
