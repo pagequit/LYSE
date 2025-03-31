@@ -44,21 +44,18 @@ export function changeScene(scene: Scene): void {
 export function setViewportOffset(x: number, y: number): void {
   game.scene.viewport.offset.x = Math.max(
     0,
-    Math.min(x, game.scene.width * game.scene.viewport.zoom - self.innerWidth),
+    Math.min(x, game.scene.width * game.settings.zoom - self.innerWidth),
   );
 
   game.scene.viewport.offset.y = Math.max(
     0,
-    Math.min(
-      y,
-      game.scene.height * game.scene.viewport.zoom - self.innerHeight,
-    ),
+    Math.min(y, game.scene.height * game.settings.zoom - self.innerHeight),
   );
 }
 
 export function focusViewportToPosition(position: Vector): void {
   setViewportOffset(
-    position.x * game.scene.viewport.zoom - self.innerWidth / 2,
-    position.y * game.scene.viewport.zoom - self.innerHeight / 2,
+    position.x * game.settings.zoom - self.innerWidth / 2,
+    position.y * game.settings.zoom - self.innerHeight / 2,
   );
 }

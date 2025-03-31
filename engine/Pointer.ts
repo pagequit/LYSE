@@ -19,10 +19,10 @@ function adjustPointerPosition(
 ): void {
   pointer.position.x =
     (eventX - canvas.offsetLeft + game.scene.viewport.offset.x) /
-    game.scene.viewport.zoom;
+    game.settings.zoom;
   pointer.position.y =
     (eventY - canvas.offsetTop + game.scene.viewport.offset.y) /
-    game.scene.viewport.zoom;
+    game.settings.zoom;
 }
 
 function onMouseDown(event: MouseEvent): void {

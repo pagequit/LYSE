@@ -43,8 +43,6 @@ import {
   setActiveKinematicBodies,
 } from "../../engine/KinematicBody.ts";
 import type { Vector } from "../../engine/Vector.ts";
-import { zoomInput } from "../gui/menu/script.ts";
-import { resizeCanvas } from "../../engine/View.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -63,15 +61,8 @@ function handleEscape({ key }: KeyboardEvent): void {
   }
 }
 
-function handleZoom(): void {
-  scene.viewport.zoom = parseFloat(zoomInput.value);
-  resizeCanvas();
-}
-
 function construct(): void {
   self.addEventListener("keyup", handleEscape);
-  zoomInput.addEventListener("input", handleZoom);
-  zoomInput.value = scene.viewport.zoom.toString();
 
   if (isTouchDevice) {
     applyTouchControls();
@@ -80,7 +71,6 @@ function construct(): void {
 
 function destruct(): void {
   self.removeEventListener("keyup", handleEscape);
-  zoomInput.removeEventListener("input", handleZoom);
 
   if (isTouchDevice) {
     removeTouchControls();

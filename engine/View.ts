@@ -13,24 +13,22 @@ container.appendChild(canvas);
 
 export type Viewport = {
   offset: Vector;
-  zoom: number;
 };
 
 export function createViewport(): Viewport {
   return {
     offset: { x: 0, y: 0 },
-    zoom: 1.0,
   };
 }
 
 export function resizeCanvas(): void {
   canvas.width = Math.min(
     self.innerWidth,
-    game.scene.width * game.scene.viewport.zoom,
+    game.scene.width * game.settings.zoom,
   );
   canvas.height = Math.min(
     self.innerHeight,
-    game.scene.height * game.scene.viewport.zoom,
+    game.scene.height * game.settings.zoom,
   );
   ctx.imageSmoothingEnabled = false;
 }
@@ -50,5 +48,5 @@ export function resetViewport(ctx: CanvasRenderingContext2D): void {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.translate(-game.scene.viewport.offset.x, -game.scene.viewport.offset.y);
-  ctx.scale(game.scene.viewport.zoom, game.scene.viewport.zoom);
+  ctx.scale(game.settings.zoom, game.settings.zoom);
 }

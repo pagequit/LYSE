@@ -3,18 +3,18 @@ import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { fpsMonitor } from "../game/gui/menu/script.ts";
 
-export type Game = {
-  scene: Scene;
-  state: unknown;
-};
-
-export const game: Game = {
+export const game = {
   scene: createScene(() => {}, {
     width: self.innerWidth,
     height: self.innerHeight,
   }),
+  settings: {
+    zoom: 1,
+  },
   state: {},
 };
+
+export type Game = typeof game;
 
 let now: number = self.performance.now();
 let then: number = now;
