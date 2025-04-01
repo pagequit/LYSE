@@ -1,5 +1,4 @@
 import { game } from "./Game.ts";
-import type { Vector } from "./Vector.ts";
 import { type Viewport, createViewport, resizeCanvas } from "./View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
@@ -39,23 +38,4 @@ export function changeScene(scene: Scene): void {
   game.scene = scene;
   resizeCanvas();
   game.scene.construct();
-}
-
-export function setViewportOffset(x: number, y: number): void {
-  game.scene.viewport.offset.x = Math.max(
-    0,
-    Math.min(x, game.scene.width * game.settings.zoom - self.innerWidth),
-  );
-
-  game.scene.viewport.offset.y = Math.max(
-    0,
-    Math.min(y, game.scene.height * game.settings.zoom - self.innerHeight),
-  );
-}
-
-export function focusViewportToPosition(position: Vector): void {
-  setViewportOffset(
-    position.x * game.settings.zoom - self.innerWidth / 2,
-    position.y * game.settings.zoom - self.innerHeight / 2,
-  );
 }

@@ -5,6 +5,7 @@ import { resizeCanvas } from "../../../engine/View.ts";
 import { changeScene } from "../../../engine/Scene.ts";
 import nodeScene from "../../scenes/nodeScene.ts";
 import testScene from "../../scenes/testScene.ts";
+import gridScene from "../../scenes/gridScene.ts";
 
 const templateElement = document.createElement("template");
 const styleElement = document.createElement("style");
@@ -49,7 +50,7 @@ const zoomInput = templateElement.content.querySelector(
 ) as HTMLInputElement;
 
 zoomInput.addEventListener("input", () => {
-  game.settings.zoom = parseFloat(zoomInput.value);
+  game.settings.scale = parseFloat(zoomInput.value);
   resizeCanvas();
 });
 
@@ -67,4 +68,12 @@ const testButton = templateElement.content.getElementById(
 
 testButton.addEventListener("click", () => {
   changeScene(testScene);
+});
+
+const gridButton = templateElement.content.getElementById(
+  "grid",
+) as HTMLButtonElement;
+
+gridButton.addEventListener("click", () => {
+  changeScene(gridScene);
 });

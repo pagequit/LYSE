@@ -1,4 +1,4 @@
-import { adoptView, ctx, resetViewport } from "./View.ts";
+import { adoptCanvas, ctx, resetViewport } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { changeScene, createScene, type Scene } from "./Scene.ts";
 import { fpsMonitor } from "../game/gui/menu/script.ts";
@@ -9,7 +9,7 @@ export const game = {
     height: self.innerHeight,
   }),
   settings: {
-    zoom: 1,
+    scale: 1,
   },
   state: {},
 };
@@ -35,7 +35,7 @@ function animate(timestamp: number): void {
 }
 
 export function startGame(scene: Scene): void {
-  adoptView();
+  adoptCanvas();
   applyInputs();
 
   changeScene(scene);

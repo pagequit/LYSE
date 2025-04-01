@@ -1,6 +1,6 @@
 import { startGame } from "./engine/Game.ts";
-import testScene from "./game/scenes/testScene.ts";
 import { mount } from "./game/gui/menu/script.ts";
+import scene from "./game/scenes/gridScene.ts";
 
 mount();
-startGame(testScene);
+startGame(scene);

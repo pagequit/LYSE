@@ -12,13 +12,7 @@ import {
   type Player,
 } from "../entities/Player.ts";
 import { createGrid, type Grid } from "../entities/Grid.ts";
-import {
-  changeScene,
-  createScene,
-  focusViewportToPosition,
-  type Scene,
-} from "../../engine/Scene.ts";
-import nodeScene from "./nodeScene.ts";
+import { createScene, type Scene } from "../../engine/Scene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
   circleContainsCircle,
@@ -43,6 +37,7 @@ import {
   setActiveKinematicBodies,
 } from "../../engine/KinematicBody.ts";
 import type { Vector } from "../../engine/Vector.ts";
+import { focusViewport } from "../../engine/View.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -54,24 +49,13 @@ const scene: Scene = createScene(process, {
 const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
-
-function handleEscape({ key }: KeyboardEvent): void {
-  if (key === "Escape") {
-    changeScene(nodeScene);
-  }
-}
-
 function construct(): void {
-  self.addEventListener("keyup", handleEscape);
-
   if (isTouchDevice) {
     applyTouchControls();
   }
 }
 
 function destruct(): void {
-  self.removeEventListener("keyup", handleEscape);
-
   if (isTouchDevice) {
     removeTouchControls();
   }
@@ -137,15 +121,17 @@ const deltaPosition: Vector = {
   y: player.position.y,
 };
 
-function focusSceneCameraToPlayerPosition(): void {
-  focusViewportToPosition(
+function focusViewportToPlayerPosition(): void {
+  if (
     player.position.x ** 2 +
       player.position.y ** 2 -
       (deltaPosition.x ** 2 + deltaPosition.y ** 2) >
-      1
-      ? player.position
-      : deltaPosition,
-  );
+    1
+  ) {
+    focusViewport(player.position.x, player.position.y);
+  } else {
+    focusViewport(deltaPosition.x, deltaPosition.y);
+  }
 
   deltaPosition.x = player.position.x;
   deltaPosition.y = player.position.y;
@@ -214,7 +200,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   animatePlayer(player, ctx, delta);
 
-  focusSceneCameraToPlayerPosition();
+  focusViewportToPlayerPosition();
 
   pointerNode.position = pointer.position;
   paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");

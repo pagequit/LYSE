@@ -1,11 +1,6 @@
 import { colors } from "../style.ts";
 import { pointer } from "../../engine/Pointer.ts";
-import {
-  changeScene,
-  createScene,
-  type Scene,
-  setViewportOffset,
-} from "../../engine/Scene.ts";
+import { createScene, type Scene } from "../../engine/Scene.ts";
 import { type Vector } from "../../engine/Vector.ts";
 import {
   createSegmentIntersection,
@@ -19,13 +14,7 @@ import {
 } from "../entities/Node.ts";
 import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
-import testScene from "./testScene.ts";
-
-function handleEscape({ key }: KeyboardEvent): void {
-  if (key === "Escape") {
-    changeScene(testScene);
-  }
-}
+import { focusViewport, setViewportOrigin } from "../../engine/View.ts";
 
 const scene: Scene = createScene(process, {
   width: 1024,
@@ -42,7 +31,7 @@ function construct(): void {
   document.addEventListener("mouseup", onPointerUp);
   document.addEventListener("touchend", onPointerUp);
 
-  self.addEventListener("keyup", handleEscape);
+  focusViewport(origin.position.x, origin.position.y);
 }
 
 function destruct(): void {
@@ -52,8 +41,6 @@ function destruct(): void {
   document.removeEventListener("touchmove", onPointerMove);
   document.removeEventListener("mouseup", onPointerUp);
   document.removeEventListener("touchend", onPointerUp);
-
-  self.removeEventListener("keyup", handleEscape);
 }
 
 const nodes: Array<Node> = [
@@ -94,8 +81,8 @@ const nodes: Array<Node> = [
 ].map(createNode);
 
 const origin: Node = createNode({
-  x: self.innerWidth / 2,
-  y: self.innerHeight / 2,
+  x: scene.width / 2,
+  y: scene.height / 2,
 });
 nodes.push(origin);
 
@@ -103,11 +90,11 @@ const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];
 
 const pointerNode = createNode(pointer.position);
-const dragOrigin: Vector = { x: 0, y: 0 };
-const dragVector: Vector = { x: 0, y: 0 };
+const panOrigin: Vector = { x: 0, y: 0 };
+const panVector: Vector = { x: 0, y: 0 };
 
 const segmentIntersection = createSegmentIntersection();
-let isDragging = false;
+let isPanning = false;
 let isIntersecting = false;
 
 let hoverNode: Node | null = null;
@@ -123,9 +110,9 @@ function onPointerDown(): void {
   });
 
   if (node === null) {
-    dragOrigin.x = pointer.position.x;
-    dragOrigin.y = pointer.position.y;
-    isDragging = true;
+    panOrigin.x = pointer.position.x;
+    panOrigin.y = pointer.position.y;
+    isPanning = true;
 
     return;
   }
@@ -135,12 +122,13 @@ function onPointerDown(): void {
 }
 
 function onPointerMove(): void {
-  if (isDragging) {
-    dragVector.x = dragOrigin.x - pointer.position.x;
-    dragVector.y = dragOrigin.y - pointer.position.y;
-    setViewportOffset(
-      scene.viewport.offset.x + dragVector.x,
-      scene.viewport.offset.y + dragVector.y,
+  if (isPanning) {
+    panVector.x = panOrigin.x - pointer.position.x;
+    panVector.y = panOrigin.y - pointer.position.y;
+
+    setViewportOrigin(
+      scene.viewport.origin.x + panVector.x,
+      scene.viewport.origin.y + panVector.y,
     );
 
     return;
@@ -206,7 +194,7 @@ function onPointerMove(): void {
 }
 
 function onPointerUp(): void {
-  isDragging = false;
+  isPanning = false;
   isIntersecting = false;
   activeNode = null;
   nextEdge.length = 0;

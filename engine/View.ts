@@ -8,32 +8,32 @@ const container = document.createElement("div");
 container.style.display = "flex";
 container.style.justifyContent = "center";
 container.style.alignItems = "center";
-container.style.background = "#161616";
+container.style.background = "#161616"; // FIXME
 container.appendChild(canvas);
 
 export type Viewport = {
-  offset: Vector;
+  origin: Vector;
 };
 
 export function createViewport(): Viewport {
   return {
-    offset: { x: 0, y: 0 },
+    origin: { x: 0, y: 0 },
   };
 }
 
 export function resizeCanvas(): void {
   canvas.width = Math.min(
     self.innerWidth,
-    game.scene.width * game.settings.zoom,
+    game.scene.width * game.settings.scale,
   );
   canvas.height = Math.min(
     self.innerHeight,
-    game.scene.height * game.settings.zoom,
+    game.scene.height * game.settings.scale,
   );
   ctx.imageSmoothingEnabled = false;
 }
 
-export function adoptView(): void {
+export function adoptCanvas(): void {
   document.body.appendChild(container);
   self.addEventListener("resize", resizeCanvas);
 }
@@ -47,6 +47,25 @@ export function resetViewport(ctx: CanvasRenderingContext2D): void {
   ctx.restore();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  ctx.translate(-game.scene.viewport.offset.x, -game.scene.viewport.offset.y);
-  ctx.scale(game.settings.zoom, game.settings.zoom);
+  ctx.translate(-game.scene.viewport.origin.x, -game.scene.viewport.origin.y);
+  ctx.scale(game.settings.scale, game.settings.scale);
+}
+
+export function setViewportOrigin(x: number, y: number): void {
+  game.scene.viewport.origin.x = Math.max(
+    0,
+    Math.min(x, game.scene.width * game.settings.scale - self.innerWidth),
+  );
+
+  game.scene.viewport.origin.y = Math.max(
+    0,
+    Math.min(y, game.scene.height * game.settings.scale - self.innerHeight),
+  );
+}
+
+export function focusViewport(x: number, y: number): void {
+  setViewportOrigin(
+    x * game.settings.scale - self.innerWidth / 2,
+    y * game.settings.scale - self.innerHeight / 2,
+  );
 }
