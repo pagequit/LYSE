@@ -75,3 +75,37 @@ export function removePointer(): void {
   canvas.removeEventListener("mouseup", onMouseUp);
   canvas.removeEventListener("touchend", onTouchEnd);
 }
+
+export function applyPointerEvents({
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+}: {
+  onPointerDown: () => void;
+  onPointerMove: () => void;
+  onPointerUp: () => void;
+}): void {
+  document.addEventListener("mousedown", onPointerDown);
+  document.addEventListener("touchstart", onPointerDown);
+  document.addEventListener("mousemove", onPointerMove);
+  document.addEventListener("touchmove", onPointerMove);
+  document.addEventListener("mouseup", onPointerUp);
+  document.addEventListener("touchend", onPointerUp);
+}
+
+export function removePointerEvents({
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+}: {
+  onPointerDown: () => void;
+  onPointerMove: () => void;
+  onPointerUp: () => void;
+}): void {
+  document.removeEventListener("mousedown", onPointerDown);
+  document.removeEventListener("touchstart", onPointerDown);
+  document.removeEventListener("mousemove", onPointerMove);
+  document.removeEventListener("touchmove", onPointerMove);
+  document.removeEventListener("mouseup", onPointerUp);
+  document.removeEventListener("touchend", onPointerUp);
+}

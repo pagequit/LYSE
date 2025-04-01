@@ -86,3 +86,23 @@ export function preFocusSceneViewport(
     Math.min(y - self.innerHeight / 2, scene.height - self.innerHeight),
   );
 }
+
+const panOrigin: Vector = { x: 0, y: 0 };
+const panDelta: Vector = { x: 0, y: 0 };
+
+export function startPenning(x: number, y: number): void {
+  panOrigin.x = x;
+  panOrigin.y = y;
+  panDelta.x = 0;
+  panDelta.y = 0;
+}
+
+export function updatePanning(x: number, y: number): void {
+  panDelta.x = panOrigin.x - x;
+  panDelta.y = panOrigin.y - y;
+
+  setViewportOrigin(
+    game.scene.viewport.origin.x + panDelta.x,
+    game.scene.viewport.origin.y + panDelta.y,
+  );
+}

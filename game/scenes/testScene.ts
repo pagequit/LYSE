@@ -49,6 +49,7 @@ const scene: Scene = createScene(process, {
 const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
+
 function preProcess(): void {
   if (isTouchDevice) {
     applyTouchControls();

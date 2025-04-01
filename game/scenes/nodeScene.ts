@@ -1,7 +1,10 @@
 import { colors } from "../style.ts";
-import { pointer } from "../../engine/Pointer.ts";
+import {
+  pointer,
+  applyPointerEvents,
+  removePointerEvents,
+} from "../../engine/Pointer.ts";
 import { createScene, type Scene } from "../../engine/Scene.ts";
-import { type Vector } from "../../engine/Vector.ts";
 import {
   createSegmentIntersection,
   setSegmentIntersection,
@@ -14,7 +17,11 @@ import {
 } from "../entities/Node.ts";
 import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
-import { preFocusSceneViewport, setViewportOrigin } from "../../engine/View.ts";
+import {
+  preFocusSceneViewport,
+  startPenning,
+  updatePanning,
+} from "../../engine/View.ts";
 
 const scene: Scene = createScene(process, {
   width: 1024,
@@ -24,21 +31,19 @@ const scene: Scene = createScene(process, {
 });
 
 function preProcess(): void {
-  document.addEventListener("mousedown", onPointerDown);
-  document.addEventListener("touchstart", onPointerDown);
-  document.addEventListener("mousemove", onPointerMove);
-  document.addEventListener("touchmove", onPointerMove);
-  document.addEventListener("mouseup", onPointerUp);
-  document.addEventListener("touchend", onPointerUp);
+  applyPointerEvents({
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+  });
 }
 
 function postProcess(): void {
-  document.removeEventListener("mousedown", onPointerDown);
-  document.removeEventListener("touchstart", onPointerDown);
-  document.removeEventListener("mousemove", onPointerMove);
-  document.removeEventListener("touchmove", onPointerMove);
-  document.removeEventListener("mouseup", onPointerUp);
-  document.removeEventListener("touchend", onPointerUp);
+  removePointerEvents({
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+  });
 }
 
 const nodes: Array<Node> = [
@@ -90,8 +95,6 @@ const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];
 
 const pointerNode = createNode(pointer.position);
-const panOrigin: Vector = { x: 0, y: 0 };
-const panVector: Vector = { x: 0, y: 0 };
 
 const segmentIntersection = createSegmentIntersection();
 let isPanning = false;
@@ -110,9 +113,8 @@ function onPointerDown(): void {
   });
 
   if (node === null) {
-    panOrigin.x = pointer.position.x;
-    panOrigin.y = pointer.position.y;
     isPanning = true;
+    startPenning(pointer.position.x, pointer.position.y);
 
     return;
   }
@@ -123,14 +125,7 @@ function onPointerDown(): void {
 
 function onPointerMove(): void {
   if (isPanning) {
-    panVector.x = panOrigin.x - pointer.position.x;
-    panVector.y = panOrigin.y - pointer.position.y;
-
-    setViewportOrigin(
-      scene.viewport.origin.x + panVector.x,
-      scene.viewport.origin.y + panVector.y,
-    );
-
+    updatePanning(pointer.position.x, pointer.position.y);
     return;
   }
 
