@@ -14,27 +14,25 @@ import {
 } from "../entities/Node.ts";
 import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
-import { focusViewport, setViewportOrigin } from "../../engine/View.ts";
+import { preFocusSceneViewport, setViewportOrigin } from "../../engine/View.ts";
 
 const scene: Scene = createScene(process, {
   width: 1024,
   height: 768,
-  construct,
-  destruct,
+  preProcess,
+  postProcess,
 });
 
-function construct(): void {
+function preProcess(): void {
   document.addEventListener("mousedown", onPointerDown);
   document.addEventListener("touchstart", onPointerDown);
   document.addEventListener("mousemove", onPointerMove);
   document.addEventListener("touchmove", onPointerMove);
   document.addEventListener("mouseup", onPointerUp);
   document.addEventListener("touchend", onPointerUp);
-
-  focusViewport(origin.position.x, origin.position.y);
 }
 
-function destruct(): void {
+function postProcess(): void {
   document.removeEventListener("mousedown", onPointerDown);
   document.removeEventListener("touchstart", onPointerDown);
   document.removeEventListener("mousemove", onPointerMove);
@@ -85,6 +83,8 @@ const origin: Node = createNode({
   y: scene.height / 2,
 });
 nodes.push(origin);
+
+preFocusSceneViewport(scene, origin.position.x, origin.position.y);
 
 const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];

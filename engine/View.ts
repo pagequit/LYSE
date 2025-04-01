@@ -1,5 +1,6 @@
 import { type Vector } from "./Vector.ts";
 import { game } from "./Game.ts";
+import type { Scene } from "./Scene.ts";
 
 export const canvas = document.createElement("canvas");
 export const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -15,9 +16,9 @@ export type Viewport = {
   origin: Vector;
 };
 
-export function createViewport(): Viewport {
+export function createViewport(x: number = 0, y: number = 0): Viewport {
   return {
-    origin: { x: 0, y: 0 },
+    origin: { x, y },
   };
 }
 
@@ -67,5 +68,21 @@ export function focusViewport(x: number, y: number): void {
   setViewportOrigin(
     x * game.settings.scale - self.innerWidth / 2,
     y * game.settings.scale - self.innerHeight / 2,
+  );
+}
+
+export function preFocusSceneViewport(
+  scene: Scene,
+  x: number,
+  y: number,
+): void {
+  scene.viewport.origin.x = Math.max(
+    0,
+    Math.min(x - self.innerWidth / 2, scene.width - self.innerWidth),
+  );
+
+  scene.viewport.origin.y = Math.max(
+    0,
+    Math.min(y - self.innerHeight / 2, scene.height - self.innerHeight),
   );
 }

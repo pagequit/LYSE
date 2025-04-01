@@ -8,34 +8,34 @@ export type Scene = {
   height: number;
   viewport: Viewport;
   process: Process;
-  construct: () => void;
-  destruct: () => void;
+  preProcess: () => void;
+  postProcess: () => void;
 };
 
 export type SceneSettings = {
   width: number;
   height: number;
-  construct?: Scene["construct"];
-  destruct?: Scene["destruct"];
+  preProcess?: Scene["preProcess"];
+  postProcess?: Scene["postProcess"];
 };
 
 export function createScene(
   process: Process,
-  { width, height, construct, destruct }: SceneSettings,
+  { width, height, preProcess, postProcess }: SceneSettings,
 ): Scene {
   return {
     width,
     height,
     viewport: createViewport(),
     process,
-    construct: construct ? construct : () => {},
-    destruct: destruct ? destruct : () => {},
+    preProcess: preProcess ?? (() => {}),
+    postProcess: postProcess ?? (() => {}),
   };
 }
 
 export function changeScene(scene: Scene): void {
-  game.scene.destruct();
+  game.scene.postProcess();
+  scene.preProcess();
   game.scene = scene;
   resizeCanvas();
-  game.scene.construct();
 }

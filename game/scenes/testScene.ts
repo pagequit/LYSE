@@ -42,20 +42,20 @@ import { focusViewport } from "../../engine/View.ts";
 const scene: Scene = createScene(process, {
   width: 1536,
   height: 1024,
-  construct,
-  destruct,
+  preProcess,
+  postProcess,
 });
 
 const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
-function construct(): void {
+function preProcess(): void {
   if (isTouchDevice) {
     applyTouchControls();
   }
 }
 
-function destruct(): void {
+function postProcess(): void {
   if (isTouchDevice) {
     removeTouchControls();
   }
