@@ -71,22 +71,6 @@ export function focusViewport(x: number, y: number): void {
   );
 }
 
-export function preFocusSceneViewport(
-  scene: Scene,
-  x: number,
-  y: number,
-): void {
-  scene.viewport.origin.x = Math.max(
-    0,
-    Math.min(x - self.innerWidth / 2, scene.width - self.innerWidth),
-  );
-
-  scene.viewport.origin.y = Math.max(
-    0,
-    Math.min(y - self.innerHeight / 2, scene.height - self.innerHeight),
-  );
-}
-
 const panOrigin: Vector = { x: 0, y: 0 };
 const panDelta: Vector = { x: 0, y: 0 };
 

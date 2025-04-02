@@ -18,7 +18,7 @@ import {
 import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
 import {
-  preFocusSceneViewport,
+  focusViewport,
   startPenning,
   updatePanning,
 } from "../../engine/View.ts";
@@ -36,6 +36,8 @@ function preProcess(): void {
     onPointerMove,
     onPointerUp,
   });
+
+  focusViewport(origin.position.x, origin.position.y);
 }
 
 function postProcess(): void {
@@ -88,8 +90,6 @@ const origin: Node = createNode({
   y: scene.height / 2,
 });
 nodes.push(origin);
-
-preFocusSceneViewport(scene, origin.position.x, origin.position.y);
 
 const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];

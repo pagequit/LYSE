@@ -35,7 +35,7 @@ export function createScene(
 
 export function changeScene(scene: Scene): void {
   game.scene.postProcess();
-  scene.preProcess();
   game.scene = scene;
+  game.scene.preProcess(); // FIXME
   resizeCanvas();
 }
