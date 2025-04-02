@@ -1,6 +1,5 @@
 import { type Vector } from "./Vector.ts";
 import { game } from "./Game.ts";
-import type { Scene } from "./Scene.ts";
 
 export const canvas = document.createElement("canvas");
 export const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;

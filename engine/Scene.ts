@@ -1,5 +1,4 @@
-import { game } from "./Game.ts";
-import { type Viewport, createViewport, resizeCanvas } from "./View.ts";
+import { type Viewport, createViewport } from "./View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
 
@@ -31,11 +30,4 @@ export function createScene(
     preProcess: preProcess ?? (() => {}),
     postProcess: postProcess ?? (() => {}),
   };
-}
-
-export function changeScene(scene: Scene): void {
-  game.scene.postProcess();
-  game.scene = scene;
-  game.scene.preProcess(); // FIXME
-  resizeCanvas();
 }

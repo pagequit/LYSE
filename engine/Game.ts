@@ -1,6 +1,6 @@
-import { adoptCanvas, ctx, resetViewport } from "./View.ts";
+import { adoptCanvas, ctx, resetViewport, resizeCanvas } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
-import { changeScene, createScene, type Scene } from "./Scene.ts";
+import { createScene, type Scene } from "./Scene.ts";
 import { fpsMonitor } from "../game/gui/menu/script.ts";
 
 export const game = {
@@ -40,4 +40,16 @@ export function startGame(scene: Scene): void {
 
   changeScene(scene);
   animate(now);
+}
+
+export function changeScene(scene: Scene): void {
+  game.scene.postProcess();
+  game.scene = scene;
+  game.scene.preProcess();
+  resizeCanvas();
+}
+
+export function scaleViewport(scale: number): void {
+  game.settings.scale = scale;
+  resizeCanvas();
 }

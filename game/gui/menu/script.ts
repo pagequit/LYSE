@@ -1,8 +1,6 @@
 import template from "./template.html?raw";
 import style from "./style.css?inline";
-import { game } from "../../../engine/Game.ts";
-import { resizeCanvas } from "../../../engine/View.ts";
-import { changeScene } from "../../../engine/Scene.ts";
+import { changeScene, scaleViewport } from "../../../engine/Game.ts";
 import nodeScene from "../../scenes/nodeScene.ts";
 import testScene from "../../scenes/testScene.ts";
 import gridScene from "../../scenes/gridScene.ts";
@@ -50,8 +48,7 @@ const zoomInput = templateElement.content.querySelector(
 ) as HTMLInputElement;
 
 zoomInput.addEventListener("input", () => {
-  game.settings.scale = parseFloat(zoomInput.value);
-  resizeCanvas();
+  scaleViewport(parseFloat(zoomInput.value));
 });
 
 const nodesButton = templateElement.content.getElementById(
