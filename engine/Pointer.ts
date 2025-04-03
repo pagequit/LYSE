@@ -54,8 +54,8 @@ function onMouseUp(event: MouseEvent): void {
   pointer.isDown = event.button === 0 ? false : pointer.isDown;
 }
 
-function onTouchEnd(): void {
-  pointer.isDown = false;
+function onTouchEnd(event: TouchEvent): void {
+  pointer.isDown = event.touches.length === 0 ? false : pointer.isDown;
 }
 
 export function applyPointer(): void {
@@ -74,38 +74,4 @@ export function removePointer(): void {
   canvas.removeEventListener("touchmove", onTouchMove);
   canvas.removeEventListener("mouseup", onMouseUp);
   canvas.removeEventListener("touchend", onTouchEnd);
-}
-
-export function applyPointerEvents({
-  onPointerDown,
-  onPointerMove,
-  onPointerUp,
-}: {
-  onPointerDown: () => void;
-  onPointerMove: () => void;
-  onPointerUp: () => void;
-}): void {
-  document.addEventListener("mousedown", onPointerDown);
-  document.addEventListener("touchstart", onPointerDown);
-  document.addEventListener("mousemove", onPointerMove);
-  document.addEventListener("touchmove", onPointerMove);
-  document.addEventListener("mouseup", onPointerUp);
-  document.addEventListener("touchend", onPointerUp);
-}
-
-export function removePointerEvents({
-  onPointerDown,
-  onPointerMove,
-  onPointerUp,
-}: {
-  onPointerDown: () => void;
-  onPointerMove: () => void;
-  onPointerUp: () => void;
-}): void {
-  document.removeEventListener("mousedown", onPointerDown);
-  document.removeEventListener("touchstart", onPointerDown);
-  document.removeEventListener("mousemove", onPointerMove);
-  document.removeEventListener("touchmove", onPointerMove);
-  document.removeEventListener("mouseup", onPointerUp);
-  document.removeEventListener("touchend", onPointerUp);
 }

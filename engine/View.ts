@@ -73,14 +73,14 @@ export function focusViewport(x: number, y: number): void {
 const panOrigin: Vector = { x: 0, y: 0 };
 const panDelta: Vector = { x: 0, y: 0 };
 
-export function startPenning(x: number, y: number): void {
+export function startPanning(x: number, y: number): void {
   panOrigin.x = x;
   panOrigin.y = y;
   panDelta.x = 0;
   panDelta.y = 0;
 }
 
-export function updatePanning(x: number, y: number): void {
+export function updatePanning(x: number, y: number): number {
   panDelta.x = panOrigin.x - x;
   panDelta.y = panOrigin.y - y;
 
@@ -88,4 +88,6 @@ export function updatePanning(x: number, y: number): void {
     game.scene.viewport.origin.x + panDelta.x,
     game.scene.viewport.origin.y + panDelta.y,
   );
+
+  return Math.sqrt(panDelta.x * panDelta.x + panDelta.y * panDelta.y);
 }

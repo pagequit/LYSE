@@ -1,9 +1,5 @@
 import { colors } from "../style.ts";
-import {
-  pointer,
-  applyPointerEvents,
-  removePointerEvents,
-} from "../../engine/Pointer.ts";
+import { pointer } from "../../engine/Pointer.ts";
 import { createScene, type Scene } from "../../engine/Scene.ts";
 import {
   createSegmentIntersection,
@@ -19,7 +15,7 @@ import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
 import {
   focusViewport,
-  startPenning,
+  startPanning,
   updatePanning,
 } from "../../engine/View.ts";
 
@@ -31,21 +27,23 @@ const scene: Scene = createScene(process, {
 });
 
 function preProcess(): void {
-  applyPointerEvents({
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
-  });
+  document.addEventListener("mousedown", onPointerDown);
+  document.addEventListener("touchstart", onPointerDown);
+  document.addEventListener("mousemove", onPointerMove);
+  document.addEventListener("touchmove", onPointerMove);
+  document.addEventListener("mouseup", onPointerUp);
+  document.addEventListener("touchend", onPointerUp);
 
   focusViewport(origin.position.x, origin.position.y);
 }
 
 function postProcess(): void {
-  removePointerEvents({
-    onPointerDown,
-    onPointerMove,
-    onPointerUp,
-  });
+  document.removeEventListener("mousedown", onPointerDown);
+  document.removeEventListener("touchstart", onPointerDown);
+  document.removeEventListener("mousemove", onPointerMove);
+  document.removeEventListener("touchmove", onPointerMove);
+  document.removeEventListener("mouseup", onPointerUp);
+  document.removeEventListener("touchend", onPointerUp);
 }
 
 const nodes: Array<Node> = [
@@ -114,7 +112,7 @@ function onPointerDown(): void {
 
   if (node === null) {
     isPanning = true;
-    startPenning(pointer.position.x, pointer.position.y);
+    startPanning(pointer.position.x, pointer.position.y);
 
     return;
   }
