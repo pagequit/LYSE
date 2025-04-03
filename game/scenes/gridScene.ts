@@ -2,7 +2,7 @@ import { pointer } from "../../engine/Pointer.ts";
 import { type Vector } from "../../engine/Vector.ts";
 import { createGrid, type Grid } from "../entities/Grid.ts";
 import { createScene, type Scene } from "../../engine/Scene.ts";
-import { createNode, paintNode } from "../entities/Node.ts";
+import { createNode, paintNode, type Node } from "../entities/Node.ts";
 import { startPanning, updatePanning } from "../../engine/View.ts";
 import {
   createStaticRectangle,
@@ -32,7 +32,7 @@ function postProcess(): void {
   document.removeEventListener("contextmenu", onContextMenu);
 }
 
-const tileSize: number = 64;
+const tileSize = 64;
 
 const hoverTile: StaticBody<Rectangle> = createStaticRectangle(
   { x: 0, y: 0 },
@@ -40,8 +40,8 @@ const hoverTile: StaticBody<Rectangle> = createStaticRectangle(
   tileSize,
 );
 
-let panDistance: number = 0;
-let isPanning: boolean = false;
+let panDistance = 0;
+let isPanning = false;
 
 function onContextMenu(event: MouseEvent): void {
   if (panDistance > 1) {
@@ -77,7 +77,7 @@ function onMouseUp(event: MouseEvent): void {
 }
 
 const grid: Grid = createGrid(scene.width, scene.height, tileSize);
-const pointerNode = createNode(pointer.position);
+const pointerNode: Node = createNode(pointer.position);
 
 function renderHoverTile(
   position: Vector,
