@@ -1,7 +1,7 @@
 import { adoptCanvas, ctx, resetViewport, resizeCanvas } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { createScene, type Scene } from "./Scene.ts";
-import { fpsMonitor } from "../game/gui/menu/script.ts";
+import { fpsMonitor } from "../game/gui/menu/menu.ts";
 
 export const game = {
   scene: createScene(() => {}, {

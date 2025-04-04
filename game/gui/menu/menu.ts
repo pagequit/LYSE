@@ -1,25 +1,17 @@
-import template from "./template.html?raw";
-import style from "./style.css?inline";
+import markup from "./menu.html?raw";
 import { changeScene, scaleViewport } from "../../../engine/Game.ts";
 import nodeScene from "../../scenes/nodeScene.ts";
 import testScene from "../../scenes/testScene.ts";
 import gridScene from "../../scenes/gridScene.ts";
-import {
-  createEffect,
-  createSignal,
-} from "../../../engine/observer/observer.js";
+import { createEffect, createSignal } from "../observers.ts";
 
-const templateElement = document.createElement("template");
-const styleElement = document.createElement("style");
-
-templateElement.innerHTML = template;
-styleElement.innerHTML = style;
+const template = document.createElement("template");
+template.innerHTML = markup;
 
 const [scale, setScale] = createSignal(1);
 
 export function mount(): void {
-  document.head.appendChild(styleElement);
-  document.body.appendChild(templateElement.content);
+  document.body.appendChild(template.content);
 
   createEffect(() => {
     scaleValue.textContent = scale().toFixed(1);
@@ -27,11 +19,9 @@ export function mount(): void {
   });
 }
 
-export const fpsMonitor = templateElement.content.getElementById(
-  "fps",
-) as HTMLElement;
+export const fpsMonitor = template.content.getElementById("fps") as HTMLElement;
 
-const fullscreenButton = templateElement.content.getElementById(
+const fullscreenButton = template.content.getElementById(
   "fullscreen",
 ) as HTMLButtonElement;
 
@@ -42,19 +32,17 @@ fullscreenButton.addEventListener("click", () => {
   document.body.requestFullscreen();
 });
 
-const menuToggle = templateElement.content.getElementById(
+const menuToggle = template.content.getElementById(
   "menu-toggle",
 ) as HTMLElement;
 
-const mainMenu = templateElement.content.querySelector(
-  ".main-menu",
-) as HTMLElement;
+const mainMenu = template.content.querySelector(".main-menu") as HTMLElement;
 
 menuToggle.addEventListener("click", () => {
   mainMenu.classList.toggle("open");
 });
 
-const scaleInput = templateElement.content.querySelector(
+const scaleInput = template.content.querySelector(
   ".main-menu input",
 ) as HTMLInputElement;
 
@@ -62,11 +50,11 @@ scaleInput.addEventListener("input", () => {
   setScale(parseFloat(scaleInput.value));
 });
 
-const scaleValue = templateElement.content.getElementById(
+const scaleValue = template.content.getElementById(
   "scale-value",
 ) as HTMLElement;
 
-const nodesButton = templateElement.content.getElementById(
+const nodesButton = template.content.getElementById(
   "nodes",
 ) as HTMLButtonElement;
 
@@ -74,17 +62,13 @@ nodesButton.addEventListener("click", () => {
   changeScene(nodeScene);
 });
 
-const testButton = templateElement.content.getElementById(
-  "test",
-) as HTMLButtonElement;
+const testButton = template.content.getElementById("test") as HTMLButtonElement;
 
 testButton.addEventListener("click", () => {
   changeScene(testScene);
 });
 
-const gridButton = templateElement.content.getElementById(
-  "grid",
-) as HTMLButtonElement;
+const gridButton = template.content.getElementById("grid") as HTMLButtonElement;
 
 gridButton.addEventListener("click", () => {
   changeScene(gridScene);

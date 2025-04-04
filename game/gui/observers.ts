@@ -1,15 +1,11 @@
-const observers = [];
+const observers: Array<() => void> = [];
 
-function getCurrentObserver() {
-  return observers[observers.length - 1];
-}
-
-export function createEffect(fn) {
+export function createEffect(callback: () => void) {
   const execute = () => {
     observers.push(execute);
 
     try {
-      fn();
+      callback();
     } finally {
       observers.pop();
     }
@@ -18,20 +14,24 @@ export function createEffect(fn) {
   execute();
 }
 
-export function createSignal(value) {
-  const subscribers = new Set();
+export function createSignal<T>(value: T): [() => T, (value: T) => void] {
+  const subscribers = new Set<() => void>();
+
   const getValue = () => {
-    const current = getCurrentObserver();
+    const current = observers[observers.length - 1];
     if (current) {
       subscribers.add(current);
     }
+
     return value;
   };
-  const setValue = (newValue) => {
+
+  const setValue = (newValue: T) => {
     value = newValue;
     for (const subscriber of subscribers) {
       subscriber();
     }
   };
+
   return [getValue, setValue];
 }
