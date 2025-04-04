@@ -38,6 +38,7 @@ import {
 } from "../../engine/KinematicBody.ts";
 import type { Vector } from "../../engine/Vector.ts";
 import { focusViewport } from "../../engine/View.ts";
+import { animateSprite, createSprite } from "../../engine/Sprite.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -46,7 +47,7 @@ const scene: Scene = createScene(process, {
   postProcess,
 });
 
-const grid: Grid = createGrid(scene.width, scene.height, 64);
+const grid: Grid = createGrid(scene.width, scene.height, 16);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
@@ -70,12 +71,12 @@ const player: Player = createPlayer(
 setDirection(player, Direction.Right);
 
 const collisionCircle = createStaticCircle(
-  { x: scene.width / 2, y: scene.height / 2 - 128 },
+  { x: scene.width / 2, y: scene.height / 2 - 192 },
   32,
 );
 
 const collisionRectangle = createStaticRectangle(
-  { x: scene.width / 2, y: scene.height / 2 - 128 },
+  { x: scene.width / 2, y: scene.height / 2 - 192 },
   64,
   64,
 );
@@ -98,7 +99,7 @@ const kiniematicCircle = createKinemeticCircle(
 );
 
 const iceFloor = createStaticRectangle(
-  { x: 256, y: scene.height - 512 },
+  { x: 256, y: scene.height - 448 },
   512,
   256,
 );
@@ -107,15 +108,64 @@ const swamp = createStaticCircle({ x: 512, y: scene.height - 768 }, 128);
 
 const wall = createStaticRectangle({ x: 256, y: 512 }, 16, scene.height / 2);
 
-const collisionBodies = [collisionRectangle, collisionCircle, wall];
+const portalA = {
+  animation: createSprite({
+    imageSrc: "/portal.png",
+    width: 64,
+    height: 64,
+    frameDuraton: 1000 / 3,
+    frameWidth: 16,
+    frameHeight: 16,
+    xFrames: 3,
+    yFrames: 1,
+  }),
+  collisionBody: createStaticCircle({ x: 512, y: 448 }, 16),
+};
+
+const portalB = {
+  animation: createSprite({
+    imageSrc: "/portal2.png",
+    width: 64,
+    height: 64,
+    frameDuraton: 1000 / 3,
+    frameWidth: 16,
+    frameHeight: 16,
+    xFrames: 3,
+    yFrames: 1,
+  }),
+  collisionBody: createStaticCircle({ x: 768, y: 448 }, 16),
+};
+
+function animatePortal(
+  portal: typeof portalA | typeof portalB,
+  ctx: CanvasRenderingContext2D,
+  delta: number,
+): void {
+  animateSprite(
+    portal.animation,
+    {
+      x: portal.collisionBody.origin.x - portal.animation.width * 0.5,
+      y: portal.collisionBody.origin.y - portal.animation.height * 0.625,
+    },
+    ctx,
+    delta,
+  );
+}
+
+const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
+const collisionBodies = [
+  collisionRectangle,
+  collisionCircle,
+  wall,
+  portalA.collisionBody,
+  portalB.collisionBody,
+];
 const kinematicBodies = [
   player.kinematicBody,
   kinematicRectangle,
   kiniematicCircle,
   kinematicSquare,
 ];
-
-const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 
 const deltaPosition: Vector = {
   x: player.position.x,
@@ -200,6 +250,8 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   renderKinematicBodies(activeKinematicBodies, ctx);
 
   animatePlayer(player, ctx, delta);
+  animatePortal(portalA, ctx, delta);
+  animatePortal(portalB, ctx, delta);
 
   focusViewportToPlayerPosition();
 

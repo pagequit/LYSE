@@ -106,6 +106,7 @@ export function animatePlayer(
   animateSprite(
     player.animations[player.state],
     {
+      // FIXME
       x: player.position.x - player.animations[player.state].width * 0.5,
       y: player.position.y - player.animations[player.state].height * 0.625,
     },

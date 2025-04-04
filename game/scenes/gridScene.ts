@@ -86,7 +86,7 @@ function renderHoverTile(
 ): void {
   tile.origin.x = Math.floor(position.x / tileSize) * tileSize;
   tile.origin.y = Math.floor(position.y / tileSize) * tileSize;
-  renderRectangle(hoverTile, ctx, "rgba(255, 255, 255, 0.25)");
+  renderRectangle(hoverTile, ctx, "rgba(255, 255, 255, 0.125)");
 }
 
 function closestTileEdge(
@@ -94,14 +94,13 @@ function closestTileEdge(
   targetPosition: Vector,
   tile: StaticBody<Rectangle>,
 ): void {
+  const centerX = tile.origin.x + tile.shape.width / 2;
+  const centerY = tile.origin.y + tile.shape.height / 2;
+
   targetPosition.x =
-    tile.origin.x + tile.shape.width - position.x > tile.shape.width / 2
-      ? tile.origin.x
-      : tile.origin.x + tile.shape.width;
+    position.x < centerX ? tile.origin.x : tile.origin.x + tile.shape.width;
   targetPosition.y =
-    tile.origin.y + tile.shape.height - position.y > tile.shape.height / 2
-      ? tile.origin.y
-      : tile.origin.y + tile.shape.height;
+    position.y < centerY ? tile.origin.y : tile.origin.y + tile.shape.height;
 }
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
