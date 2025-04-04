@@ -77,7 +77,7 @@ function onMouseUp(event: MouseEvent): void {
 }
 
 const grid: Grid = createGrid(scene.width, scene.height, tileSize);
-const pointerNode: Node = createNode(pointer.position);
+const edgeNode: Node = createNode({ x: 0, y: 0 });
 
 function renderHoverTile(
   position: Vector,
@@ -89,13 +89,28 @@ function renderHoverTile(
   renderRectangle(hoverTile, ctx, "rgba(255, 255, 255, 0.25)");
 }
 
+function closestTileEdge(
+  position: Vector,
+  targetPosition: Vector,
+  tile: StaticBody<Rectangle>,
+): void {
+  targetPosition.x =
+    tile.origin.x + tile.shape.width - position.x > tile.shape.width / 2
+      ? tile.origin.x
+      : tile.origin.x + tile.shape.width;
+  targetPosition.y =
+    tile.origin.y + tile.shape.height - position.y > tile.shape.height / 2
+      ? tile.origin.y
+      : tile.origin.y + tile.shape.height;
+}
+
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
   renderHoverTile(pointer.position, hoverTile, ctx);
 
-  pointerNode.position = pointer.position;
-  paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
+  closestTileEdge(pointer.position, edgeNode.position, hoverTile);
+  paintNode(edgeNode, ctx, "rgba(255, 255, 255, 0.5)");
 }
 
 export default scene;
