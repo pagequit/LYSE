@@ -4,6 +4,10 @@ import { changeScene, scaleViewport } from "../../../engine/Game.ts";
 import nodeScene from "../../scenes/nodeScene.ts";
 import testScene from "../../scenes/testScene.ts";
 import gridScene from "../../scenes/gridScene.ts";
+import {
+  createEffect,
+  createSignal,
+} from "../../../engine/observer/observer.js";
 
 const templateElement = document.createElement("template");
 const styleElement = document.createElement("style");
@@ -11,9 +15,16 @@ const styleElement = document.createElement("style");
 templateElement.innerHTML = template;
 styleElement.innerHTML = style;
 
+const [scale, setScale] = createSignal(1);
+
 export function mount(): void {
   document.head.appendChild(styleElement);
   document.body.appendChild(templateElement.content);
+
+  createEffect(() => {
+    scaleValue.textContent = scale().toFixed(1);
+    scaleViewport(parseFloat(scaleInput.value));
+  });
 }
 
 export const fpsMonitor = templateElement.content.getElementById(
@@ -43,13 +54,17 @@ menuToggle.addEventListener("click", () => {
   mainMenu.classList.toggle("open");
 });
 
-const zoomInput = templateElement.content.querySelector(
+const scaleInput = templateElement.content.querySelector(
   ".main-menu input",
 ) as HTMLInputElement;
 
-zoomInput.addEventListener("input", () => {
-  scaleViewport(parseFloat(zoomInput.value));
+scaleInput.addEventListener("input", () => {
+  setScale(parseFloat(scaleInput.value));
 });
+
+const scaleValue = templateElement.content.getElementById(
+  "scale-value",
+) as HTMLElement;
 
 const nodesButton = templateElement.content.getElementById(
   "nodes",
