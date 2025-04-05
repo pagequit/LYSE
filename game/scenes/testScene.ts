@@ -20,6 +20,7 @@ import {
   createStaticCircle,
   createStaticRectangle,
   ShapeType,
+  renderStaticBodies,
   type Circle,
   type Rectangle,
 } from "../../lib/StaticBody.ts";
@@ -186,9 +187,26 @@ const icicle = {
   ),
 };
 
+const DERSCHNEEMANN = {
+  animation: createSprite({
+    imageSrc: "/DERSCHNEEMANN.png",
+    width: 64,
+    height: 64,
+    frameWidth: 16,
+    frameHeight: 16,
+    xFrames: 1,
+    yFrames: 1,
+  }),
+  collisionBody: createStaticCircle(
+    { x: scene.width / 2 + 128, y: scene.height / 2 - 192 },
+    20,
+  ),
+};
+
 const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 const collisionBodies = [
   wall,
+  DERSCHNEEMANN.collisionBody,
   icicle.collisionBody,
   portalA.collisionBody,
   portalB.collisionBody,
@@ -271,6 +289,16 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   drawSprite(background, { x: 0, y: 0 }, ctx);
   drawSprite(iceFloor.animation, iceFloor.collisionBody.origin, ctx);
+
+  drawSprite(
+    DERSCHNEEMANN.animation,
+    {
+      x: DERSCHNEEMANN.collisionBody.origin.x - 32,
+      y: DERSCHNEEMANN.collisionBody.origin.y - 42,
+    },
+    ctx,
+  );
+
   drawSprite(
     icicle.animation,
     {
