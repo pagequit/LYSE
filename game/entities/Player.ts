@@ -1,9 +1,10 @@
 import {
-  animateSprite,
   createSprite,
-  setXFrame,
-  setYFrame,
-  type Sprite,
+  createSpritePlayer,
+  playbackSpritePlayer,
+  setSpritePlayerXFrame,
+  setSpritePlayerYFrame,
+  type SpritePlayer,
 } from "../../engine/Sprite.ts";
 import { getDirection, isZero, type Vector } from "../../engine/Vector.ts";
 import { input } from "../../engine/Input.ts";
@@ -32,8 +33,8 @@ export type Player = {
   velocity: Vector;
   speedMultiplier: number;
   animations: {
-    [State.Walk]: Sprite;
-    [State.Idle]: Sprite;
+    [State.Walk]: SpritePlayer;
+    [State.Idle]: SpritePlayer;
   };
   kinematicBody: KinematicBody<Circle>;
 };
@@ -51,26 +52,30 @@ export function createPlayer(
     velocity,
     speedMultiplier: 1,
     animations: {
-      [State.Idle]: createSprite({
-        imageSrc: "/player-idle.png",
-        width,
-        height,
-        frameDuraton: 1000 / 2,
-        frameWidth: 16,
-        frameHeight: 16,
-        xFrames: 2,
-        yFrames: 4,
-      }),
-      [State.Walk]: createSprite({
-        imageSrc: "/player-walk.png",
-        width,
-        height,
-        frameDuraton: 1000 / 4,
-        frameWidth: 16,
-        frameHeight: 16,
-        xFrames: 4,
-        yFrames: 4,
-      }),
+      [State.Idle]: createSpritePlayer(
+        createSprite({
+          imageSrc: "/player-idle.png",
+          width,
+          height,
+          frameWidth: 16,
+          frameHeight: 16,
+          xFrames: 2,
+          yFrames: 4,
+        }),
+        500,
+      ),
+      [State.Walk]: createSpritePlayer(
+        createSprite({
+          imageSrc: "/player-walk.png",
+          width,
+          height,
+          frameWidth: 16,
+          frameHeight: 16,
+          xFrames: 4,
+          yFrames: 4,
+        }),
+        500,
+      ),
     },
     kinematicBody: createKinemeticCircle(position, width * 0.25, velocity),
   };
@@ -81,8 +86,8 @@ export function setState(player: Player, state: State): void {
     return;
   }
 
-  setXFrame(player.animations[player.state], 0);
-  setXFrame(player.animations[state], 0);
+  setSpritePlayerXFrame(player.animations[player.state], 0);
+  setSpritePlayerXFrame(player.animations[state], 0);
 
   player.state = state;
 }
@@ -92,8 +97,8 @@ export function setDirection(player: Player, direction: Direction): void {
     return;
   }
 
-  setYFrame(player.animations[State.Idle], direction);
-  setYFrame(player.animations[State.Walk], direction);
+  setSpritePlayerYFrame(player.animations[State.Idle], direction);
+  setSpritePlayerYFrame(player.animations[State.Walk], direction);
 
   player.direction = direction;
 }
@@ -103,12 +108,14 @@ export function animatePlayer(
   ctx: CanvasRenderingContext2D,
   delta: number,
 ): void {
-  animateSprite(
+  playbackSpritePlayer(
     player.animations[player.state],
     {
-      // FIXME
-      x: player.position.x - player.animations[player.state].width * 0.5,
-      y: player.position.y - player.animations[player.state].height * 0.625,
+      // FIXME: avoid object creation in render loop
+      x: player.position.x - player.animations[player.state].sprite.width * 0.5,
+      y:
+        player.position.y -
+        player.animations[player.state].sprite.height * 0.625,
     },
     ctx,
     delta,

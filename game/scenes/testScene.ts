@@ -19,7 +19,6 @@ import {
   rectangleContainsRectangle,
   createStaticCircle,
   createStaticRectangle,
-  renderStaticBodies,
   ShapeType,
   type Circle,
   type Rectangle,
@@ -35,7 +34,12 @@ import {
 } from "../../engine/KinematicBody.ts";
 import type { Vector } from "../../engine/Vector.ts";
 import { focusViewport } from "../../engine/View.ts";
-import { animateSprite, createSprite } from "../../engine/Sprite.ts";
+import {
+  createSprite,
+  drawSprite,
+  createSpritePlayer,
+  playbackSpritePlayer,
+} from "../../engine/Sprite.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -87,30 +91,34 @@ const kiniematicCircle = createKinemeticCircle(
 const wall = createStaticRectangle({ x: 0, y: 0 }, scene.width, 64 * 3);
 
 const portalA = {
-  animation: createSprite({
-    imageSrc: "/portal.png",
-    width: 64,
-    height: 64,
-    frameDuraton: 1000 / 3,
-    frameWidth: 16,
-    frameHeight: 16,
-    xFrames: 3,
-    yFrames: 1,
-  }),
+  animation: createSpritePlayer(
+    createSprite({
+      imageSrc: "/portal.png",
+      width: 64,
+      height: 64,
+      frameWidth: 16,
+      frameHeight: 16,
+      xFrames: 3,
+      yFrames: 1,
+    }),
+    334,
+  ),
   collisionBody: createStaticCircle({ x: 512, y: 448 }, 16),
 };
 
 const portalB = {
-  animation: createSprite({
-    imageSrc: "/portal2.png",
-    width: 64,
-    height: 64,
-    frameDuraton: 1000 / 3,
-    frameWidth: 16,
-    frameHeight: 16,
-    xFrames: 3,
-    yFrames: 1,
-  }),
+  animation: createSpritePlayer(
+    createSprite({
+      imageSrc: "/portal2.png",
+      width: 64,
+      height: 64,
+      frameWidth: 16,
+      frameHeight: 16,
+      xFrames: 3,
+      yFrames: 1,
+    }),
+    334,
+  ),
   collisionBody: createStaticCircle({ x: 768, y: 448 }, 16),
 };
 
@@ -122,11 +130,11 @@ function animatePortal(
   const globalAlpha = ctx.globalAlpha;
   ctx.globalAlpha = 0.667;
 
-  animateSprite(
+  playbackSpritePlayer(
     portal.animation,
     {
-      x: portal.collisionBody.origin.x - portal.animation.width * 0.5,
-      y: portal.collisionBody.origin.y - portal.animation.height * 0.625,
+      x: portal.collisionBody.origin.x - portal.animation.sprite.width * 0.5,
+      y: portal.collisionBody.origin.y - portal.animation.sprite.height * 0.625,
     },
     ctx,
     delta,
@@ -139,7 +147,6 @@ const background = createSprite({
   imageSrc: "/test-scene.png",
   width: scene.width,
   height: scene.height,
-  frameDuraton: Number.POSITIVE_INFINITY,
   frameWidth: scene.width / 4,
   frameHeight: scene.height / 4,
   xFrames: 1,
@@ -151,7 +158,6 @@ const iceFloor = {
     imageSrc: "/ice-floor.png",
     width: 128 * 4,
     height: 64 * 4,
-    frameDuraton: Number.POSITIVE_INFINITY,
     frameWidth: 128,
     frameHeight: 64,
     xFrames: 1,
@@ -169,7 +175,6 @@ const icicle = {
     imageSrc: "/icicle.png",
     width: 64,
     height: 128,
-    frameDuraton: Number.POSITIVE_INFINITY,
     frameWidth: 16,
     frameHeight: 32,
     xFrames: 1,
@@ -264,16 +269,15 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     }
   }
 
-  animateSprite(background, { x: 0, y: 0 }, ctx, delta);
-  animateSprite(iceFloor.animation, iceFloor.collisionBody.origin, ctx, delta);
-  animateSprite(
+  drawSprite(background, { x: 0, y: 0 }, ctx);
+  drawSprite(iceFloor.animation, iceFloor.collisionBody.origin, ctx);
+  drawSprite(
     icicle.animation,
     {
       x: icicle.collisionBody.origin.x - 28,
       y: icicle.collisionBody.origin.y - 86,
     },
     ctx,
-    delta,
   );
 
   // renderStaticBodies(collisionBodies, ctx);
