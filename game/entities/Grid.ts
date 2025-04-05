@@ -1,4 +1,4 @@
-import { type Renderable } from "../../engine/Renderable";
+import { type Renderable } from "../../lib/Renderable";
 
 export type Grid = {
   tileSize: number;

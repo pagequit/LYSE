@@ -1,6 +1,5 @@
-import { colors } from "../style.ts"; // TODO: decouple styling
 import { type Node } from "./Node.ts";
-import { type Renderable } from "../../engine/Renderable.ts";
+import { type Renderable } from "../../lib/Renderable.ts";
 
 export type Edge = {
   nodes: [Node, Node];
@@ -21,7 +20,7 @@ export function paintEdge(
 
 function render(this: Edge, ctx: CanvasRenderingContext2D) {
   ctx.lineWidth = 2;
-  ctx.strokeStyle = colors.foregroundColor;
+  ctx.strokeStyle = "#c9d1d9";
   ctx.moveTo(this.nodes[0].position.x, this.nodes[0].position.y);
   ctx.lineTo(this.nodes[1].position.x, this.nodes[1].position.y);
   ctx.stroke();

@@ -1,6 +1,5 @@
-import { colors } from "../style.ts"; // TODO: decouple styling
-import { type Vector } from "../../engine/Vector.ts";
-import { type Renderable } from "../../engine/Renderable.ts";
+import { type Vector } from "../../lib/Vector.ts";
+import { type Renderable } from "../../lib/Renderable.ts";
 
 export type Node = {
   position: Vector;
@@ -20,7 +19,7 @@ export function paintNode(
 
 function render(this: Node, ctx: CanvasRenderingContext2D): void {
   ctx.lineWidth = 2;
-  ctx.strokeStyle = colors.foregroundColor;
+  ctx.strokeStyle = "#c9d1d9";
   ctx.beginPath();
   ctx.arc(this.position.x, this.position.y, 4, 0, 2 * Math.PI);
   ctx.stroke();

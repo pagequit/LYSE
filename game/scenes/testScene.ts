@@ -1,8 +1,8 @@
 import {
   applyTouchControls,
   removeTouchControls,
-} from "../../engine/TouchControls.ts";
-import { pointer } from "../../engine/Pointer.ts";
+} from "../../lib/TouchControls.ts";
+import { pointer } from "../../lib/Pointer.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -12,7 +12,7 @@ import {
   type Player,
 } from "../entities/Player.ts";
 import { createGrid, type Grid } from "../entities/Grid.ts";
-import { createScene, type Scene } from "../../engine/Scene.ts";
+import { createScene, type Scene } from "../../lib/Scene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
   rectangleContainsCircle,
@@ -22,7 +22,7 @@ import {
   ShapeType,
   type Circle,
   type Rectangle,
-} from "../../engine/StaticBody.ts";
+} from "../../lib/StaticBody.ts";
 import {
   createKinemeticCircle,
   createKinemeticRectangle,
@@ -31,15 +31,15 @@ import {
   processKinematicBodies,
   type KinematicBody,
   setActiveKinematicBodies,
-} from "../../engine/KinematicBody.ts";
-import type { Vector } from "../../engine/Vector.ts";
-import { focusViewport } from "../../engine/View.ts";
+} from "../../lib/KinematicBody.ts";
+import type { Vector } from "../../lib/Vector.ts";
+import { focusViewport } from "../../lib/View.ts";
 import {
   createSprite,
   drawSprite,
   createSpritePlayer,
   playbackSpritePlayer,
-} from "../../engine/Sprite.ts";
+} from "../../lib/Sprite.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,

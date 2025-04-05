@@ -1,10 +1,9 @@
-import { colors } from "../style.ts";
-import { pointer } from "../../engine/Pointer.ts";
-import { createScene, type Scene } from "../../engine/Scene.ts";
+import { pointer } from "../../lib/Pointer.ts";
+import { createScene, type Scene } from "../../lib/Scene.ts";
 import {
   createSegmentIntersection,
   setSegmentIntersection,
-} from "../../engine/Segment.ts";
+} from "../../lib/Segment.ts";
 import {
   createNode,
   getNodeByPosition,
@@ -13,11 +12,7 @@ import {
 } from "../entities/Node.ts";
 import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
-import {
-  focusViewport,
-  startPanning,
-  updatePanning,
-} from "../../engine/View.ts";
+import { focusViewport, startPanning, updatePanning } from "../../lib/View.ts";
 
 const scene: Scene = createScene(process, {
   width: 1024,
@@ -203,30 +198,30 @@ function process(ctx: CanvasRenderingContext2D): void {
   }
 
   for (const node of graph.keys()) {
-    paintNode(node, ctx, colors.errorColor);
+    paintNode(node, ctx, "#eb3342");
   }
 
   for (const node of mainGraphNodes) {
-    paintNode(node, ctx, colors.warningColor);
+    paintNode(node, ctx, "#fddf68");
   }
 
   if (activeNode) {
-    paintNode(activeNode, ctx, colors.infoColor);
+    paintNode(activeNode, ctx, "#4493f8");
 
     if (pointer.isDown) {
-      paintEdge(createEdge([activeNode!, pointerNode]), ctx, colors.infoColor);
-      paintNode(pointerNode, ctx, colors.infoColor);
+      paintEdge(createEdge([activeNode!, pointerNode]), ctx, "#4493f8");
+      paintNode(pointerNode, ctx, "#4493f8");
     }
   }
 
   pointerNode.position = pointer.position;
-  paintNode(pointerNode, ctx, colors.infoColor);
+  paintNode(pointerNode, ctx, "#4493f8");
 
   if (isIntersecting) {
-    paintEdge(createEdge([activeNode!, pointerNode]), ctx, colors.errorColor);
-    paintNode(pointerNode, ctx, colors.errorColor);
+    paintEdge(createEdge([activeNode!, pointerNode]), ctx, "#eb3342");
+    paintNode(pointerNode, ctx, "#eb3342");
   } else if (hoverNode) {
-    paintNode(hoverNode, ctx, colors.infoColor);
+    paintNode(hoverNode, ctx, "#4493f8");
   }
 }
 

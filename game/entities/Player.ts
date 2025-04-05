@@ -5,14 +5,14 @@ import {
   setSpritePlayerXFrame,
   setSpritePlayerYFrame,
   type SpritePlayer,
-} from "../../engine/Sprite.ts";
-import { getDirection, isZero, type Vector } from "../../engine/Vector.ts";
-import { input } from "../../engine/Input.ts";
-import { type Circle } from "../../engine/StaticBody.ts";
+} from "../../lib/Sprite.ts";
+import { getDirection, isZero, type Vector } from "../../lib/Vector.ts";
+import { input } from "../../lib/Input.ts";
+import { type Circle } from "../../lib/StaticBody.ts";
 import {
   createKinemeticCircle,
   type KinematicBody,
-} from "../../engine/KinematicBody.ts";
+} from "../../lib/KinematicBody.ts";
 
 export enum State {
   Idle,

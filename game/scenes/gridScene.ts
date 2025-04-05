@@ -1,15 +1,15 @@
-import { pointer } from "../../engine/Pointer.ts";
-import { type Vector } from "../../engine/Vector.ts";
+import { pointer } from "../../lib/Pointer.ts";
+import { type Vector } from "../../lib/Vector.ts";
 import { createGrid, type Grid } from "../entities/Grid.ts";
-import { createScene, type Scene } from "../../engine/Scene.ts";
+import { createScene, type Scene } from "../../lib/Scene.ts";
 import { createNode, paintNode, type Node } from "../entities/Node.ts";
-import { startPanning, updatePanning } from "../../engine/View.ts";
+import { startPanning, updatePanning } from "../../lib/View.ts";
 import {
   createStaticRectangle,
   renderRectangle,
   type Rectangle,
   type StaticBody,
-} from "../../engine/StaticBody.ts";
+} from "../../lib/StaticBody.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
