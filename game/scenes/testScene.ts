@@ -15,14 +15,11 @@ import { createGrid, type Grid } from "../entities/Grid.ts";
 import { createScene, type Scene } from "../../engine/Scene.ts";
 import { createNode, paintNode } from "../entities/Node.ts";
 import {
-  circleContainsCircle,
   rectangleContainsCircle,
   rectangleContainsRectangle,
   createStaticCircle,
   createStaticRectangle,
-  renderCircle,
   renderStaticBodies,
-  renderRectangle,
   ShapeType,
   type Circle,
   type Rectangle,
@@ -47,7 +44,7 @@ const scene: Scene = createScene(process, {
   postProcess,
 });
 
-const grid: Grid = createGrid(scene.width, scene.height, 16);
+const grid: Grid = createGrid(scene.width, scene.height, 64);
 const pointerNode = createNode(pointer.position);
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
@@ -70,17 +67,6 @@ const player: Player = createPlayer(
 );
 setDirection(player, Direction.Right);
 
-const collisionCircle = createStaticCircle(
-  { x: scene.width / 2, y: scene.height / 2 - 192 },
-  32,
-);
-
-const collisionRectangle = createStaticRectangle(
-  { x: scene.width / 2, y: scene.height / 2 - 192 },
-  64,
-  64,
-);
-
 const kinematicRectangle = createKinemeticRectangle(
   { x: scene.width / 2 - 96, y: scene.height / 2 + 64 },
   128,
@@ -98,15 +84,7 @@ const kiniematicCircle = createKinemeticCircle(
   32,
 );
 
-const iceFloor = createStaticRectangle(
-  { x: 256, y: scene.height - 448 },
-  512,
-  256,
-);
-
-const swamp = createStaticCircle({ x: 512, y: scene.height - 768 }, 128);
-
-const wall = createStaticRectangle({ x: 256, y: 512 }, 16, scene.height / 2);
+const wall = createStaticRectangle({ x: 0, y: 0 }, scene.width, 64 * 3);
 
 const portalA = {
   animation: createSprite({
@@ -141,6 +119,9 @@ function animatePortal(
   ctx: CanvasRenderingContext2D,
   delta: number,
 ): void {
+  const globalAlpha = ctx.globalAlpha;
+  ctx.globalAlpha = 0.667;
+
   animateSprite(
     portal.animation,
     {
@@ -150,13 +131,60 @@ function animatePortal(
     ctx,
     delta,
   );
+
+  ctx.globalAlpha = globalAlpha;
 }
+
+const background = createSprite({
+  imageSrc: "/test-scene.png",
+  width: scene.width,
+  height: scene.height,
+  frameDuraton: Number.POSITIVE_INFINITY,
+  frameWidth: scene.width / 4,
+  frameHeight: scene.height / 4,
+  xFrames: 1,
+  yFrames: 1,
+});
+
+const iceFloor = {
+  animation: createSprite({
+    imageSrc: "/ice-floor.png",
+    width: 128 * 4,
+    height: 64 * 4,
+    frameDuraton: Number.POSITIVE_INFINITY,
+    frameWidth: 128,
+    frameHeight: 64,
+    xFrames: 1,
+    yFrames: 1,
+  }),
+  collisionBody: createStaticRectangle(
+    { x: 256, y: scene.height - 448 },
+    512,
+    256,
+  ),
+};
+
+const icicle = {
+  animation: createSprite({
+    imageSrc: "/icicle.png",
+    width: 64,
+    height: 128,
+    frameDuraton: Number.POSITIVE_INFINITY,
+    frameWidth: 16,
+    frameHeight: 32,
+    xFrames: 1,
+    yFrames: 1,
+  }),
+  collisionBody: createStaticCircle(
+    { x: scene.width / 2, y: scene.height / 2 - 192 },
+    28,
+  ),
+};
 
 const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
 const collisionBodies = [
-  collisionRectangle,
-  collisionCircle,
   wall,
+  icicle.collisionBody,
   portalA.collisionBody,
   portalB.collisionBody,
 ];
@@ -191,20 +219,14 @@ function focusViewportToPlayerPosition(): void {
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   grid.render(ctx);
 
-  const playerFrictionModSwamp = circleContainsCircle(
-    swamp,
-    player.kinematicBody,
-  )
-    ? 0.5
-    : 1;
   const playerFrictionModIce = rectangleContainsCircle(
-    iceFloor,
+    iceFloor.collisionBody,
     player.kinematicBody,
   )
     ? 0.015
     : 1;
 
-  processPlayer(player, playerFrictionModSwamp * playerFrictionModIce);
+  processPlayer(player, playerFrictionModIce);
 
   setActiveKinematicBodies(activeKinematicBodies, kinematicBodies);
 
@@ -219,7 +241,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     switch (body.type) {
       case ShapeType.Circle: {
         onIce = rectangleContainsCircle(
-          iceFloor,
+          iceFloor.collisionBody,
           body as KinematicBody<Circle>,
         );
 
@@ -227,7 +249,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
       }
       case ShapeType.Rectangle: {
         onIce = rectangleContainsRectangle(
-          iceFloor,
+          iceFloor.collisionBody,
           body as KinematicBody<Rectangle>,
         );
 
@@ -242,10 +264,19 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     }
   }
 
-  renderRectangle(iceFloor, ctx, "rgba(255, 255, 255, 0.5)");
-  renderCircle(swamp, ctx, "rgba(0, 0, 0, 0.5)");
+  animateSprite(background, { x: 0, y: 0 }, ctx, delta);
+  animateSprite(iceFloor.animation, iceFloor.collisionBody.origin, ctx, delta);
+  animateSprite(
+    icicle.animation,
+    {
+      x: icicle.collisionBody.origin.x - 28,
+      y: icicle.collisionBody.origin.y - 86,
+    },
+    ctx,
+    delta,
+  );
 
-  renderStaticBodies(collisionBodies, ctx);
+  // renderStaticBodies(collisionBodies, ctx);
   renderKinematicBodies(kinematicBodies, ctx);
   renderKinematicBodies(activeKinematicBodies, ctx);
 
