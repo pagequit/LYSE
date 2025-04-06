@@ -43,9 +43,17 @@ export function createPlayer(
   width: number,
   height: number,
 ): Player {
-  const velocity = { x: 0, y: 0 };
+  const spriteOrigin = {
+    x: position.x - width * 0.5,
+    y: position.y - height + 16,
+  };
+  const renderPosition = {
+    x: position.x,
+    y: position.y + 8,
+  };
+
   return {
-    position,
+    position: renderPosition,
     state: State.Idle,
     direction: Direction.Right,
     speedMultiplier: 1,
@@ -53,6 +61,7 @@ export function createPlayer(
       [State.Idle]: createSpritePlayer(
         createSprite({
           imageSrc: "/player-idle.png",
+          origin: spriteOrigin,
           width,
           height,
           frameWidth: 16,
@@ -65,6 +74,7 @@ export function createPlayer(
       [State.Walk]: createSpritePlayer(
         createSprite({
           imageSrc: "/player-walk.png",
+          origin: spriteOrigin,
           width,
           height,
           frameWidth: 16,
@@ -75,7 +85,10 @@ export function createPlayer(
         500,
       ),
     },
-    kinematicBody: createKinemeticCircle(position, width * 0.25, velocity),
+    kinematicBody: createKinemeticCircle(position, width * 0.25, {
+      x: 0,
+      y: 0,
+    }),
   };
 }
 
@@ -106,18 +119,7 @@ export function animatePlayer(
   ctx: CanvasRenderingContext2D,
   delta: number,
 ): void {
-  playbackSpritePlayer(
-    player.animations[player.state],
-    {
-      // FIXME: avoid object creation in render loop
-      x: player.position.x - player.animations[player.state].sprite.width * 0.5,
-      y:
-        player.position.y -
-        player.animations[player.state].sprite.height * 0.625,
-    },
-    ctx,
-    delta,
-  );
+  playbackSpritePlayer(player.animations[player.state], ctx, delta);
 }
 
 export function processPlayer(player: Player, friction: number = 1): void {
@@ -142,4 +144,12 @@ export function processPlayer(player: Player, friction: number = 1): void {
     input.vector.x * friction * player.speedMultiplier;
   player.kinematicBody.velocity.y +=
     input.vector.y * friction * player.speedMultiplier;
+
+  player.animations[player.state].sprite.origin.x =
+    player.position.x - player.animations[player.state].sprite.width * 0.5;
+  player.animations[player.state].sprite.origin.y =
+    player.position.y - player.animations[player.state].sprite.height + 16;
+
+  player.position.x = player.kinematicBody.origin.x;
+  player.position.y = player.kinematicBody.origin.y + 8;
 }

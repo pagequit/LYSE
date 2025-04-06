@@ -2,6 +2,7 @@ import { type Vector } from "./Vector.ts";
 
 export type Sprite = {
   image: HTMLImageElement;
+  origin: Vector;
   width: number;
   height: number;
   framePosition: Vector;
@@ -19,17 +20,9 @@ export type SpritePlayer = {
   frameDelta: number;
 };
 
-// CONTINUE HERE
-export type SpriteObject = {
-  sprite: Sprite;
-  renderPosition: {
-    x: number;
-    y: number;
-  };
-};
-
 export function createSprite(spriteData: {
   imageSrc: string;
+  origin: Vector;
   width: number;
   height: number;
   frameWidth: number;
@@ -42,6 +35,7 @@ export function createSprite(spriteData: {
 
   return {
     image,
+    origin: spriteData.origin,
     width: spriteData.width,
     height: spriteData.height,
     framePosition: { x: 0, y: 0 },
@@ -66,7 +60,6 @@ export function setSpriteYFrame(sprite: Sprite, index: number): void {
 
 export function drawSprite(
   sprite: Sprite,
-  position: Vector,
   ctx: CanvasRenderingContext2D,
 ): void {
   ctx.drawImage(
@@ -75,8 +68,8 @@ export function drawSprite(
     sprite.framePosition.y,
     sprite.frameWidth,
     sprite.frameHeight,
-    position.x,
-    position.y,
+    sprite.origin.x,
+    sprite.origin.y,
     sprite.width,
     sprite.height,
   );
@@ -95,11 +88,10 @@ export function createSpritePlayer(
 
 export function playbackSpritePlayer(
   spritePlayer: SpritePlayer,
-  position: Vector,
   ctx: CanvasRenderingContext2D,
   delta: number,
 ): void {
-  drawSprite(spritePlayer.sprite, position, ctx);
+  drawSprite(spritePlayer.sprite, ctx);
 
   spritePlayer.sprite.framePosition.x =
     spritePlayer.sprite.frameWidth * spritePlayer.sprite.xIndex;
