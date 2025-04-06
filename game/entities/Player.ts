@@ -30,7 +30,6 @@ export type Player = {
   position: Vector;
   state: State;
   direction: Direction;
-  velocity: Vector;
   speedMultiplier: number;
   animations: {
     [State.Walk]: SpritePlayer;
@@ -49,7 +48,6 @@ export function createPlayer(
     position,
     state: State.Idle,
     direction: Direction.Right,
-    velocity,
     speedMultiplier: 1,
     animations: {
       [State.Idle]: createSpritePlayer(
@@ -140,6 +138,8 @@ export function processPlayer(player: Player, friction: number = 1): void {
     }
   }
 
-  player.velocity.x += input.vector.x * friction * player.speedMultiplier;
-  player.velocity.y += input.vector.y * friction * player.speedMultiplier;
+  player.kinematicBody.velocity.x +=
+    input.vector.x * friction * player.speedMultiplier;
+  player.kinematicBody.velocity.y +=
+    input.vector.y * friction * player.speedMultiplier;
 }

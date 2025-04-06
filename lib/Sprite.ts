@@ -19,6 +19,15 @@ export type SpritePlayer = {
   frameDelta: number;
 };
 
+// CONTINUE HERE
+export type SpriteObject = {
+  sprite: Sprite;
+  renderPosition: {
+    x: number;
+    y: number;
+  };
+};
+
 export function createSprite(spriteData: {
   imageSrc: string;
   width: number;
