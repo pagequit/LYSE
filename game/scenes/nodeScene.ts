@@ -4,15 +4,11 @@ import {
   createSegmentIntersection,
   setSegmentIntersection,
 } from "../../lib/Segment.ts";
-import {
-  createNode,
-  getNodeByPosition,
-  type Node,
-  paintNode,
-} from "../entities/Node.ts";
-import { createEdge, type Edge, paintEdge } from "../entities/Edge.ts";
+import { getNodeByPosition, type Node, paintNode } from "../entities/Node.ts";
+import { type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
 import { focusViewport, startPanning, updatePanning } from "../../lib/View.ts";
+import type { Vector } from "../../lib/Vector.ts";
 
 const scene: Scene = createScene(process, {
   width: 1024,
@@ -76,18 +72,24 @@ const nodes: Array<Node> = [
   { x: 1088, y: 315 },
   { x: 1098, y: 179 },
   { x: 1108, y: 650 },
-].map(createNode);
-
-const origin: Node = createNode({
-  x: scene.width / 2,
-  y: scene.height / 2,
+].map((vector: Vector): Node => {
+  return { position: vector };
 });
+
+const origin: Node = {
+  position: {
+    x: scene.width / 2,
+    y: scene.height / 2,
+  },
+};
 nodes.push(origin);
 
 const edges: Array<Edge> = [];
 const nextEdge: Array<Node> = [];
 
-const pointerNode = createNode(pointer.position);
+const pointerNode = {
+  position: pointer.position,
+};
 
 const segmentIntersection = createSegmentIntersection();
 let isPanning = false;
@@ -129,12 +131,12 @@ function onPointerMove(): void {
 
   if (activeNode !== null) {
     for (const edge of edges.filter(
-      (edge) => edge.nodes[0] !== activeNode && edge.nodes[1] !== activeNode,
+      (edge) => edge[0] !== activeNode && edge[1] !== activeNode,
     )) {
       setSegmentIntersection(
         segmentIntersection,
         [activeNode.position, pointer.position],
-        [edge.nodes[0].position, edge.nodes[1].position],
+        [edge[0].position, edge[1].position],
       );
 
       isIntersecting = !Number.isNaN(segmentIntersection.offset);
@@ -157,14 +159,14 @@ function onPointerMove(): void {
   nextEdge.push(activeNode);
 
   if (nextEdge.length === 2) {
-    const maybeEdge: Edge = createEdge([nextEdge[0], nextEdge[1]]);
+    const maybeEdge: Edge = [nextEdge[0], nextEdge[1]];
 
     let existingIndex = 0;
     const existingEdge: Edge | undefined = edges.find((edge, index) => {
       existingIndex = index;
       return (
-        (edge.nodes[0] === nextEdge[0] && edge.nodes[1] === nextEdge[1]) ||
-        (edge.nodes[0] === nextEdge[1] && edge.nodes[1] === nextEdge[0])
+        (edge[0] === nextEdge[0] && edge[1] === nextEdge[1]) ||
+        (edge[0] === nextEdge[1] && edge[1] === nextEdge[0])
       );
     });
 
@@ -190,11 +192,11 @@ function onPointerUp(): void {
 
 function process(ctx: CanvasRenderingContext2D): void {
   for (const node of nodes) {
-    node.render(ctx);
+    paintNode(node, ctx, "#c9d1d9");
   }
 
   for (const edge of edges) {
-    edge.render(ctx);
+    paintEdge(edge, ctx, "#c9d1d9");
   }
 
   for (const node of graph.keys()) {
@@ -209,7 +211,7 @@ function process(ctx: CanvasRenderingContext2D): void {
     paintNode(activeNode, ctx, "#4493f8");
 
     if (pointer.isDown) {
-      paintEdge(createEdge([activeNode!, pointerNode]), ctx, "#4493f8");
+      paintEdge([activeNode!, pointerNode], ctx, "#4493f8");
       paintNode(pointerNode, ctx, "#4493f8");
     }
   }
@@ -218,7 +220,7 @@ function process(ctx: CanvasRenderingContext2D): void {
   paintNode(pointerNode, ctx, "#4493f8");
 
   if (isIntersecting) {
-    paintEdge(createEdge([activeNode!, pointerNode]), ctx, "#eb3342");
+    paintEdge([activeNode!, pointerNode], ctx, "#eb3342");
     paintNode(pointerNode, ctx, "#eb3342");
   } else if (hoverNode) {
     paintNode(hoverNode, ctx, "#4493f8");

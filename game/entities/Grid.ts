@@ -1,12 +1,11 @@
-import { type Renderable } from "../../lib/Renderable";
-
 export type Grid = {
   tileSize: number;
   width: number;
   height: number;
   x: number;
   y: number;
-} & Renderable;
+  render: (ctx: CanvasRenderingContext2D) => void;
+};
 
 function render(this: Grid, ctx: CanvasRenderingContext2D): void {
   for (let i = 0; i < this.x; i++) {

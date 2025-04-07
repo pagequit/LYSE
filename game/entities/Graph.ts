@@ -8,13 +8,13 @@ export function createGraph(nodes: Array<Node>, edges: Array<Edge>): Graph {
 
   for (const node of nodes) {
     const neighbours = edges.reduce((acc, edge) => {
-      if (edge.nodes[0] === node) {
-        acc.push(edge.nodes[1]);
+      if (edge[0] === node) {
+        acc.push(edge[1]);
         return acc;
       }
 
-      if (edge.nodes[1] === node) {
-        acc.push(edge.nodes[0]);
+      if (edge[1] === node) {
+        acc.push(edge[0]);
         return acc;
       }
 

@@ -2,7 +2,7 @@ import { pointer } from "../../lib/Pointer.ts";
 import { type Vector } from "../../lib/Vector.ts";
 import { createGrid, type Grid } from "../entities/Grid.ts";
 import { createScene, type Scene } from "../../lib/Scene.ts";
-import { createNode, paintNode, type Node } from "../entities/Node.ts";
+import { paintNode, type Node } from "../entities/Node.ts";
 import { startPanning, updatePanning } from "../../lib/View.ts";
 import {
   createStaticRectangle,
@@ -77,7 +77,7 @@ function onMouseUp(event: MouseEvent): void {
 }
 
 const grid: Grid = createGrid(scene.width, scene.height, tileSize);
-const edgeNode: Node = createNode({ x: 0, y: 0 });
+const edgeNode: Node = { position: { x: 0, y: 0 } };
 
 function renderHoverTile(
   position: Vector,

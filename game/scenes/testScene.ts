@@ -12,7 +12,7 @@ import {
   type Player,
 } from "../entities/Player.ts";
 import { createScene, type Scene } from "../../lib/Scene.ts";
-import { createNode, paintNode } from "../entities/Node.ts";
+import { paintNode, type Node } from "../entities/Node.ts";
 import {
   rectangleContainsCircle,
   rectangleContainsRectangle,
@@ -43,7 +43,7 @@ const scene: Scene = createScene(process, {
   postProcess,
 });
 
-const pointerNode = createNode(pointer.position);
+const pointerNode: Node = { position: pointer.position };
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
 function preProcess(): void {
