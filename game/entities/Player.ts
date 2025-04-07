@@ -13,6 +13,7 @@ import {
   createKinemeticCircle,
   type KinematicBody,
 } from "../../lib/KinematicBody.ts";
+import { linkPositions } from "../../lib/linkPositions.ts";
 
 export enum State {
   Idle,
@@ -43,17 +44,17 @@ export function createPlayer(
   width: number,
   height: number,
 ): Player {
-  const spriteOrigin = {
-    x: position.x - width * 0.5,
+  const spriteOffset = {
+    x: position.x - width / 2,
     y: position.y - height + 16,
   };
-  const renderPosition = {
+  const kinematicBodyOffset = {
     x: position.x,
     y: position.y + 8,
   };
 
   return {
-    position: renderPosition,
+    position,
     state: State.Idle,
     direction: Direction.Right,
     speedMultiplier: 1,
@@ -61,7 +62,7 @@ export function createPlayer(
       [State.Idle]: createSpriteAnimation(
         createSprite({
           imageSrc: "/player-idle.png",
-          origin: spriteOrigin,
+          origin: spriteOffset,
           width,
           height,
           frameWidth: 16,
@@ -74,7 +75,7 @@ export function createPlayer(
       [State.Walk]: createSpriteAnimation(
         createSprite({
           imageSrc: "/player-walk.png",
-          origin: spriteOrigin,
+          origin: spriteOffset,
           width,
           height,
           frameWidth: 16,
@@ -85,10 +86,7 @@ export function createPlayer(
         500,
       ),
     },
-    kinematicBody: createKinemeticCircle(position, width * 0.25, {
-      x: 0,
-      y: 0,
-    }),
+    kinematicBody: createKinemeticCircle(position, width / 4, { x: 0, y: 0 }),
   };
 }
 
@@ -147,10 +145,13 @@ export function processPlayer(player: Player, friction: number = 1): void {
 
   // FIXME
   player.animations[player.state].sprite.origin.x =
-    player.position.x - player.animations[player.state].sprite.width * 0.5;
+    player.kinematicBodyOffsetPosition.x -
+    player.animations[player.state].sprite.width * 0.5;
   player.animations[player.state].sprite.origin.y =
-    player.position.y - player.animations[player.state].sprite.height + 16;
+    player.kinematicBodyOffsetPosition.y -
+    player.animations[player.state].sprite.height +
+    16;
 
-  player.position.x = player.kinematicBody.origin.x;
-  player.position.y = player.kinematicBody.origin.y + 8;
+  player.kinematicBodyOffsetPosition.x = player.kinematicBody.origin.x;
+  player.kinematicBodyOffsetPosition.y = player.kinematicBody.origin.y + 8;
 }

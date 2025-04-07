@@ -1,4 +1,5 @@
 import { type Vector } from "./Vector.ts";
+import { type KinematicBody } from "./KinematicBody.ts";
 
 const defaultFillStyle = "rgba(255, 0, 128, 0.5)";
 
@@ -20,7 +21,38 @@ export type StaticBody<Shape> = {
   type: ShapeType;
   shape: Shape;
   origin: Vector;
+  onCollision: (
+    self: StaticBody<Shape>,
+    other: KinematicBody<Circle | Rectangle>,
+  ) => void;
 };
+
+export function createStaticCircle(
+  origin: Vector,
+  radius: number,
+  onCollision: StaticBody<Circle>["onCollision"],
+): StaticBody<Circle> {
+  return {
+    type: ShapeType.Circle,
+    shape: { radius },
+    origin,
+    onCollision,
+  };
+}
+
+export function createStaticRectangle(
+  origin: Vector,
+  width: number,
+  height: number,
+  onCollision: StaticBody<Rectangle>["onCollision"],
+): StaticBody<Rectangle> {
+  return {
+    type: ShapeType.Rectangle,
+    shape: { width, height },
+    origin,
+    onCollision,
+  };
+}
 
 export function renderCircle(
   body: StaticBody<Circle>,
@@ -63,29 +95,6 @@ export function renderStaticBodies(
       }
     }
   }
-}
-
-export function createStaticCircle(
-  origin: Vector,
-  radius: number,
-): StaticBody<Circle> {
-  return {
-    type: ShapeType.Circle,
-    shape: { radius },
-    origin,
-  };
-}
-
-export function createStaticRectangle(
-  origin: Vector,
-  width: number,
-  height: number,
-): StaticBody<Rectangle> {
-  return {
-    type: ShapeType.Rectangle,
-    shape: { width, height },
-    origin,
-  };
 }
 
 export function circlesCollide(

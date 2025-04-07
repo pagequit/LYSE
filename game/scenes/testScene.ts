@@ -33,6 +33,7 @@ import type { Vector } from "../../lib/Vector.ts";
 import { focusViewport } from "../../lib/View.ts";
 import { createSprite, drawSprite, type Sprite } from "../../lib/Sprite.ts";
 import type { SpriteAnimation } from "../../lib/SpriteAnimation.ts";
+import { type PositionLink } from "../../lib/linkPositions.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -80,11 +81,6 @@ const iceCubePosition = {
   y: scene.height / 2 - 64,
 };
 
-type RenderNode = {
-  position: Vector;
-  offset: Vector;
-};
-
 const iceCube = {
   animation: createSprite({
     imageSrc: "/ice-cube.png",
@@ -97,8 +93,8 @@ const iceCube = {
     yFrames: 1,
   }),
   collisionBody: createKinemeticRectangle(iceCubePosition, 64, 64),
-  renderNode: {
-    position: { x: 0, y: 0 },
+  renderProps: {
+    yIndex: 0,
     offset: { x: 32, y: 56 },
   },
 };
@@ -172,14 +168,14 @@ const collisionBodies = [
 const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
 
 const deltaPosition: Vector = {
-  x: player.position.x,
-  y: player.position.y,
+  x: player.kinematicBodyOffsetPosition.x,
+  y: player.kinematicBodyOffsetPosition.y,
 };
 
 function renderFrameAndPosition(
   object: {
     animation: Sprite;
-    renderNode: RenderNode;
+    renderNode: PositionLink;
   },
   ctx: CanvasRenderingContext2D,
 ): void {
@@ -205,18 +201,21 @@ function renderFrameAndPosition(
 
 function focusViewportToPlayerPosition(): void {
   if (
-    player.position.x ** 2 +
-      player.position.y ** 2 -
+    player.kinematicBodyOffsetPosition.x ** 2 +
+      player.kinematicBodyOffsetPosition.y ** 2 -
       (deltaPosition.x ** 2 + deltaPosition.y ** 2) >
     1
   ) {
-    focusViewport(player.position.x, player.position.y);
+    focusViewport(
+      player.kinematicBodyOffsetPosition.x,
+      player.kinematicBodyOffsetPosition.y,
+    );
   } else {
     focusViewport(deltaPosition.x, deltaPosition.y);
   }
 
-  deltaPosition.x = player.position.x;
-  deltaPosition.y = player.position.y;
+  deltaPosition.x = player.kinematicBodyOffsetPosition.x;
+  deltaPosition.y = player.kinematicBodyOffsetPosition.y;
 }
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
@@ -270,10 +269,8 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   // in this case it's just zero by acciddent
   iceCube.animation.origin.x = iceCube.collisionBody.origin.x;
   iceCube.animation.origin.y = iceCube.collisionBody.origin.y;
-  iceCube.renderNode.position.x =
-    iceCube.animation.origin.x + iceCube.renderNode.offset.x;
-  iceCube.renderNode.position.y =
-    iceCube.animation.origin.y + iceCube.renderNode.offset.y;
+  iceCube.renderProps.yIndex =
+    iceCube.animation.origin.y + iceCube.renderProps.offset.y;
 
   // so the general plan is:
   // ---

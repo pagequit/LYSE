@@ -12,7 +12,43 @@ const defaultFillStyle = "rgba(64, 64, 255, 0.5)";
 
 export type KinematicBody<Shape> = StaticBody<Shape> & {
   velocity: Vector;
+  onUpdate: (self: KinematicBody<Shape>) => void;
 };
+
+export function createKinemeticCircle(
+  origin: Vector,
+  radius: number,
+  velocity: Vector = { x: 0, y: 0 },
+  onUpdate: KinematicBody<Circle>["onUpdate"],
+  onCollision: KinematicBody<Circle>["onCollision"],
+): KinematicBody<Circle> {
+  return {
+    type: ShapeType.Circle,
+    shape: { radius },
+    origin,
+    velocity,
+    onUpdate,
+    onCollision,
+  };
+}
+
+export function createKinemeticRectangle(
+  origin: Vector,
+  width: number,
+  height: number,
+  velocity: Vector = { x: 0, y: 0 },
+  onUpdate: KinematicBody<Rectangle>["onUpdate"],
+  onCollision: KinematicBody<Rectangle>["onCollision"],
+): KinematicBody<Rectangle> {
+  return {
+    type: ShapeType.Rectangle,
+    shape: { width, height },
+    origin,
+    velocity,
+    onUpdate,
+    onCollision,
+  };
+}
 
 export function renderKinemeticCircle(
   body: KinematicBody<Circle>,
@@ -48,33 +84,6 @@ export function renderKinematicBodies(
       }
     }
   }
-}
-
-export function createKinemeticCircle(
-  origin: Vector,
-  radius: number,
-  velocity: Vector = { x: 0, y: 0 },
-): KinematicBody<Circle> {
-  return {
-    type: ShapeType.Circle,
-    shape: { radius },
-    origin,
-    velocity,
-  };
-}
-
-export function createKinemeticRectangle(
-  origin: Vector,
-  width: number,
-  height: number,
-  velocity: Vector = { x: 0, y: 0 },
-): KinematicBody<Rectangle> {
-  return {
-    type: ShapeType.Rectangle,
-    shape: { width, height },
-    origin,
-    velocity,
-  };
 }
 
 export function updateKinematicBody(
