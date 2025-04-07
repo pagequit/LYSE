@@ -14,12 +14,6 @@ export type Sprite = {
   yIndex: number;
 };
 
-export type SpritePlayer = {
-  sprite: Sprite;
-  frameDuration: number;
-  frameDelta: number;
-};
-
 export function createSprite(spriteData: {
   imageSrc: string;
   origin: Vector;
@@ -48,16 +42,6 @@ export function createSprite(spriteData: {
   };
 }
 
-export function setSpriteXFrame(sprite: Sprite, index: number): void {
-  sprite.xIndex = index;
-  sprite.framePosition.x = sprite.frameWidth * index;
-}
-
-export function setSpriteYFrame(sprite: Sprite, index: number): void {
-  sprite.yIndex = index;
-  sprite.framePosition.y = sprite.frameHeight * index;
-}
-
 export function drawSprite(
   sprite: Sprite,
   ctx: CanvasRenderingContext2D,
@@ -75,46 +59,12 @@ export function drawSprite(
   );
 }
 
-export function createSpritePlayer(
-  sprite: Sprite,
-  playbackSpeed: number,
-): SpritePlayer {
-  return {
-    sprite,
-    frameDuration: playbackSpeed / sprite.xLength,
-    frameDelta: 0,
-  };
+export function setSpriteXFrame(sprite: Sprite, index: number): void {
+  sprite.xIndex = index;
+  sprite.framePosition.x = sprite.frameWidth * index;
 }
 
-export function playbackSpritePlayer(
-  spritePlayer: SpritePlayer,
-  ctx: CanvasRenderingContext2D,
-  delta: number,
-): void {
-  drawSprite(spritePlayer.sprite, ctx);
-
-  spritePlayer.sprite.framePosition.x =
-    spritePlayer.sprite.frameWidth * spritePlayer.sprite.xIndex;
-  if ((spritePlayer.frameDelta += delta) > spritePlayer.frameDuration) {
-    spritePlayer.frameDelta = 0;
-    if ((spritePlayer.sprite.xIndex += 1) > spritePlayer.sprite.xLength) {
-      spritePlayer.sprite.xIndex = 0;
-    }
-  }
-}
-
-export function setSpritePlayerXFrame(
-  spritePlayer: SpritePlayer,
-  index: number,
-): void {
-  setSpriteXFrame(spritePlayer.sprite, index);
-  spritePlayer.frameDelta = 0;
-}
-
-export function setSpritePlayerYFrame(
-  spritePlayer: SpritePlayer,
-  index: number,
-): void {
-  setSpriteYFrame(spritePlayer.sprite, index);
-  spritePlayer.frameDelta = 0;
+export function setSpriteYFrame(sprite: Sprite, index: number): void {
+  sprite.yIndex = index;
+  sprite.framePosition.y = sprite.frameHeight * index;
 }

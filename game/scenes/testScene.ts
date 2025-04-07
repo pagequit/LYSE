@@ -2,7 +2,6 @@ import {
   applyTouchControls,
   removeTouchControls,
 } from "../../lib/TouchControls.ts";
-import { pointer } from "../../lib/Pointer.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -12,7 +11,6 @@ import {
   type Player,
 } from "../entities/Player.ts";
 import { createScene, type Scene } from "../../lib/Scene.ts";
-import { paintNode, type Node } from "../entities/Node.ts";
 import {
   rectangleContainsCircle,
   rectangleContainsRectangle,
@@ -43,7 +41,6 @@ const scene: Scene = createScene(process, {
   postProcess,
 });
 
-const pointerNode: Node = { position: pointer.position };
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
 function preProcess(): void {
@@ -208,14 +205,12 @@ function focusViewportToPlayerPosition(): void {
 }
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
-  const playerFrictionModIce = rectangleContainsCircle(
-    iceFloor.collisionBody,
-    player.kinematicBody,
-  )
-    ? 0.015
-    : 1;
-
-  processPlayer(player, playerFrictionModIce);
+  processPlayer(
+    player,
+    rectangleContainsCircle(iceFloor.collisionBody, player.kinematicBody)
+      ? 0.015
+      : 1,
+  );
 
   setActiveKinematicBodies(activeKinematicBodies, kinematicBodies);
 
@@ -267,9 +262,6 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   renderKinematicBodies(activeKinematicBodies, ctx);
 
   renderFrameAndPosition(player, ctx);
-
-  pointerNode.position = pointer.position;
-  paintNode(pointerNode, ctx, "rgba(255, 255, 255, 0.5)");
 }
 
 export default scene;
