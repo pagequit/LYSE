@@ -22,7 +22,6 @@ import {
   type Rectangle,
 } from "../../lib/StaticBody.ts";
 import {
-  createKinemeticCircle,
   createKinemeticRectangle,
   updateKinematicBody,
   renderKinematicBodies,
@@ -32,7 +31,8 @@ import {
 } from "../../lib/KinematicBody.ts";
 import type { Vector } from "../../lib/Vector.ts";
 import { focusViewport } from "../../lib/View.ts";
-import { createSprite, drawSprite } from "../../lib/Sprite.ts";
+import { createSprite, drawSprite, type Sprite } from "../../lib/Sprite.ts";
+import type { SpriteAnimation } from "../../lib/SpriteAnimation.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -55,30 +55,6 @@ function postProcess(): void {
   }
 }
 
-const player: Player = createPlayer(
-  { x: (scene.width - 64) / 2, y: (scene.height - 64) / 2 + 16 },
-  64,
-  64,
-);
-setDirection(player, Direction.Right);
-
-const kinematicRectangle = createKinemeticRectangle(
-  { x: scene.width / 2 - 96, y: scene.height / 2 + 64 },
-  128,
-  64,
-);
-
-const kinematicSquare = createKinemeticRectangle(
-  { x: scene.width / 2 - 96, y: scene.height / 2 + 128 },
-  64,
-  64,
-);
-
-const kiniematicCircle = createKinemeticCircle(
-  { x: scene.width / 2, y: scene.height / 2 + 256 },
-  32,
-);
-
 const wall = createStaticRectangle({ x: 0, y: 0 }, scene.width, 64 * 3);
 
 const background = createSprite({
@@ -91,6 +67,41 @@ const background = createSprite({
   xFrames: 1,
   yFrames: 1,
 });
+
+const player: Player = createPlayer(
+  { x: (scene.width - 64) / 2, y: (scene.height - 64) / 2 + 16 },
+  64,
+  64,
+);
+setDirection(player, Direction.Right);
+
+const iceCubePosition = {
+  x: scene.width / 2 + 96,
+  y: scene.height / 2 - 64,
+};
+
+type RenderNode = {
+  position: Vector;
+  offset: Vector;
+};
+
+const iceCube = {
+  animation: createSprite({
+    imageSrc: "/ice-cube.png",
+    origin: { ...iceCubePosition },
+    width: 64,
+    height: 64,
+    frameWidth: 16,
+    frameHeight: 16,
+    xFrames: 1,
+    yFrames: 1,
+  }),
+  collisionBody: createKinemeticRectangle(iceCubePosition, 64, 64),
+  renderNode: {
+    position: { x: 0, y: 0 },
+    offset: { x: 32, y: 56 },
+  },
+};
 
 const iceFloorPosition = {
   x: 256,
@@ -158,12 +169,7 @@ const collisionBodies = [
   DERSCHNEEMANN.collisionBody,
   icicle.collisionBody,
 ];
-const kinematicBodies = [
-  player.kinematicBody,
-  kinematicRectangle,
-  kiniematicCircle,
-  kinematicSquare,
-];
+const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
 
 const deltaPosition: Vector = {
   x: player.position.x,
@@ -171,20 +177,29 @@ const deltaPosition: Vector = {
 };
 
 function renderFrameAndPosition(
-  player: Player,
+  object: {
+    animation: Sprite;
+    renderNode: RenderNode;
+  },
   ctx: CanvasRenderingContext2D,
 ): void {
   ctx.lineWidth = 2;
   ctx.strokeStyle = "#fddf68";
   ctx.beginPath();
-  ctx.arc(player.position.x, player.position.y, 4, 0, 2 * Math.PI);
+  ctx.arc(
+    object.renderNode.position.x,
+    object.renderNode.position.y,
+    4,
+    0,
+    2 * Math.PI,
+  );
   ctx.stroke();
 
   ctx.strokeRect(
-    player.animations[player.state].sprite.origin.x,
-    player.animations[player.state].sprite.origin.y,
-    player.animations[player.state].sprite.width,
-    player.animations[player.state].sprite.height,
+    object.animation.origin.x,
+    object.animation.origin.y,
+    object.animation.width,
+    object.animation.height,
   );
 }
 
@@ -248,20 +263,44 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     }
   }
 
+  // this is what I need to do
+  // but, there is an offset between the animation and the collision body as well
+  // in this case it's just zero by acciddent
+  iceCube.animation.origin.x = iceCube.collisionBody.origin.x;
+  iceCube.animation.origin.y = iceCube.collisionBody.origin.y;
+  iceCube.renderNode.position.x =
+    iceCube.animation.origin.x + iceCube.renderNode.offset.x;
+  iceCube.renderNode.position.y =
+    iceCube.animation.origin.y + iceCube.renderNode.offset.y;
+
+  // so the general plan is:
+  // ---
+  // (processPlayer?)
+  // setActivieKinematicBodies
+  // processKinematicBodies
+  // updateKinematicBodies
+  // set the animation origin to the kinematic body origin + offset
+  // set the renderNode position to the animation origin + offset
+  // y-sort the renderNode positions
+  // draw the animations based on the y-sort
+  // repeat?
+
   focusViewportToPlayerPosition();
 
   drawSprite(background, ctx);
+
   drawSprite(iceFloor.animation, ctx);
   drawSprite(DERSCHNEEMANN.animation, ctx);
   drawSprite(icicle.animation, ctx);
+  drawSprite(iceCube.animation, ctx);
 
   animatePlayer(player, ctx, delta);
 
-  renderStaticBodies(collisionBodies, ctx);
-  renderKinematicBodies(kinematicBodies, ctx);
-  renderKinematicBodies(activeKinematicBodies, ctx);
+  // renderStaticBodies(collisionBodies, ctx);
+  // renderKinematicBodies(kinematicBodies, ctx);
+  // renderKinematicBodies(activeKinematicBodies, ctx);
 
-  renderFrameAndPosition(player, ctx);
+  renderFrameAndPosition(iceCube, ctx);
 }
 
 export default scene;
