@@ -2,6 +2,7 @@ import { type Vector } from "./Vector.ts";
 import { type KinematicBody } from "./KinematicBody.ts";
 
 const defaultFillStyle = "rgba(255, 0, 128, 0.5)";
+const defaultCollisionHandler = (): void => {};
 
 export type Circle = {
   radius: number;
@@ -22,7 +23,7 @@ export type StaticBody<Shape> = {
   shape: Shape;
   origin: Vector;
   onCollision: (
-    self: StaticBody<Shape>,
+    self: StaticBody<Circle | Rectangle>,
     other: KinematicBody<Circle | Rectangle>,
   ) => void;
 };
@@ -30,7 +31,7 @@ export type StaticBody<Shape> = {
 export function createStaticCircle(
   origin: Vector,
   radius: number,
-  onCollision: StaticBody<Circle>["onCollision"],
+  onCollision: StaticBody<Circle>["onCollision"] = defaultCollisionHandler,
 ): StaticBody<Circle> {
   return {
     type: ShapeType.Circle,
@@ -44,7 +45,7 @@ export function createStaticRectangle(
   origin: Vector,
   width: number,
   height: number,
-  onCollision: StaticBody<Rectangle>["onCollision"],
+  onCollision: StaticBody<Rectangle>["onCollision"] = defaultCollisionHandler,
 ): StaticBody<Rectangle> {
   return {
     type: ShapeType.Rectangle,

@@ -20,6 +20,7 @@ import {
   renderStaticBodies,
   type Circle,
   type Rectangle,
+  type StaticBody,
 } from "../../lib/StaticBody.ts";
 import {
   createKinemeticRectangle,
@@ -160,17 +161,12 @@ const DERSCHNEEMANN = {
 };
 
 const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
-const collisionBodies = [
+const collisionBodies: Array<StaticBody<Circle | Rectangle>> = [
   wall,
   DERSCHNEEMANN.collisionBody,
   icicle.collisionBody,
 ];
 const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
-
-const deltaPosition: Vector = {
-  x: player.kinematicBodyOffsetPosition.x,
-  y: player.kinematicBodyOffsetPosition.y,
-};
 
 function renderFrameAndPosition(
   object: {
@@ -197,25 +193,6 @@ function renderFrameAndPosition(
     object.animation.width,
     object.animation.height,
   );
-}
-
-function focusViewportToPlayerPosition(): void {
-  if (
-    player.kinematicBodyOffsetPosition.x ** 2 +
-      player.kinematicBodyOffsetPosition.y ** 2 -
-      (deltaPosition.x ** 2 + deltaPosition.y ** 2) >
-    1
-  ) {
-    focusViewport(
-      player.kinematicBodyOffsetPosition.x,
-      player.kinematicBodyOffsetPosition.y,
-    );
-  } else {
-    focusViewport(deltaPosition.x, deltaPosition.y);
-  }
-
-  deltaPosition.x = player.kinematicBodyOffsetPosition.x;
-  deltaPosition.y = player.kinematicBodyOffsetPosition.y;
 }
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
