@@ -12,29 +12,24 @@ import {
 } from "../entities/Player.ts";
 import { createScene, type Scene } from "../../lib/Scene.ts";
 import {
-  rectangleContainsCircle,
-  rectangleContainsRectangle,
-  createStaticCircle,
-  createStaticRectangle,
-  ShapeType,
-  renderStaticBodies,
-  type Circle,
-  type Rectangle,
-  type StaticBody,
-} from "../../lib/StaticBody.ts";
-import {
   createKinemeticRectangle,
   updateKinematicBody,
   renderKinematicBodies,
   processKinematicBodies,
-  type KinematicBody,
   setActiveKinematicBodies,
+  createKinemeticCircle,
+  rectangleContainsCircle,
+  rectangleContainsRectangle,
+  ShapeType,
+  type KinematicBody,
+  type Circle,
+  type Rectangle,
+  type UnionShape,
 } from "../../lib/KinematicBody.ts";
 import type { Vector } from "../../lib/Vector.ts";
 import { focusViewport } from "../../lib/View.ts";
 import { createSprite, drawSprite, type Sprite } from "../../lib/Sprite.ts";
 import type { SpriteAnimation } from "../../lib/SpriteAnimation.ts";
-import { type PositionLink } from "../../lib/linkPositions.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -57,7 +52,7 @@ function postProcess(): void {
   }
 }
 
-const wall = createStaticRectangle({ x: 0, y: 0 }, scene.width, 64 * 3);
+const wall = createKinemeticRectangle({ x: 0, y: 0 }, scene.width, 64 * 3);
 
 const background = createSprite({
   imageSrc: "/test-scene.png",
@@ -76,6 +71,24 @@ const player: Player = createPlayer(
   64,
 );
 setDirection(player, Direction.Right);
+
+const iceFloorPosition = {
+  x: 256,
+  y: scene.height - 448,
+};
+const iceFloor = {
+  animation: createSprite({
+    imageSrc: "/ice-floor.png",
+    origin: iceFloorPosition,
+    width: 128 * 4,
+    height: 64 * 4,
+    frameWidth: 128,
+    frameHeight: 64,
+    xFrames: 1,
+    yFrames: 1,
+  }),
+  collisionBody: createKinemeticRectangle(iceFloorPosition, 512, 256),
+};
 
 const iceCubePosition = {
   x: scene.width / 2 + 96,
@@ -100,24 +113,6 @@ const iceCube = {
   },
 };
 
-const iceFloorPosition = {
-  x: 256,
-  y: scene.height - 448,
-};
-const iceFloor = {
-  animation: createSprite({
-    imageSrc: "/ice-floor.png",
-    origin: iceFloorPosition,
-    width: 128 * 4,
-    height: 64 * 4,
-    frameWidth: 128,
-    frameHeight: 64,
-    xFrames: 1,
-    yFrames: 1,
-  }),
-  collisionBody: createStaticRectangle(iceFloorPosition, 512, 256),
-};
-
 const iciclePosition = {
   x: scene.width / 2,
   y: scene.height / 2 - 192,
@@ -136,64 +131,15 @@ const icicle = {
     xFrames: 1,
     yFrames: 1,
   }),
-  collisionBody: createStaticCircle(iciclePosition, 28),
+  collisionBody: createKinemeticCircle(iciclePosition, 28),
 };
 
-const DERSCHNEEMANN_POSITION = {
-  x: scene.width / 2 + 128,
-  y: scene.height / 2 - 192,
-};
-const DERSCHNEEMANN = {
-  animation: createSprite({
-    imageSrc: "/DERSCHNEEMANN.png",
-    origin: {
-      x: DERSCHNEEMANN_POSITION.x - 32,
-      y: DERSCHNEEMANN_POSITION.y - 42,
-    },
-    width: 64,
-    height: 64,
-    frameWidth: 16,
-    frameHeight: 16,
-    xFrames: 1,
-    yFrames: 1,
-  }),
-  collisionBody: createStaticCircle(DERSCHNEEMANN_POSITION, 20),
-};
-
-const activeKinematicBodies: Array<KinematicBody<Circle | Rectangle>> = [];
-const collisionBodies: Array<StaticBody<Circle | Rectangle>> = [
+const activeKinematicBodies: Array<KinematicBody<UnionShape>> = [];
+const collisionBodies: Array<KinematicBody<UnionShape>> = [
   wall,
-  DERSCHNEEMANN.collisionBody,
   icicle.collisionBody,
 ];
 const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
-
-function renderFrameAndPosition(
-  object: {
-    animation: Sprite;
-    renderNode: PositionLink;
-  },
-  ctx: CanvasRenderingContext2D,
-): void {
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#fddf68";
-  ctx.beginPath();
-  ctx.arc(
-    object.renderNode.position.x,
-    object.renderNode.position.y,
-    4,
-    0,
-    2 * Math.PI,
-  );
-  ctx.stroke();
-
-  ctx.strokeRect(
-    object.animation.origin.x,
-    object.animation.origin.y,
-    object.animation.width,
-    object.animation.height,
-  );
-}
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   processPlayer(
@@ -265,22 +211,19 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   // draw the animations based on the y-sort
   // repeat?
 
-  focusViewportToPlayerPosition();
-
   drawSprite(background, ctx);
 
   drawSprite(iceFloor.animation, ctx);
-  drawSprite(DERSCHNEEMANN.animation, ctx);
   drawSprite(icicle.animation, ctx);
   drawSprite(iceCube.animation, ctx);
 
   animatePlayer(player, ctx, delta);
 
-  // renderStaticBodies(collisionBodies, ctx);
-  // renderKinematicBodies(kinematicBodies, ctx);
-  // renderKinematicBodies(activeKinematicBodies, ctx);
+  focusViewport(player.kinematicBody.origin.x, player.kinematicBody.origin.y);
 
-  renderFrameAndPosition(iceCube, ctx);
+  // renderStaticBodies(collisionBodies, ctx);
+  renderKinematicBodies(kinematicBodies, ctx);
+  // renderKinematicBodies(activeKinematicBodies, ctx);
 }
 
 export default scene;

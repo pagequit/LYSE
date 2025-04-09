@@ -1,27 +1,34 @@
-import {
-  renderCircle,
-  renderRectangle,
-  ShapeType,
-  type StaticBody,
-  type Circle,
-  type Rectangle,
-} from "./StaticBody.ts";
 import { isZero, type Vector } from "./Vector.ts";
 
 const defaultFillStyle = "rgba(64, 64, 255, 0.5)";
 const defaultCollisionHandler = (): void => {};
 const defaultUpdateHandler = (): void => {};
 
-export type KinematicBody<Shape> = StaticBody<Shape> & {
+export type Circle = {
+  radius: number;
+};
+
+export type Rectangle = {
+  width: number;
+  height: number;
+};
+
+export enum ShapeType {
+  Circle,
+  Rectangle,
+}
+
+export type UnionShape = Circle | Rectangle;
+
+export type KinematicBody<Shape> = {
+  type: ShapeType;
+  shape: Shape;
+  origin: Vector;
   velocity: Vector;
-  onUpdate: (self: KinematicBody<Shape>) => void;
+  onUpdate: (self: KinematicBody<UnionShape>) => void;
   onCollision: (
-    self: KinematicBody<Shape>,
-    other:
-      | KinematicBody<Circle>
-      | KinematicBody<Rectangle>
-      | StaticBody<Circle>
-      | StaticBody<Rectangle>,
+    self: KinematicBody<UnionShape>,
+    other: KinematicBody<UnionShape> | KinematicBody<UnionShape>,
   ) => void;
 };
 
@@ -60,6 +67,160 @@ export function createKinemeticRectangle(
   };
 }
 
+export function renderCircle(
+  body: KinematicBody<Circle>,
+  ctx: CanvasRenderingContext2D,
+  fillStyle: string = defaultFillStyle,
+): void {
+  ctx.fillStyle = fillStyle;
+  ctx.beginPath();
+  ctx.arc(body.origin.x, body.origin.y, body.shape.radius, 0, 2 * Math.PI);
+  ctx.fill();
+}
+
+export function renderRectangle(
+  body: KinematicBody<Rectangle>,
+  ctx: CanvasRenderingContext2D,
+  fillStyle: string = defaultFillStyle,
+): void {
+  ctx.fillStyle = fillStyle;
+  ctx.fillRect(
+    body.origin.x,
+    body.origin.y,
+    body.shape.width,
+    body.shape.height,
+  );
+}
+
+export function renderStaticBodies(
+  staticBodies: Array<KinematicBody<UnionShape>>,
+  ctx: CanvasRenderingContext2D,
+): void {
+  for (const body of staticBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderCircle(body as KinematicBody<Circle>, ctx);
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderRectangle(body as KinematicBody<Rectangle>, ctx);
+        break;
+      }
+    }
+  }
+}
+
+export function circlesCollide(
+  circleA: KinematicBody<Circle>,
+  circleB: KinematicBody<Circle>,
+): boolean {
+  const dx = circleA.origin.x - circleB.origin.x;
+  const dy = circleA.origin.y - circleB.origin.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  return distance <= circleA.shape.radius + circleB.shape.radius;
+}
+
+export function rectanglesCollide(
+  rectangleA: KinematicBody<Rectangle>,
+  rectangleB: KinematicBody<Rectangle>,
+): boolean {
+  return (
+    rectangleA.origin.x <= rectangleB.origin.x + rectangleB.shape.width &&
+    rectangleA.origin.x + rectangleA.shape.width >= rectangleB.origin.x &&
+    rectangleA.origin.y <= rectangleB.origin.y + rectangleB.shape.height &&
+    rectangleA.origin.y + rectangleA.shape.height >= rectangleB.origin.y
+  );
+}
+
+export function circleAndRectangleCollide(
+  circle: KinematicBody<Circle>,
+  rectangle: KinematicBody<Rectangle>,
+): boolean {
+  const nearestX = Math.max(
+    rectangle.origin.x,
+    Math.min(circle.origin.x, rectangle.origin.x + rectangle.shape.width),
+  );
+  const nearestY = Math.max(
+    rectangle.origin.y,
+    Math.min(circle.origin.y, rectangle.origin.y + rectangle.shape.height),
+  );
+  const dx = circle.origin.x - nearestX;
+  const dy = circle.origin.y - nearestY;
+
+  return dx * dx + dy * dy < circle.shape.radius * circle.shape.radius;
+}
+
+export function circleContainsCircle(
+  circleA: KinematicBody<Circle>,
+  circleB: KinematicBody<Circle>,
+): boolean {
+  const dx = circleA.origin.x - circleB.origin.x;
+  const dy = circleA.origin.y - circleB.origin.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  return distance + circleB.shape.radius <= circleA.shape.radius;
+}
+
+export function rectangleContainsRectangle(
+  rectangleA: KinematicBody<Rectangle>,
+  rectangleB: KinematicBody<Rectangle>,
+): boolean {
+  return (
+    rectangleA.origin.x <= rectangleB.origin.x &&
+    rectangleA.origin.x + rectangleA.shape.width >=
+      rectangleB.origin.x + rectangleB.shape.width &&
+    rectangleA.origin.y <= rectangleB.origin.y &&
+    rectangleA.origin.y + rectangleA.shape.height >=
+      rectangleB.origin.y + rectangleB.shape.height
+  );
+}
+
+export function circleContainsRectangle(
+  circle: KinematicBody<Circle>,
+  rectangle: KinematicBody<Rectangle>,
+): boolean {
+  const dAX = rectangle.origin.x - circle.origin.x;
+  const dAY = rectangle.origin.y - circle.origin.y;
+
+  const dBX = rectangle.origin.x + rectangle.shape.width - circle.origin.x;
+  const dBY = rectangle.origin.y - circle.origin.y;
+
+  const dCX = rectangle.origin.x - circle.origin.x;
+  const dCY = rectangle.origin.y + rectangle.shape.height - circle.origin.y;
+
+  const dDX = rectangle.origin.x + rectangle.shape.width - circle.origin.x;
+  const dDY = rectangle.origin.y + rectangle.shape.height - circle.origin.y;
+
+  const dASquare = dAX * dAX + dAY * dAY;
+  const dBsquare = dBX * dBX + dBY * dBY;
+  const dCSquare = dCX * dCX + dCY * dCY;
+  const dDSquare = dDX * dDX + dDY * dDY;
+
+  const radiusSquare = circle.shape.radius ** 2;
+
+  return (
+    dASquare <= radiusSquare &&
+    dBsquare <= radiusSquare &&
+    dCSquare <= radiusSquare &&
+    dDSquare <= radiusSquare
+  );
+}
+
+export function rectangleContainsCircle(
+  rectangle: KinematicBody<Rectangle>,
+  circle: KinematicBody<Circle>,
+): boolean {
+  return (
+    rectangle.origin.x <= circle.origin.x - circle.shape.radius &&
+    rectangle.origin.x + rectangle.shape.width >=
+      circle.origin.x + circle.shape.radius &&
+    rectangle.origin.y <= circle.origin.y - circle.shape.radius &&
+    rectangle.origin.y + rectangle.shape.height >=
+      circle.origin.y + circle.shape.radius
+  );
+}
+
 export function renderKinemeticCircle(
   body: KinematicBody<Circle>,
   ctx: CanvasRenderingContext2D,
@@ -77,7 +238,7 @@ export function renderKinemeticRectangle(
 }
 
 export function renderKinematicBodies(
-  kinematicBodies: Array<KinematicBody<Circle> | KinematicBody<Rectangle>>,
+  kinematicBodies: Array<KinematicBody<UnionShape>>,
   ctx: CanvasRenderingContext2D,
 ): void {
   for (const body of kinematicBodies) {
@@ -97,7 +258,7 @@ export function renderKinematicBodies(
 }
 
 export function updateKinematicBody(
-  body: KinematicBody<Circle> | KinematicBody<Rectangle>,
+  body: KinematicBody<UnionShape>,
   friction: number = 1,
 ): void {
   body.velocity.x *= friction;
@@ -121,22 +282,24 @@ export function processCircleCollision(
   const distance = Math.sqrt(dx * dx + dy * dy);
 
   if (distance < circleA.shape.radius + circleB.shape.radius && distance > 0) {
+    const dvx = circleA.velocity.x - circleB.velocity.x;
+    const dvy = circleA.velocity.y - circleB.velocity.y;
+
     const normalX = dx / distance;
     const normalY = dy / distance;
     const overlap =
       (distance - circleA.shape.radius - circleB.shape.radius) / 2;
+    const dot = dvx * normalX + dvy * normalY;
 
     circleA.origin.x -= normalX * overlap;
     circleA.origin.y -= normalY * overlap;
+
     circleB.origin.x += normalX * overlap;
     circleB.origin.y += normalY * overlap;
 
-    const dvx = circleA.velocity.x - circleB.velocity.x;
-    const dvy = circleA.velocity.y - circleB.velocity.y;
-    const dot = dvx * normalX + dvy * normalY;
-
     circleA.velocity.x -= dot * normalX;
     circleA.velocity.y -= dot * normalY;
+
     circleB.velocity.x += dot * normalX;
     circleB.velocity.y += dot * normalY;
 
@@ -239,7 +402,7 @@ export function processCircleAndRectangleCollision(
 
 export function processCircleOnStaticCircleCollision(
   circleA: KinematicBody<Circle>,
-  circleB: StaticBody<Circle>,
+  circleB: KinematicBody<Circle>,
 ): void {
   const dx = circleA.origin.x + circleA.velocity.x - circleB.origin.x;
   const dy = circleA.origin.y + circleA.velocity.y - circleB.origin.y;
@@ -264,7 +427,7 @@ export function processCircleOnStaticCircleCollision(
 
 export function processRectangleOnStaticRectiangleCollision(
   rectangleA: KinematicBody<Rectangle>,
-  rectangleB: StaticBody<Rectangle>,
+  rectangleB: KinematicBody<Rectangle>,
 ): void {
   const rectangleARight = rectangleA.origin.x + rectangleA.shape.width;
   const rectangleABottom = rectangleA.origin.y + rectangleA.shape.height;
@@ -308,7 +471,7 @@ export function processRectangleOnStaticRectiangleCollision(
 
 export function processCircleOnStaticRectangleCollision(
   circle: KinematicBody<Circle>,
-  rectangle: StaticBody<Rectangle>,
+  rectangle: KinematicBody<Rectangle>,
 ): void {
   const dx =
     circle.origin.x -
@@ -343,7 +506,7 @@ export function processCircleOnStaticRectangleCollision(
 
 export function processRectangleOnStaticCircleCollision(
   rectangle: KinematicBody<Rectangle>,
-  circle: StaticBody<Circle>,
+  circle: KinematicBody<Circle>,
 ): void {
   const rectangleX = rectangle.origin.x + rectangle.velocity.x;
   const rectangleY = rectangle.origin.y + rectangle.velocity.y;
@@ -381,21 +544,21 @@ export function processRectangleOnStaticCircleCollision(
 
 export function handleCircleCollisions(
   circle: KinematicBody<Circle>,
-  staticBodies: Array<StaticBody<Circle> | StaticBody<Rectangle>>,
+  staticBodies: Array<KinematicBody<UnionShape>>,
 ): void {
   for (const staticBody of staticBodies) {
     switch (staticBody.type) {
       case ShapeType.Circle:
         processCircleOnStaticCircleCollision(
           circle,
-          staticBody as StaticBody<Circle>,
+          staticBody as KinematicBody<Circle>,
         );
 
         break;
       case ShapeType.Rectangle:
         processCircleOnStaticRectangleCollision(
           circle,
-          staticBody as StaticBody<Rectangle>,
+          staticBody as KinematicBody<Rectangle>,
         );
 
         break;
@@ -405,7 +568,7 @@ export function handleCircleCollisions(
 
 export function handleKinematicCircleCollisions(
   circle: KinematicBody<Circle>,
-  kinematicBodies: Array<KinematicBody<Circle> | KinematicBody<Rectangle>>,
+  kinematicBodies: Array<KinematicBody<UnionShape>>,
 ): void {
   for (const kinematicBody of kinematicBodies) {
     switch (kinematicBody.type) {
@@ -426,21 +589,21 @@ export function handleKinematicCircleCollisions(
 
 export function handleRectangleCollisions(
   rectangle: KinematicBody<Rectangle>,
-  staticBodies: Array<StaticBody<Circle> | StaticBody<Rectangle>>,
+  staticBodies: Array<KinematicBody<UnionShape>>,
 ): void {
   for (const staticBody of staticBodies) {
     switch (staticBody.type) {
       case ShapeType.Circle:
         processRectangleOnStaticCircleCollision(
           rectangle,
-          staticBody as StaticBody<Circle>,
+          staticBody as KinematicBody<Circle>,
         );
 
         break;
       case ShapeType.Rectangle:
         processRectangleOnStaticRectiangleCollision(
           rectangle,
-          staticBody as StaticBody<Rectangle>,
+          staticBody as KinematicBody<Rectangle>,
         );
 
         break;
@@ -450,7 +613,7 @@ export function handleRectangleCollisions(
 
 export function handleKinematicRectangleCollisions(
   rectangle: KinematicBody<Rectangle>,
-  kinematicBodies: Array<KinematicBody<Circle> | KinematicBody<Rectangle>>,
+  kinematicBodies: Array<KinematicBody<UnionShape>>,
 ): void {
   for (const kinematicBody of kinematicBodies) {
     switch (kinematicBody.type) {
@@ -473,9 +636,9 @@ export function handleKinematicRectangleCollisions(
 }
 
 export function processKinematicBodies(
-  activeBodies: Array<KinematicBody<Circle> | KinematicBody<Rectangle>>,
-  staticBodies: Array<StaticBody<Circle> | StaticBody<Rectangle>>,
-  kinematicBodies: Array<KinematicBody<Circle> | KinematicBody<Rectangle>>,
+  activeBodies: Array<KinematicBody<UnionShape>>,
+  staticBodies: Array<KinematicBody<UnionShape>>,
+  kinematicBodies: Array<KinematicBody<UnionShape>>,
 ): void {
   for (const activeBody of activeBodies) {
     switch (activeBody.type) {
@@ -508,8 +671,8 @@ export function processKinematicBodies(
 }
 
 export function setActiveKinematicBodies(
-  activeBodies: Array<KinematicBody<Circle> | KinematicBody<Rectangle>>,
-  kinematicBodies: Array<KinematicBody<Circle> | KinematicBody<Rectangle>>,
+  activeBodies: Array<KinematicBody<UnionShape>>,
+  kinematicBodies: Array<KinematicBody<UnionShape>>,
 ): void {
   activeBodies.length = 0;
   for (const kinematicBody of kinematicBodies) {

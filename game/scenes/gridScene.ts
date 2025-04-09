@@ -5,11 +5,11 @@ import { createScene, type Scene } from "../../lib/Scene.ts";
 import { paintNode, type Node } from "../entities/Node.ts";
 import { startPanning, updatePanning } from "../../lib/View.ts";
 import {
-  createStaticRectangle,
+  createKinemeticRectangle,
   renderRectangle,
+  type KinematicBody,
   type Rectangle,
-  type StaticBody,
-} from "../../lib/StaticBody.ts";
+} from "../../lib/KinematicBody.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -34,7 +34,7 @@ function postProcess(): void {
 
 const tileSize = 64;
 
-const hoverTile: StaticBody<Rectangle> = createStaticRectangle(
+const hoverTile: KinematicBody<Rectangle> = createKinemeticRectangle(
   { x: 0, y: 0 },
   tileSize,
   tileSize,
@@ -81,7 +81,7 @@ const edgeNode: Node = { position: { x: 0, y: 0 } };
 
 function renderHoverTile(
   position: Vector,
-  tile: StaticBody<Rectangle>,
+  tile: KinematicBody<Rectangle>,
   ctx: CanvasRenderingContext2D,
 ): void {
   tile.origin.x = Math.floor(position.x / tileSize) * tileSize;
@@ -92,7 +92,7 @@ function renderHoverTile(
 function closestTileEdge(
   position: Vector,
   targetPosition: Vector,
-  tile: StaticBody<Rectangle>,
+  tile: KinematicBody<Rectangle>,
 ): void {
   const centerX = tile.origin.x + tile.shape.width / 2;
   const centerY = tile.origin.y + tile.shape.height / 2;

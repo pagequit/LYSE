@@ -8,12 +8,11 @@ import {
 } from "../../lib/SpriteAnimation.ts";
 import { getDirection, isZero, type Vector } from "../../lib/Vector.ts";
 import { input } from "../../lib/Input.ts";
-import { type Circle } from "../../lib/StaticBody.ts";
 import {
   createKinemeticCircle,
   type KinematicBody,
+  type Circle,
 } from "../../lib/KinematicBody.ts";
-import { linkPositions } from "../../lib/linkPositions.ts";
 
 export enum State {
   Idle,
@@ -48,10 +47,10 @@ export function createPlayer(
     x: position.x - width / 2,
     y: position.y - height + 16,
   };
-  const kinematicBodyOffset = {
-    x: position.x,
-    y: position.y + 8,
-  };
+  // const kinematicBodyOffset = {
+  //   x: position.x,
+  //   y: position.y + 8,
+  // };
 
   return {
     position,
@@ -144,14 +143,11 @@ export function processPlayer(player: Player, friction: number = 1): void {
     input.vector.y * friction * player.speedMultiplier;
 
   // FIXME
-  player.animations[player.state].sprite.origin.x =
-    player.kinematicBodyOffsetPosition.x -
-    player.animations[player.state].sprite.width * 0.5;
-  player.animations[player.state].sprite.origin.y =
-    player.kinematicBodyOffsetPosition.y -
-    player.animations[player.state].sprite.height +
-    16;
+  // player.animations[player.state].sprite.origin.x =
+  //   player.position.x - player.animations[player.state].sprite.width * 0.5;
+  // player.animations[player.state].sprite.origin.y =
+  //   player.position.y - player.animations[player.state].sprite.height + 16;
 
-  player.kinematicBodyOffsetPosition.x = player.kinematicBody.origin.x;
-  player.kinematicBodyOffsetPosition.y = player.kinematicBody.origin.y + 8;
+  // player.position.x = player.kinematicBody.origin.x;
+  // player.position.y = player.kinematicBody.origin.y + 8;
 }
