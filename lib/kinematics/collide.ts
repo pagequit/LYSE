@@ -1,9 +1,8 @@
-import type { Vector } from "../Vector";
 import { type KinematicBody, type ShapeUnion } from "./KinematicBody.ts";
 
 export function collideKinematicBody(
   self: KinematicBody<ShapeUnion>,
-  impact: Vector,
+  other: KinematicBody<ShapeUnion>,
   normalX: number,
   normalY: number,
   overlap: number,
@@ -12,8 +11,8 @@ export function collideKinematicBody(
   self.origin.y -= normalY * overlap;
 
   const dot =
-    (self.velocity.x - impact.x) * normalX +
-    (self.velocity.y - impact.y) * normalY;
+    (self.velocity.x - other.velocity.x) * normalX +
+    (self.velocity.y - other.velocity.y) * normalY;
   self.velocity.x -= dot * normalX;
   self.velocity.y -= dot * normalY;
 }

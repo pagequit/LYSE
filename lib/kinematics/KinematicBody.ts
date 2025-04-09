@@ -1,5 +1,6 @@
 import { type Vector } from "../Vector.ts";
 import { updateKinematicBody } from "./update.ts";
+import { collideKinematicBody } from "./collide.ts";
 
 export type Circle = {
   radius: number;
@@ -26,6 +27,9 @@ export type KinematicBody<Shape> = {
   collide: (
     self: KinematicBody<ShapeUnion>,
     other: KinematicBody<ShapeUnion>,
+    normalX: number,
+    normalY: number,
+    overlap: number,
   ) => void;
 };
 
@@ -34,7 +38,7 @@ export function createKinemeticCircle(
   radius: number,
   velocity: Vector = { x: 0, y: 0 },
   update: KinematicBody<Circle>["update"] = updateKinematicBody,
-  collide: KinematicBody<Circle>["collide"],
+  collide: KinematicBody<Circle>["collide"] = collideKinematicBody,
 ): KinematicBody<Circle> {
   return {
     type: ShapeType.Circle,
