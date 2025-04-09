@@ -26,10 +26,8 @@ import {
   type Rectangle,
   type UnionShape,
 } from "../../lib/KinematicBody.ts";
-import type { Vector } from "../../lib/Vector.ts";
 import { focusViewport } from "../../lib/View.ts";
-import { createSprite, drawSprite, type Sprite } from "../../lib/Sprite.ts";
-import type { SpriteAnimation } from "../../lib/SpriteAnimation.ts";
+import { createSprite, drawSprite } from "../../lib/Sprite.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -72,6 +70,7 @@ const player: Player = createPlayer(
 );
 setDirection(player, Direction.Right);
 
+const onIceFriction = 0.99;
 const iceFloorPosition = {
   x: 256,
   y: scene.height - 448,
@@ -94,7 +93,6 @@ const iceCubePosition = {
   x: scene.width / 2 + 96,
   y: scene.height / 2 - 64,
 };
-
 const iceCube = {
   animation: createSprite({
     imageSrc: "/ice-cube.png",
@@ -106,11 +104,17 @@ const iceCube = {
     xFrames: 1,
     yFrames: 1,
   }),
-  collisionBody: createKinemeticRectangle(iceCubePosition, 64, 64),
-  renderProps: {
-    yIndex: 0,
-    offset: { x: 32, y: 56 },
-  },
+  collisionBody: createKinemeticRectangle(
+    iceCubePosition,
+    64,
+    64,
+    { x: 0, y: 0 },
+    (self, friction) => {
+      updateKinematicBody(self, friction);
+      iceCube.animation.origin.x = self.origin.x;
+      iceCube.animation.origin.y = self.origin.y;
+    },
+  ),
 };
 
 const iciclePosition = {
@@ -160,40 +164,32 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   );
 
   for (const body of activeKinematicBodies) {
-    let onIce = false;
+    let friction = 0.5;
     switch (body.type) {
       case ShapeType.Circle: {
-        onIce = rectangleContainsCircle(
+        friction = rectangleContainsCircle(
           iceFloor.collisionBody,
           body as KinematicBody<Circle>,
-        );
+        )
+          ? onIceFriction
+          : friction;
 
         break;
       }
       case ShapeType.Rectangle: {
-        onIce = rectangleContainsRectangle(
+        friction = rectangleContainsRectangle(
           iceFloor.collisionBody,
           body as KinematicBody<Rectangle>,
-        );
+        )
+          ? onIceFriction
+          : friction;
 
         break;
       }
     }
 
-    if (onIce) {
-      updateKinematicBody(body, 0.99);
-    } else {
-      updateKinematicBody(body, 0.5);
-    }
+    body.update(body, friction);
   }
-
-  // this is what I need to do
-  // but, there is an offset between the animation and the collision body as well
-  // in this case it's just zero by acciddent
-  iceCube.animation.origin.x = iceCube.collisionBody.origin.x;
-  iceCube.animation.origin.y = iceCube.collisionBody.origin.y;
-  iceCube.renderProps.yIndex =
-    iceCube.animation.origin.y + iceCube.renderProps.offset.y;
 
   // so the general plan is:
   // ---
@@ -221,9 +217,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   focusViewport(player.kinematicBody.origin.x, player.kinematicBody.origin.y);
 
-  // renderStaticBodies(collisionBodies, ctx);
   renderKinematicBodies(kinematicBodies, ctx);
-  // renderKinematicBodies(activeKinematicBodies, ctx);
 }
 
 export default scene;

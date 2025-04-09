@@ -10,6 +10,7 @@ import { getDirection, isZero, type Vector } from "../../lib/Vector.ts";
 import { input } from "../../lib/Input.ts";
 import {
   createKinemeticCircle,
+  updateKinematicBody,
   type KinematicBody,
   type Circle,
 } from "../../lib/KinematicBody.ts";
@@ -44,13 +45,13 @@ export function createPlayer(
   height: number,
 ): Player {
   const spriteOffset = {
-    x: position.x - width / 2,
-    y: position.y - height + 16,
+    x: width * 0.5,
+    y: height * 0.625,
   };
-  // const kinematicBodyOffset = {
-  //   x: position.x,
-  //   y: position.y + 8,
-  // };
+  const spriteOrigin = {
+    x: position.x - spriteOffset.x,
+    y: position.y - spriteOffset.y,
+  };
 
   return {
     position,
@@ -61,7 +62,7 @@ export function createPlayer(
       [State.Idle]: createSpriteAnimation(
         createSprite({
           imageSrc: "/player-idle.png",
-          origin: spriteOffset,
+          origin: spriteOrigin,
           width,
           height,
           frameWidth: 16,
@@ -74,7 +75,7 @@ export function createPlayer(
       [State.Walk]: createSpriteAnimation(
         createSprite({
           imageSrc: "/player-walk.png",
-          origin: spriteOffset,
+          origin: spriteOrigin,
           width,
           height,
           frameWidth: 16,
@@ -85,7 +86,16 @@ export function createPlayer(
         500,
       ),
     },
-    kinematicBody: createKinemeticCircle(position, width / 4, { x: 0, y: 0 }),
+    kinematicBody: createKinemeticCircle(
+      position,
+      width / 4,
+      { x: 0, y: 0 },
+      (self, friction) => {
+        updateKinematicBody(self, friction);
+        spriteOrigin.x = self.origin.x - spriteOffset.x;
+        spriteOrigin.y = self.origin.y - spriteOffset.y;
+      },
+    ),
   };
 }
 

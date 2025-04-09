@@ -1,9 +1,5 @@
 import { isZero, type Vector } from "./Vector.ts";
 
-const defaultFillStyle = "rgba(64, 64, 255, 0.5)";
-const defaultCollisionHandler = (): void => {};
-const defaultUpdateHandler = (): void => {};
-
 export type Circle = {
   radius: number;
 };
@@ -25,18 +21,38 @@ export type KinematicBody<Shape> = {
   shape: Shape;
   origin: Vector;
   velocity: Vector;
-  onUpdate: (self: KinematicBody<UnionShape>) => void;
+  update: (self: KinematicBody<UnionShape>, friction: number) => void;
   onCollision: (
-    self: KinematicBody<UnionShape>,
+    this: KinematicBody<UnionShape>,
     other: KinematicBody<UnionShape> | KinematicBody<UnionShape>,
   ) => void;
 };
+
+const defaultFillStyle = "rgba(64, 64, 255, 0.5)";
+const defaultCollisionHandler: KinematicBody<UnionShape>["onCollision"] =
+  (): void => {};
+const defaultUpdateHandler: KinematicBody<UnionShape>["update"] =
+  updateKinematicBody;
+
+export function updateKinematicBody(
+  body: KinematicBody<UnionShape>,
+  friction: number = 1,
+): void {
+  body.velocity.x *= friction;
+  body.velocity.y *= friction;
+
+  body.velocity.x = Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x;
+  body.velocity.y = Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y;
+
+  body.origin.x += body.velocity.x;
+  body.origin.y += body.velocity.y;
+}
 
 export function createKinemeticCircle(
   origin: Vector,
   radius: number,
   velocity: Vector = { x: 0, y: 0 },
-  onUpdate: KinematicBody<Circle>["onUpdate"] = defaultUpdateHandler,
+  update: KinematicBody<Circle>["update"] = defaultUpdateHandler,
   onCollision: KinematicBody<Circle>["onCollision"] = defaultCollisionHandler,
 ): KinematicBody<Circle> {
   return {
@@ -44,7 +60,7 @@ export function createKinemeticCircle(
     shape: { radius },
     origin,
     velocity,
-    onUpdate,
+    update,
     onCollision,
   };
 }
@@ -54,7 +70,7 @@ export function createKinemeticRectangle(
   width: number,
   height: number,
   velocity: Vector = { x: 0, y: 0 },
-  onUpdate: KinematicBody<Rectangle>["onUpdate"] = defaultUpdateHandler,
+  update: KinematicBody<Rectangle>["update"] = defaultUpdateHandler,
   onCollision: KinematicBody<Rectangle>["onCollision"] = defaultCollisionHandler,
 ): KinematicBody<Rectangle> {
   return {
@@ -62,7 +78,7 @@ export function createKinemeticRectangle(
     shape: { width, height },
     origin,
     velocity,
-    onUpdate,
+    update,
     onCollision,
   };
 }
@@ -90,24 +106,6 @@ export function renderRectangle(
     body.shape.width,
     body.shape.height,
   );
-}
-
-export function renderStaticBodies(
-  staticBodies: Array<KinematicBody<UnionShape>>,
-  ctx: CanvasRenderingContext2D,
-): void {
-  for (const body of staticBodies) {
-    switch (body.type) {
-      case ShapeType.Circle: {
-        renderCircle(body as KinematicBody<Circle>, ctx);
-        break;
-      }
-      case ShapeType.Rectangle: {
-        renderRectangle(body as KinematicBody<Rectangle>, ctx);
-        break;
-      }
-    }
-  }
 }
 
 export function circlesCollide(
@@ -257,22 +255,6 @@ export function renderKinematicBodies(
   }
 }
 
-export function updateKinematicBody(
-  body: KinematicBody<UnionShape>,
-  friction: number = 1,
-): void {
-  body.velocity.x *= friction;
-  body.velocity.y *= friction;
-
-  body.velocity.x = Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x;
-  body.velocity.y = Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y;
-
-  body.origin.x += body.velocity.x;
-  body.origin.y += body.velocity.y;
-
-  body.onUpdate(body);
-}
-
 export function processCircleCollision(
   circleA: KinematicBody<Circle>,
   circleB: KinematicBody<Circle>,
@@ -302,9 +284,6 @@ export function processCircleCollision(
 
     circleB.velocity.x += dot * normalX;
     circleB.velocity.y += dot * normalY;
-
-    circleA.onCollision(circleA, circleB);
-    circleB.onCollision(circleB, circleA);
   }
 }
 
@@ -352,9 +331,6 @@ export function processRectangleCollision(
       rectangleA.velocity.x -= dvx * absOverlap ** 2;
       rectangleB.velocity.x += dvx * absOverlap ** 2;
     }
-
-    rectangleA.onCollision(rectangleA, rectangleB);
-    rectangleB.onCollision(rectangleB, rectangleA);
   }
 }
 
@@ -394,9 +370,6 @@ export function processCircleAndRectangleCollision(
     circle.velocity.y -= dot * normalY;
     rectangle.velocity.x += dot * normalX;
     rectangle.velocity.y += dot * normalY;
-
-    circle.onCollision(circle, rectangle);
-    rectangle.onCollision(rectangle, circle);
   }
 }
 
@@ -419,9 +392,6 @@ export function processCircleOnStaticCircleCollision(
     const dot = circleA.velocity.x * normalX + circleA.velocity.y * normalY;
     circleA.velocity.x -= dot * normalX;
     circleA.velocity.y -= dot * normalY;
-
-    circleA.onCollision(circleA, circleB);
-    circleB.onCollision(circleB, circleA);
   }
 }
 
@@ -463,9 +433,6 @@ export function processRectangleOnStaticRectiangleCollision(
       const absOverlap = Math.abs(overlap);
       rectangleA.velocity.x -= rectangleA.velocity.x * absOverlap ** 2;
     }
-
-    rectangleA.onCollision(rectangleA, rectangleB);
-    rectangleB.onCollision(rectangleB, rectangleA);
   }
 }
 
@@ -498,9 +465,6 @@ export function processCircleOnStaticRectangleCollision(
     const dot = circle.velocity.x * normalX + circle.velocity.y * normalY;
     circle.velocity.x -= dot * normalX;
     circle.velocity.y -= dot * normalY;
-
-    circle.onCollision(circle, rectangle);
-    rectangle.onCollision(rectangle, circle);
   }
 }
 
@@ -536,9 +500,6 @@ export function processRectangleOnStaticCircleCollision(
     const dot = rectangle.velocity.x * normalX + rectangle.velocity.y * normalY;
     rectangle.velocity.x -= dot * normalX;
     rectangle.velocity.y -= dot * normalY;
-
-    rectangle.onCollision(rectangle, circle);
-    circle.onCollision(circle, rectangle);
   }
 }
 
