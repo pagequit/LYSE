@@ -155,7 +155,15 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   setActiveKinematicBodies(activeKinematicBodies, kinematicBodies);
 
-  // move the render stuff here before the kinematic bodies are processed
+  drawSprite(background, ctx);
+  drawSprite(iceFloor.animation, ctx);
+  drawSprite(icicle.animation, ctx);
+  drawSprite(iceCube.animation, ctx);
+
+  animatePlayer(player, ctx, delta);
+  focusViewport(player.kinematicBody.origin.x, player.kinematicBody.origin.y);
+
+  // renderKinematicBodies(kinematicBodies, ctx);
 
   processKinematicBodies(
     activeKinematicBodies,
@@ -190,34 +198,6 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
     body.update(body, friction);
   }
-
-  // so the general plan is:
-  // ---
-  // (processPlayer?)
-  // setActivieKinematicBodies
-  // processKinematicBodies
-  // updateKinematicBodies
-  // update the animation origin of active kinematic bodies
-  //  - set the animation origin to the kinematic body origin + offset
-  //  - set the renderNode position to the animation origin + offset
-  //    * but an inactive kinematic body might become active in the updateKinematicBodies function
-  //    * so I have to query the active kinematic bodies again ... that sucks
-  //    * or, I render first and then update the kinematic bodies ... probably a good idea
-  // y-sort the renderNode positions
-  // draw the animations based on the y-sort
-  // repeat?
-
-  drawSprite(background, ctx);
-
-  drawSprite(iceFloor.animation, ctx);
-  drawSprite(icicle.animation, ctx);
-  drawSprite(iceCube.animation, ctx);
-
-  animatePlayer(player, ctx, delta);
-
-  focusViewport(player.kinematicBody.origin.x, player.kinematicBody.origin.y);
-
-  renderKinematicBodies(kinematicBodies, ctx);
 }
 
 export default scene;
