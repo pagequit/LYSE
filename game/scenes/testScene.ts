@@ -99,7 +99,10 @@ const iceCube = {
   position: iceCubePosition,
   animation: createSprite({
     imageSrc: "/ice-cube.png",
-    origin: { ...iceCubePosition },
+    origin: {
+      x: iceCubePosition.x,
+      y: iceCubePosition.y - 4,
+    },
     width: 64,
     height: 64,
     frameWidth: 16,
@@ -110,12 +113,12 @@ const iceCube = {
   collisionBody: createKinemeticRectangle(
     iceCubePosition,
     64,
-    64,
+    60,
     { x: 0, y: 0 },
     (self, friction) => {
       updateKinematicBody(self, friction);
       iceCube.animation.origin.x = self.origin.x;
-      iceCube.animation.origin.y = self.origin.y;
+      iceCube.animation.origin.y = self.origin.y - 4;
     },
   ),
 };
