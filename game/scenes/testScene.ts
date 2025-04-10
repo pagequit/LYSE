@@ -94,6 +94,7 @@ const iceCubePosition = {
   y: scene.height / 2 - 64,
 };
 const iceCube = {
+  position: iceCubePosition,
   animation: createSprite({
     imageSrc: "/ice-cube.png",
     origin: { ...iceCubePosition },
@@ -105,7 +106,7 @@ const iceCube = {
     yFrames: 1,
   }),
   collisionBody: createKinemeticRectangle(
-    iceCubePosition,
+    { ...iceCubePosition },
     64,
     64,
     { x: 0, y: 0 },
@@ -122,6 +123,7 @@ const iciclePosition = {
   y: scene.height / 2 - 192,
 };
 const icicle = {
+  position: iciclePosition,
   animation: createSprite({
     imageSrc: "/icicle.png",
     origin: {
@@ -144,6 +146,8 @@ const collisionBodies: Array<KinematicBody<UnionShape>> = [
   icicle.collisionBody,
 ];
 const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
+
+const ySortedObjects = [player, icicle, iceCube];
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   processPlayer(
