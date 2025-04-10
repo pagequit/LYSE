@@ -14,6 +14,7 @@ import {
   type KinematicBody,
   type Circle,
 } from "../../lib/KinematicBody.ts";
+import type { Drawable } from "../../lib/Drawable.ts";
 
 export enum State {
   Idle,
@@ -37,23 +38,23 @@ export type Player = {
     [State.Idle]: SpriteAnimation;
   };
   kinematicBody: KinematicBody<Circle>;
-};
+} & Drawable;
 
 export function createPlayer(
   position: Vector,
   width: number,
   height: number,
 ): Player {
-  const spriteOffset = {
+  const spriteOffset: Vector = {
     x: width * 0.5,
     y: height * 0.625,
   };
-  const spriteOrigin = {
+  const spriteOrigin: Vector = {
     x: position.x - spriteOffset.x,
     y: position.y - spriteOffset.y,
   };
 
-  return {
+  const player = {
     position,
     state: State.Idle,
     direction: Direction.Right,
@@ -96,7 +97,12 @@ export function createPlayer(
         spriteOrigin.y = self.origin.y - spriteOffset.y;
       },
     ),
+    draw: (ctx: CanvasRenderingContext2D, delta: number) => {
+      playSpriteAnimation(player.animations[player.state], ctx, delta);
+    },
   };
+
+  return player;
 }
 
 export function setState(player: Player, state: State): void {

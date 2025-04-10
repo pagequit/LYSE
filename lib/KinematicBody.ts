@@ -24,7 +24,7 @@ export type KinematicBody<Shape> = {
   update: (self: KinematicBody<UnionShape>, friction: number) => void;
   onCollision: (
     this: KinematicBody<UnionShape>,
-    other: KinematicBody<UnionShape> | KinematicBody<UnionShape>,
+    other: KinematicBody<UnionShape>,
   ) => void;
 };
 

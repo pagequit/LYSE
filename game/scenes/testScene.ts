@@ -30,6 +30,7 @@ import { focusViewport } from "../../lib/View.ts";
 import { createSprite, drawSprite } from "../../lib/Sprite.ts";
 import type { Vector } from "../../lib/Vector.ts";
 import { paintNode } from "../entities/Node.ts";
+import type { Drawable } from "../../lib/Drawable.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -121,6 +122,9 @@ const iceCube = {
       iceCube.animation.origin.y = self.origin.y - 4;
     },
   ),
+  draw: (ctx: CanvasRenderingContext2D) => {
+    drawSprite(iceCube.animation, ctx);
+  },
 };
 
 const iciclePosition = {
@@ -143,16 +147,15 @@ const icicle = {
     yFrames: 1,
   }),
   collisionBody: createKinemeticCircle(iciclePosition, 28),
+  draw: (ctx: CanvasRenderingContext2D) => {
+    drawSprite(icicle.animation, ctx);
+  },
 };
 
 const activeKinematicBodies: Array<KinematicBody<UnionShape>> = [];
-const collisionBodies: Array<KinematicBody<UnionShape>> = [
-  wall,
-  icicle.collisionBody,
-];
 const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
-
-const ySortedObjects = [player, icicle, iceCube];
+const staticBodies = [wall, icicle.collisionBody];
+const ySortedObjects: Array<Drawable> = [player, icicle, iceCube];
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   processPlayer(
@@ -169,22 +172,14 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   ySortedObjects.sort((a, b) => a.position.y - b.position.y);
   for (const object of ySortedObjects) {
-    if (object === player) {
-      animatePlayer(player, ctx, delta);
-    } else {
-      drawSprite(object.animation, ctx);
-    }
+    object.draw(ctx, delta);
   }
 
   focusViewport(player.kinematicBody.origin.x, player.kinematicBody.origin.y);
 
   // renderKinematicBodies(kinematicBodies, ctx);
 
-  processKinematicBodies(
-    activeKinematicBodies,
-    collisionBodies,
-    kinematicBodies,
-  );
+  processKinematicBodies(activeKinematicBodies, staticBodies, kinematicBodies);
 
   for (const body of activeKinematicBodies) {
     let friction = 0.5;
