@@ -151,13 +151,4 @@ export function processPlayer(player: Player, friction: number = 1): void {
     input.vector.x * friction * player.speedMultiplier;
   player.kinematicBody.velocity.y +=
     input.vector.y * friction * player.speedMultiplier;
-
-  // FIXME
-  // player.animations[player.state].sprite.origin.x =
-  //   player.position.x - player.animations[player.state].sprite.width * 0.5;
-  // player.animations[player.state].sprite.origin.y =
-  //   player.position.y - player.animations[player.state].sprite.height + 16;
-
-  // player.position.x = player.kinematicBody.origin.x;
-  // player.position.y = player.kinematicBody.origin.y + 8;
 }

@@ -28,6 +28,8 @@ import {
 } from "../../lib/KinematicBody.ts";
 import { focusViewport } from "../../lib/View.ts";
 import { createSprite, drawSprite } from "../../lib/Sprite.ts";
+import type { Vector } from "../../lib/Vector.ts";
+import { paintNode } from "../entities/Node.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -106,7 +108,7 @@ const iceCube = {
     yFrames: 1,
   }),
   collisionBody: createKinemeticRectangle(
-    { ...iceCubePosition },
+    iceCubePosition,
     64,
     64,
     { x: 0, y: 0 },
@@ -161,10 +163,16 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
   drawSprite(background, ctx);
   drawSprite(iceFloor.animation, ctx);
-  drawSprite(icicle.animation, ctx);
-  drawSprite(iceCube.animation, ctx);
 
-  animatePlayer(player, ctx, delta);
+  ySortedObjects.sort((a, b) => a.position.y - b.position.y);
+  for (const object of ySortedObjects) {
+    if (object === player) {
+      animatePlayer(player, ctx, delta);
+    } else {
+      drawSprite(object.animation, ctx);
+    }
+  }
+
   focusViewport(player.kinematicBody.origin.x, player.kinematicBody.origin.y);
 
   // renderKinematicBodies(kinematicBodies, ctx);
