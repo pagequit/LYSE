@@ -46,7 +46,7 @@ const scene: Scene = createScene(process, {
   postProcess,
 });
 
-const audioPlayer: AudioPlayer = createAudioPlayer();
+export const audioPlayer: AudioPlayer = createAudioPlayer();
 audioPlayer.source.loop = true;
 await enqueueAudioFromUrl(audioPlayer, "/bgm.wav");
 connectAudioPlayer(audioPlayer, audioPlayer.queue[0]);

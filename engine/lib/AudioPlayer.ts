@@ -1,6 +1,7 @@
 export type AudioPlayer = {
   ctx: AudioContext;
   source: AudioBufferSourceNode;
+  gain: GainNode;
   queue: Array<AudioBuffer>;
   isPaused: boolean;
 };
@@ -11,6 +12,7 @@ export function createAudioPlayer(): AudioPlayer {
   return {
     ctx: audioContext,
     source: audioContext.createBufferSource(),
+    gain: audioContext.createGain(),
     queue: [],
     isPaused: false,
   };
@@ -30,7 +32,8 @@ export function connectAudioPlayer(
   audioBuffer: AudioBuffer,
 ): void {
   audioPlayer.source.buffer = audioBuffer;
-  audioPlayer.source.connect(audioPlayer.ctx.destination);
+  audioPlayer.source.connect(audioPlayer.gain);
+  audioPlayer.gain.connect(audioPlayer.ctx.destination);
 }
 
 export async function togglePausePlay(audioPlayer: AudioPlayer): Promise<void> {
@@ -56,4 +59,8 @@ export async function togglePausePlay(audioPlayer: AudioPlayer): Promise<void> {
       break;
     }
   }
+}
+
+export function setGain(audioPlayer: AudioPlayer, volume: number): void {
+  audioPlayer.gain.gain.value = volume;
 }
