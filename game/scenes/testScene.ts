@@ -41,13 +41,80 @@ const scene: Scene = createScene(process, {
 
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
+const bgm = {
+  audioContext: new AudioContext(),
+  audioElement: null as HTMLAudioElement | null,
+  audioSource: null as MediaElementAudioSourceNode | null,
+  sourceNode: null as AudioBufferSourceNode | null,
+  audioBuffer: null as AudioBuffer | null,
+  startTime: 0,
+  isPlaying: false,
+};
+
+async function loadAudio(url: string): Promise<AudioBuffer | null> {
+  try {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    const decodedAudio = await bgm.audioContext.decodeAudioData(arrayBuffer);
+    return decodedAudio;
+  } catch (error) {
+    console.error("Error loading or decoding audio:", error);
+    return null;
+  }
+}
+
+function playSound(buffer: AudioBuffer) {
+  bgm.sourceNode = bgm.audioContext.createBufferSource();
+  bgm.sourceNode.buffer = buffer;
+  bgm.sourceNode.connect(bgm.audioContext.destination);
+  bgm.sourceNode.onended = playSound.bind(null, buffer); // Schedule the next playback
+  bgm.startTime = bgm.audioContext.currentTime;
+  bgm.sourceNode.start();
+  bgm.isPlaying = true;
+  console.log("Background music started (gapless).");
+}
+
+async function playBackgroundMusic() {
+  if (bgm.audioContext.state === "suspended") {
+    await bgm.audioContext.resume();
+  }
+
+  if (!bgm.audioBuffer) {
+    bgm.audioBuffer = await loadAudio("/hain.wav");
+  }
+
+  if (!bgm.isPlaying) {
+    playSound(bgm.audioBuffer!);
+  }
+}
+
+function stopBackgroundMusic() {
+  if (bgm.isPlaying && bgm.sourceNode) {
+    bgm.sourceNode.onended = null; // Prevent the automatic restart
+    bgm.sourceNode.stop();
+    bgm.isPlaying = false;
+  }
+}
+
 function preProcess(): void {
+  self.addEventListener("keydown", (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      if (bgm.isPlaying) {
+        stopBackgroundMusic();
+      } else {
+        playBackgroundMusic();
+      }
+    }
+  });
+
   if (isTouchDevice) {
     applyTouchControls();
   }
 }
 
 function postProcess(): void {
+  stopBackgroundMusic();
+
   if (isTouchDevice) {
     removeTouchControls();
   }
@@ -129,7 +196,7 @@ const iceCube = {
 
 const iciclePosition = {
   x: scene.width / 2,
-  y: scene.height / 2 - 192,
+  y: scene.height / 2 - 128,
 };
 const icicle = {
   position: iciclePosition,
