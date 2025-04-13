@@ -67,11 +67,10 @@ function playSound(buffer: AudioBuffer) {
   bgm.sourceNode = bgm.audioContext.createBufferSource();
   bgm.sourceNode.buffer = buffer;
   bgm.sourceNode.connect(bgm.audioContext.destination);
-  bgm.sourceNode.onended = playSound.bind(null, buffer); // Schedule the next playback
+  bgm.sourceNode.onended = playSound.bind(null, buffer);
   bgm.startTime = bgm.audioContext.currentTime;
   bgm.sourceNode.start();
   bgm.isPlaying = true;
-  console.log("Background music started (gapless).");
 }
 
 async function playBackgroundMusic() {
@@ -80,7 +79,7 @@ async function playBackgroundMusic() {
   }
 
   if (!bgm.audioBuffer) {
-    bgm.audioBuffer = await loadAudio("/hain.wav");
+    bgm.audioBuffer = await loadAudio("/bgm.wav");
   }
 
   if (!bgm.isPlaying) {
@@ -90,7 +89,7 @@ async function playBackgroundMusic() {
 
 function stopBackgroundMusic() {
   if (bgm.isPlaying && bgm.sourceNode) {
-    bgm.sourceNode.onended = null; // Prevent the automatic restart
+    bgm.sourceNode.onended = null;
     bgm.sourceNode.stop();
     bgm.isPlaying = false;
   }
