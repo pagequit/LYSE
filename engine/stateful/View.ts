@@ -1,4 +1,4 @@
-import { type Vector } from "./Vector.ts";
+import { type Vector } from "../lib/Vector.ts";
 import { game } from "./Game.ts";
 
 export const canvas = document.createElement("canvas");

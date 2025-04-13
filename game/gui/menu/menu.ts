@@ -1,5 +1,5 @@
 import markup from "./menu.html?raw";
-import { changeScene, scaleViewport } from "../../../lib/Game.ts";
+import { changeScene, scaleViewport } from "../../../engine/stateful/Game.ts";
 import nodeScene from "../../scenes/nodeScene.ts";
 import testScene from "../../scenes/testScene.ts";
 import gridScene from "../../scenes/gridScene.ts";

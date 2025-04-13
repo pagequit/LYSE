@@ -1,4 +1,4 @@
-import { type Vector } from "../../lib/Vector.ts";
+import { type Vector } from "../../engine/lib/Vector.ts";
 
 export type Node = {
   position: Vector;

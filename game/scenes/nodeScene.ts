@@ -1,14 +1,18 @@
-import { pointer } from "../../lib/Pointer.ts";
-import { createScene, type Scene } from "../../lib/Scene.ts";
+import { pointer } from "../../engine/stateful/Pointer.ts";
+import { createScene, type Scene } from "../../engine/lib/Scene.ts";
 import {
   createSegmentIntersection,
   setSegmentIntersection,
-} from "../../lib/Segment.ts";
+} from "../../engine/lib/Segment.ts";
 import { getNodeByPosition, type Node, paintNode } from "../entities/Node.ts";
 import { type Edge, paintEdge } from "../entities/Edge.ts";
 import { createGraph, type Graph, originDFS } from "../entities/Graph.ts";
-import { focusViewport, startPanning, updatePanning } from "../../lib/View.ts";
-import type { Vector } from "../../lib/Vector.ts";
+import {
+  focusViewport,
+  startPanning,
+  updatePanning,
+} from "../../engine/stateful/View.ts";
+import type { Vector } from "../../engine/lib/Vector.ts";
 
 const scene: Scene = createScene(process, {
   width: 1024,

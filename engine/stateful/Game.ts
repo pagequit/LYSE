@@ -1,9 +1,16 @@
 import { adoptCanvas, ctx, resetViewport, resizeCanvas } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
-import { createScene, type Scene } from "./Scene.ts";
-import { fpsMonitor } from "../game/gui/menu/menu.ts";
+import { createScene, type Scene } from "../lib/Scene.ts";
+import { fpsMonitor } from "../../game/gui/menu/menu.ts";
 
-export const game = {
+export type Game = {
+  scene: Scene;
+  settings: {
+    scale: number;
+  };
+};
+
+export const game: Game = {
   scene: createScene(() => {}, {
     width: self.innerWidth,
     height: self.innerHeight,
@@ -11,10 +18,7 @@ export const game = {
   settings: {
     scale: 1,
   },
-  state: {},
 };
-
-export type Game = typeof game;
 
 let now: number = self.performance.now();
 let then: number = now;

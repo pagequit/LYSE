@@ -1,20 +1,20 @@
-import { createSprite } from "../../lib/Sprite.ts";
+import { createSprite } from "../../engine/lib/Sprite.ts";
 import {
   createSpriteAnimation,
   playSpriteAnimation,
   setSpriteAnimationXFrame,
   setSpriteAnimationYFrame,
   type SpriteAnimation,
-} from "../../lib/SpriteAnimation.ts";
-import { getDirection, isZero, type Vector } from "../../lib/Vector.ts";
-import { input } from "../../lib/Input.ts";
+} from "../../engine/lib/SpriteAnimation.ts";
+import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
+import { input } from "../../engine/stateful/Input.ts";
 import {
   createKinemeticCircle,
   updateKinematicBody,
   type KinematicBody,
   type Circle,
-} from "../../lib/KinematicBody.ts";
-import type { Drawable } from "../../lib/Drawable.ts";
+} from "../../engine/lib/KinematicBody.ts";
+import type { Drawable } from "../../engine/lib/Drawable.ts";
 
 export enum State {
   Idle,

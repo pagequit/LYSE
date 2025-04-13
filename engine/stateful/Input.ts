@@ -1,4 +1,4 @@
-import { normalize, type Vector } from "./Vector.ts";
+import { normalize, type Vector } from "../lib/Vector.ts";
 import { applyKeyboard, keyboardInput, removeKeyboard } from "./Keyboard.ts";
 import { touchControls } from "./TouchControls.ts";
 import { applyPointer, removePointer } from "./Pointer.ts";

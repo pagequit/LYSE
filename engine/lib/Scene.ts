@@ -1,4 +1,4 @@
-import { type Viewport, createViewport } from "./View.ts";
+import { type Viewport, createViewport } from "../stateful/View.ts";
 
 export type Process = (ctx: CanvasRenderingContext2D, delta: number) => void;
 

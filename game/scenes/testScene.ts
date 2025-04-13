@@ -1,7 +1,7 @@
 import {
   applyTouchControls,
   removeTouchControls,
-} from "../../lib/TouchControls.ts";
+} from "../../engine/stateful/TouchControls.ts";
 import {
   animatePlayer,
   createPlayer,
@@ -10,7 +10,7 @@ import {
   setDirection,
   type Player,
 } from "../entities/Player.ts";
-import { createScene, type Scene } from "../../lib/Scene.ts";
+import { createScene, type Scene } from "../../engine/lib/Scene.ts";
 import {
   createKinemeticRectangle,
   updateKinematicBody,
@@ -25,12 +25,19 @@ import {
   type Circle,
   type Rectangle,
   type UnionShape,
-} from "../../lib/KinematicBody.ts";
-import { focusViewport } from "../../lib/View.ts";
-import { createSprite, drawSprite } from "../../lib/Sprite.ts";
-import type { Vector } from "../../lib/Vector.ts";
+} from "../../engine/lib/KinematicBody.ts";
+import { focusViewport } from "../../engine/stateful/View.ts";
+import { createSprite, drawSprite } from "../../engine/lib/Sprite.ts";
+import type { Vector } from "../../engine/lib/Vector.ts";
 import { paintNode } from "../entities/Node.ts";
-import type { Drawable } from "../../lib/Drawable.ts";
+import type { Drawable } from "../../engine/lib/Drawable.ts";
+import {
+  togglePausePlay,
+  enqueueAudioFromUrl,
+  connectAudioPlayer,
+  createAudioPlayer,
+  type AudioPlayer,
+} from "../../engine/lib/AudioPlayer.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -39,72 +46,25 @@ const scene: Scene = createScene(process, {
   postProcess,
 });
 
+const audioPlayer: AudioPlayer = createAudioPlayer();
+audioPlayer.source.loop = true;
+await enqueueAudioFromUrl(audioPlayer, "/bgm.wav");
+connectAudioPlayer(audioPlayer, audioPlayer.queue[0]);
+
 const isTouchDevice = self.navigator.maxTouchPoints > 0;
 
-const bgm = {
-  audioContext: new AudioContext(),
-  audioElement: null as HTMLAudioElement | null,
-  audioSource: null as MediaElementAudioSourceNode | null,
-  sourceNode: null as AudioBufferSourceNode | null,
-  audioBuffer: null as AudioBuffer | null,
-  startTime: 0,
-  isPlaying: false,
-};
-
-async function loadAudio(url: string): Promise<AudioBuffer | null> {
-  try {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    const decodedAudio = await bgm.audioContext.decodeAudioData(arrayBuffer);
-    return decodedAudio;
-  } catch (error) {
-    console.error("Error loading or decoding audio:", error);
-    return null;
-  }
-}
-
-function playSound(buffer: AudioBuffer) {
-  bgm.sourceNode = bgm.audioContext.createBufferSource();
-  bgm.sourceNode.buffer = buffer;
-  bgm.sourceNode.connect(bgm.audioContext.destination);
-  bgm.sourceNode.onended = playSound.bind(null, buffer);
-  bgm.startTime = bgm.audioContext.currentTime;
-  bgm.sourceNode.start();
-  bgm.isPlaying = true;
-}
-
-async function playBackgroundMusic() {
-  if (bgm.audioContext.state === "suspended") {
-    await bgm.audioContext.resume();
+function handleAudioPlayer(event: KeyboardEvent): void {
+  if (event.code !== "Space") {
+    return;
   }
 
-  if (!bgm.audioBuffer) {
-    bgm.audioBuffer = await loadAudio("/bgm.wav");
-  }
-
-  if (!bgm.isPlaying) {
-    playSound(bgm.audioBuffer!);
-  }
-}
-
-function stopBackgroundMusic() {
-  if (bgm.isPlaying && bgm.sourceNode) {
-    bgm.sourceNode.onended = null;
-    bgm.sourceNode.stop();
-    bgm.isPlaying = false;
-  }
+  togglePausePlay(audioPlayer).then(() => {
+    console.log("audioPlayer", audioPlayer.ctx.state);
+  });
 }
 
 function preProcess(): void {
-  self.addEventListener("keydown", (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      if (bgm.isPlaying) {
-        stopBackgroundMusic();
-      } else {
-        playBackgroundMusic();
-      }
-    }
-  });
+  window.addEventListener("keydown", handleAudioPlayer);
 
   if (isTouchDevice) {
     applyTouchControls();
@@ -112,7 +72,10 @@ function preProcess(): void {
 }
 
 function postProcess(): void {
-  stopBackgroundMusic();
+  window.removeEventListener("keydown", handleAudioPlayer);
+  if (audioPlayer.ctx.state === "running") {
+    audioPlayer.source.stop();
+  }
 
   if (isTouchDevice) {
     removeTouchControls();

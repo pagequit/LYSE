@@ -1,4 +1,4 @@
-import { getDirection, getMagnitude, type Vector } from "./Vector.ts";
+import { getDirection, getMagnitude, type Vector } from "../lib/Vector.ts";
 
 const canvas = document.createElement("canvas");
 canvas.width = 164;
