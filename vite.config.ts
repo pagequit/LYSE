@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 // import { readdir } from "node:fs/promises";
 
 export default defineConfig({
+  base: "/LYSE/",
   server: { port: 3080 },
   build: { target: "esnext" },
   // plugins: [
