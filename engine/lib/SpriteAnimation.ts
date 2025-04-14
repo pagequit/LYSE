@@ -1,8 +1,8 @@
 import {
-  type Sprite,
   drawSprite,
   setSpriteXFrame,
   setSpriteYFrame,
+  type Sprite,
 } from "./Sprite";
 
 export type SpriteAnimation = {

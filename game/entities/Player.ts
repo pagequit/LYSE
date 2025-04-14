@@ -9,10 +9,10 @@ import {
 import { getDirection, isZero, type Vector } from "../../engine/lib/Vector.ts";
 import { input } from "../../engine/stateful/Input.ts";
 import {
-  createKinemeticCircle,
-  updateKinematicBody,
-  type KinematicBody,
   type Circle,
+  createKinemeticCircle,
+  type KinematicBody,
+  updateKinematicBody,
 } from "../../engine/lib/KinematicBody.ts";
 import type { Drawable } from "../../engine/lib/Drawable.ts";
 

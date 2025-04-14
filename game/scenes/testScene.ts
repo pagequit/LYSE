@@ -6,25 +6,25 @@ import {
   animatePlayer,
   createPlayer,
   Direction,
+  type Player,
   processPlayer,
   setDirection,
-  type Player,
 } from "../entities/Player.ts";
 import { createScene, type Scene } from "../../engine/lib/Scene.ts";
 import {
-  createKinemeticRectangle,
-  updateKinematicBody,
-  renderKinematicBodies,
-  processKinematicBodies,
-  setActiveKinematicBodies,
+  type Circle,
   createKinemeticCircle,
+  createKinemeticRectangle,
+  type KinematicBody,
+  processKinematicBodies,
+  type Rectangle,
   rectangleContainsCircle,
   rectangleContainsRectangle,
+  renderKinematicBodies,
+  setActiveKinematicBodies,
   ShapeType,
-  type KinematicBody,
-  type Circle,
-  type Rectangle,
   type UnionShape,
+  updateKinematicBody,
 } from "../../engine/lib/KinematicBody.ts";
 import { focusViewport } from "../../engine/stateful/View.ts";
 import { createSprite, drawSprite } from "../../engine/lib/Sprite.ts";
@@ -32,11 +32,11 @@ import type { Vector } from "../../engine/lib/Vector.ts";
 import { paintNode } from "../entities/Node.ts";
 import type { Drawable } from "../../engine/lib/Drawable.ts";
 import {
-  togglePausePlay,
-  enqueueAudioFromUrl,
+  type AudioPlayer,
   connectAudioPlayer,
   createAudioPlayer,
-  type AudioPlayer,
+  enqueueAudioFromUrl,
+  togglePausePlay,
 } from "../../engine/lib/AudioPlayer.ts";
 
 const scene: Scene = createScene(process, {
@@ -46,38 +46,14 @@ const scene: Scene = createScene(process, {
   postProcess,
 });
 
-export const audioPlayer: AudioPlayer = createAudioPlayer();
-audioPlayer.source.loop = true;
-await enqueueAudioFromUrl(audioPlayer, "/bgm.wav");
-connectAudioPlayer(audioPlayer, audioPlayer.queue[0]);
-
-const isTouchDevice = self.navigator.maxTouchPoints > 0;
-
-function handleAudioPlayer(event: KeyboardEvent): void {
-  if (event.code !== "Space") {
-    return;
-  }
-
-  togglePausePlay(audioPlayer).then(() => {
-    console.log("audioPlayer", audioPlayer.ctx.state);
-  });
-}
-
 function preProcess(): void {
-  window.addEventListener("keydown", handleAudioPlayer);
-
-  if (isTouchDevice) {
+  if (self.navigator.maxTouchPoints > 0) {
     applyTouchControls();
   }
 }
 
 function postProcess(): void {
-  window.removeEventListener("keydown", handleAudioPlayer);
-  if (audioPlayer.ctx.state === "running") {
-    audioPlayer.source.stop();
-  }
-
-  if (isTouchDevice) {
+  if (self.navigator.maxTouchPoints > 0) {
     removeTouchControls();
   }
 }

@@ -14,8 +14,5 @@ bun dev
 
 --- Notes ---
 
-Thanks to:
-https://onlinesequencer.net/
-https://lmms.io/
-https://musical-artifacts.com/artifacts/6204
-PocketSongsGM by Vini
+Thanks to: https://onlinesequencer.net/ https://lmms.io/
+https://musical-artifacts.com/artifacts/6204 PocketSongsGM by Vini
