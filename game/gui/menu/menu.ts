@@ -1,8 +1,8 @@
 import markup from "./menu.html?raw";
 import {
   changeScene,
-  scaleViewport,
   game,
+  scaleViewport,
 } from "../../../engine/stateful/Game.ts";
 import nodeScene from "../../scenes/nodeScene.ts";
 import testScene from "../../scenes/testScene.ts";

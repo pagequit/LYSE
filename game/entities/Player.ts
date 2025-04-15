@@ -15,7 +15,6 @@ import {
   updateKinematicBody,
 } from "../../engine/lib/KinematicBody.ts";
 import type { Drawable } from "../../engine/lib/Drawable.ts";
-import { lerp } from "../../engine/lib/lerp.ts";
 
 export enum State {
   Idle,

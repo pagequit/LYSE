@@ -1,4 +1,3 @@
-import { lerp } from "./lerp.ts";
 import { isZero, type Vector } from "./Vector.ts";
 
 export type Circle = {
