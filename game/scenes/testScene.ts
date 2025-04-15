@@ -3,7 +3,6 @@ import {
   removeTouchControls,
 } from "../../engine/stateful/TouchControls.ts";
 import {
-  animatePlayer,
   createPlayer,
   Direction,
   type Player,
@@ -20,7 +19,6 @@ import {
   type Rectangle,
   rectangleContainsCircle,
   rectangleContainsRectangle,
-  renderKinematicBodies,
   setActiveKinematicBodies,
   ShapeType,
   type UnionShape,
@@ -28,16 +26,7 @@ import {
 } from "../../engine/lib/KinematicBody.ts";
 import { focusViewport } from "../../engine/stateful/View.ts";
 import { createSprite, drawSprite } from "../../engine/lib/Sprite.ts";
-import type { Vector } from "../../engine/lib/Vector.ts";
-import { paintNode } from "../entities/Node.ts";
 import type { Drawable } from "../../engine/lib/Drawable.ts";
-import {
-  type AudioPlayer,
-  connectAudioPlayer,
-  createAudioPlayer,
-  enqueueAudioFromUrl,
-  togglePausePlay,
-} from "../../engine/lib/AudioPlayer.ts";
 
 const scene: Scene = createScene(process, {
   width: 1536,
@@ -78,7 +67,6 @@ const player: Player = createPlayer(
 );
 setDirection(player, Direction.Right);
 
-const onIceFriction = 0.99;
 const iceFloorPosition = {
   x: 256,
   y: scene.height - 448,
@@ -121,8 +109,8 @@ const iceCube = {
     64,
     60,
     { x: 0, y: 0 },
-    (self, friction) => {
-      updateKinematicBody(self, friction);
+    (self, delta, friction) => {
+      updateKinematicBody(self, delta, friction);
       iceCube.animation.origin.x = self.origin.x;
       iceCube.animation.origin.y = self.origin.y - 4;
     },
@@ -162,16 +150,9 @@ const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
 const staticBodies = [wall, icicle.collisionBody];
 const ySortedObjects: Array<Drawable> = [player, icicle, iceCube];
 
+const onIceFriction = 0.5;
+
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
-  processPlayer(
-    player,
-    rectangleContainsCircle(iceFloor.collisionBody, player.kinematicBody)
-      ? 0.015
-      : 1,
-  );
-
-  setActiveKinematicBodies(activeKinematicBodies, kinematicBodies);
-
   drawSprite(background, ctx);
   drawSprite(iceFloor.animation, ctx);
 
@@ -181,10 +162,6 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
   }
 
   focusViewport(player.kinematicBody.origin.x, player.kinematicBody.origin.y);
-
-  // renderKinematicBodies(kinematicBodies, ctx);
-
-  processKinematicBodies(activeKinematicBodies, staticBodies, kinematicBodies);
 
   for (const body of activeKinematicBodies) {
     let friction = 0.5;
@@ -211,8 +188,20 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
       }
     }
 
-    body.update(body, friction);
+    body.update(body, delta, friction);
   }
+
+  processKinematicBodies(activeKinematicBodies, staticBodies, kinematicBodies);
+
+  processPlayer(
+    player,
+    delta,
+    rectangleContainsCircle(iceFloor.collisionBody, player.kinematicBody)
+      ? 0.5
+      : 0.5,
+  );
+
+  setActiveKinematicBodies(activeKinematicBodies, kinematicBodies);
 }
 
 export default scene;

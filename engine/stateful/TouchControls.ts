@@ -100,9 +100,9 @@ export function renderTouchControls(): void {
     2 * Math.PI,
   );
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+  ctx.strokeStyle = "rgba(124, 124, 124, 0.5)";
   ctx.stroke();
-  ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+  ctx.fillStyle = "rgba(124, 124, 124, 0.5)";
   ctx.fill();
 
   ctx.beginPath();

@@ -1,3 +1,4 @@
+import { lerp } from "./lerp.ts";
 import { isZero, type Vector } from "./Vector.ts";
 
 export type Circle = {
@@ -21,7 +22,11 @@ export type KinematicBody<Shape> = {
   shape: Shape;
   origin: Vector;
   velocity: Vector;
-  update: (self: KinematicBody<UnionShape>, friction: number) => void;
+  update: (
+    self: KinematicBody<UnionShape>,
+    delta: number,
+    friction: number,
+  ) => void;
   onCollision: (
     this: KinematicBody<UnionShape>,
     other: KinematicBody<UnionShape>,
@@ -36,16 +41,18 @@ const defaultUpdateHandler: KinematicBody<UnionShape>["update"] =
 
 export function updateKinematicBody(
   body: KinematicBody<UnionShape>,
-  friction: number = 1,
+  delta: number,
+  frictionRate: number = 1,
 ): void {
-  body.velocity.x *= friction;
-  body.velocity.y *= friction;
+  console.log(body.type, body.velocity);
+  body.velocity.x *= frictionRate;
+  body.velocity.y *= frictionRate;
 
   body.velocity.x = Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x;
   body.velocity.y = Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y;
 
-  body.origin.x += body.velocity.x;
-  body.origin.y += body.velocity.y;
+  body.origin.x += body.velocity.x * delta;
+  body.origin.y += body.velocity.y * delta;
 }
 
 export function createKinemeticCircle(
@@ -106,6 +113,26 @@ export function renderRectangle(
     body.shape.width,
     body.shape.height,
   );
+}
+
+export function renderKinematicBodies(
+  kinematicBodies: Array<KinematicBody<UnionShape>>,
+  ctx: CanvasRenderingContext2D,
+): void {
+  for (const body of kinematicBodies) {
+    switch (body.type) {
+      case ShapeType.Circle: {
+        renderCircle(body as KinematicBody<Circle>, ctx);
+
+        break;
+      }
+      case ShapeType.Rectangle: {
+        renderRectangle(body as KinematicBody<Rectangle>, ctx);
+
+        break;
+      }
+    }
+  }
 }
 
 export function circlesCollide(
@@ -217,42 +244,6 @@ export function rectangleContainsCircle(
     rectangle.origin.y + rectangle.shape.height >=
       circle.origin.y + circle.shape.radius
   );
-}
-
-export function renderKinemeticCircle(
-  body: KinematicBody<Circle>,
-  ctx: CanvasRenderingContext2D,
-  fillStyle: string = defaultFillStyle,
-): void {
-  renderCircle(body, ctx, fillStyle);
-}
-
-export function renderKinemeticRectangle(
-  body: KinematicBody<Rectangle>,
-  ctx: CanvasRenderingContext2D,
-  fillStyle: string = defaultFillStyle,
-): void {
-  renderRectangle(body, ctx, fillStyle);
-}
-
-export function renderKinematicBodies(
-  kinematicBodies: Array<KinematicBody<UnionShape>>,
-  ctx: CanvasRenderingContext2D,
-): void {
-  for (const body of kinematicBodies) {
-    switch (body.type) {
-      case ShapeType.Circle: {
-        renderKinemeticCircle(body as KinematicBody<Circle>, ctx);
-
-        break;
-      }
-      case ShapeType.Rectangle: {
-        renderKinemeticRectangle(body as KinematicBody<Rectangle>, ctx);
-
-        break;
-      }
-    }
-  }
 }
 
 export function processCircleCollision(

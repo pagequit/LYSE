@@ -15,6 +15,7 @@ import {
   updateKinematicBody,
 } from "../../engine/lib/KinematicBody.ts";
 import type { Drawable } from "../../engine/lib/Drawable.ts";
+import { lerp } from "../../engine/lib/lerp.ts";
 
 export enum State {
   Idle,
@@ -32,7 +33,7 @@ export type Player = {
   position: Vector;
   state: State;
   direction: Direction;
-  speedMultiplier: number;
+  accelerationRate: number;
   animations: {
     [State.Walk]: SpriteAnimation;
     [State.Idle]: SpriteAnimation;
@@ -58,7 +59,7 @@ export function createPlayer(
     position,
     state: State.Idle,
     direction: Direction.Right,
-    speedMultiplier: 1,
+    accelerationRate: 0.2,
     animations: {
       [State.Idle]: createSpriteAnimation(
         createSprite({
@@ -91,8 +92,8 @@ export function createPlayer(
       position,
       width / 4,
       { x: 0, y: 0 },
-      (self, friction) => {
-        updateKinematicBody(self, friction);
+      (self, delta, friction) => {
+        updateKinematicBody(self, delta, friction);
         spriteOrigin.x = self.origin.x - spriteOffset.x;
         spriteOrigin.y = self.origin.y - spriteOffset.y;
       },
@@ -135,7 +136,11 @@ export function animatePlayer(
   playSpriteAnimation(player.animations[player.state], ctx, delta);
 }
 
-export function processPlayer(player: Player, friction: number = 1): void {
+export function processPlayer(
+  player: Player,
+  delta: number,
+  frictionRate: number = 1,
+): void {
   if (isZero(input.vector)) {
     setState(player, State.Idle);
   } else {
@@ -154,7 +159,7 @@ export function processPlayer(player: Player, friction: number = 1): void {
   }
 
   player.kinematicBody.velocity.x +=
-    input.vector.x * friction * player.speedMultiplier;
+    input.vector.x * frictionRate * player.accelerationRate;
   player.kinematicBody.velocity.y +=
-    input.vector.y * friction * player.speedMultiplier;
+    input.vector.y * frictionRate * player.accelerationRate;
 }
