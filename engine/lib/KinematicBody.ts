@@ -44,12 +44,11 @@ export function updateKinematicBody(
   delta: number,
   frictionRate: number = 1,
 ): void {
-  console.log(body.type, body.velocity);
   body.velocity.x *= frictionRate;
   body.velocity.y *= frictionRate;
 
-  body.velocity.x = Math.abs(body.velocity.x) < 0.01 ? 0 : body.velocity.x;
-  body.velocity.y = Math.abs(body.velocity.y) < 0.01 ? 0 : body.velocity.y;
+  body.velocity.x = Math.abs(body.velocity.x) < 0.001 ? 0 : body.velocity.x;
+  body.velocity.y = Math.abs(body.velocity.y) < 0.001 ? 0 : body.velocity.y;
 
   body.origin.x += body.velocity.x * delta;
   body.origin.y += body.velocity.y * delta;

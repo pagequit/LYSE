@@ -59,7 +59,7 @@ export function createPlayer(
     position,
     state: State.Idle,
     direction: Direction.Right,
-    accelerationRate: 0.2,
+    accelerationRate: 0.25,
     animations: {
       [State.Idle]: createSpriteAnimation(
         createSprite({

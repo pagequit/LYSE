@@ -150,7 +150,7 @@ const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
 const staticBodies = [wall, icicle.collisionBody];
 const ySortedObjects: Array<Drawable> = [player, icicle, iceCube];
 
-const onIceFriction = 0.5;
+const onIceFriction = 0.98;
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
   drawSprite(background, ctx);
@@ -197,7 +197,7 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
     player,
     delta,
     rectangleContainsCircle(iceFloor.collisionBody, player.kinematicBody)
-      ? 0.5
+      ? 0.015
       : 0.5,
   );
 
