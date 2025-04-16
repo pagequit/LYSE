@@ -58,6 +58,7 @@ const background = createSprite({
   frameHeight: scene.height / 4,
   xFrames: 1,
   yFrames: 1,
+  animationTime: 0,
 });
 
 const player: Player = createPlayer(
@@ -81,6 +82,7 @@ const iceFloor = {
     frameHeight: 64,
     xFrames: 1,
     yFrames: 1,
+    animationTime: 0,
   }),
   collisionBody: createKinemeticRectangle(iceFloorPosition, 512, 256),
 };
@@ -90,7 +92,6 @@ const iceCubePosition = {
   y: scene.height / 2 - 64,
 };
 const iceCube = {
-  position: iceCubePosition,
   animation: createSprite({
     imageSrc: "/ice-cube.png",
     origin: {
@@ -103,6 +104,7 @@ const iceCube = {
     frameHeight: 16,
     xFrames: 1,
     yFrames: 1,
+    animationTime: 0,
   }),
   collisionBody: createKinemeticRectangle(
     iceCubePosition,
@@ -115,8 +117,11 @@ const iceCube = {
       iceCube.animation.origin.y = self.origin.y - 4;
     },
   ),
-  draw: (ctx: CanvasRenderingContext2D) => {
-    drawSprite(iceCube.animation, ctx);
+  drawabel: {
+    position: iceCubePosition,
+    draw: (ctx: CanvasRenderingContext2D) => {
+      drawSprite(iceCube.animation, ctx);
+    },
   },
 };
 
@@ -125,7 +130,6 @@ const iciclePosition = {
   y: scene.height / 2 - 128,
 };
 const icicle = {
-  position: iciclePosition,
   animation: createSprite({
     imageSrc: "/icicle.png",
     origin: {
@@ -138,17 +142,25 @@ const icicle = {
     frameHeight: 32,
     xFrames: 1,
     yFrames: 1,
+    animationTime: 0,
   }),
   collisionBody: createKinemeticCircle(iciclePosition, 28),
-  draw: (ctx: CanvasRenderingContext2D) => {
-    drawSprite(icicle.animation, ctx);
+  drawabel: {
+    position: iciclePosition,
+    draw: (ctx: CanvasRenderingContext2D) => {
+      drawSprite(icicle.animation, ctx);
+    },
   },
 };
 
 const activeKinematicBodies: Array<KinematicBody<UnionShape>> = [];
 const kinematicBodies = [player.kinematicBody, iceCube.collisionBody];
 const staticBodies = [wall, icicle.collisionBody];
-const ySortedObjects: Array<Drawable> = [player, icicle, iceCube];
+const ySortedObjects: Array<Drawable> = [
+  player.drawable,
+  icicle.drawabel,
+  iceCube.drawabel,
+];
 
 const onIceFriction = 0.98;
 
