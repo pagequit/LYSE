@@ -1,10 +1,12 @@
 import { defineConfig } from "vite";
 import { readdir } from "node:fs/promises";
+import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
   server: { port: 3080 },
   build: { target: "esnext" },
   plugins: [
+    solidPlugin(),
     {
       name: "asset-indexer",
       buildStart: async function () {
