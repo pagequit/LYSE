@@ -9,7 +9,7 @@ export default function RangeSlider(props: {
   children: JSX.Element;
 }) {
   return (
-    <label for={props.name}>
+    <label>
       {props.children}
       <input
         type="range"
