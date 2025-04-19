@@ -7,9 +7,11 @@ export default function RangeSlider(props: {
   step: number;
   value: number;
   children: JSX.Element;
+  onChange?: (value: number) => void;
+  onInput?: (value: number) => void;
 }) {
   return (
-    <label>
+    <label class="range-slider">
       {props.children}
       <input
         type="range"
@@ -18,6 +20,10 @@ export default function RangeSlider(props: {
         max={props.max}
         step={props.step}
         value={props.value}
+        onChange={(e) =>
+          props.onChange && props.onChange(e.target.valueAsNumber)
+        }
+        onInput={(e) => props.onInput && props.onInput(e.target.valueAsNumber)}
       />
     </label>
   );
