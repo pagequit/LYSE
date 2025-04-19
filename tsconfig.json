@@ -6,7 +6,6 @@
     "moduleDetection": "force",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
     "allowJs": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
