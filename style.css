@@ -10,7 +10,7 @@
   --rgb-blurple: 101, 114, 244;
   --c-blurple: rgb(var(--rgb-blurple));
 
-  --rgb-fuchsia: 235, 69, 158;
+  --rgb-fuchsia: 238, 69, 158;
   --c-fuchsia: rgb(var(--rgb-fuchsia));
 
   --rgb-green: 35, 165, 89;
@@ -21,6 +21,9 @@
 
   --rgb-red: 218, 55, 60;
   --c-red: rgb(var(--rgb-red));
+
+  --rgb-cyan: 95, 205, 228;
+  --c-cyan: rgb(var(--rgb-cyan));
 
   --rgb-gray: 117, 126, 138;
   --c-gray: rgb(var(--rgb-gray));
