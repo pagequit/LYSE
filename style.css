@@ -7,7 +7,7 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
 
-  --rgb-blurple: 101, 114, 244;
+  --rgb-blurple: 101, 114, 245;
   --c-blurple: rgb(var(--rgb-blurple));
 
   --rgb-fuchsia: 238, 69, 158;
@@ -19,11 +19,17 @@
   --rgb-yellow: 240, 178, 50;
   --c-yellow: rgb(var(--rgb-yellow));
 
+  --rgb-orange: 255, 144, 0;
+  --c-orange: rgb(var(--rgb-orange));
+
   --rgb-red: 218, 55, 60;
   --c-red: rgb(var(--rgb-red));
 
   --rgb-cyan: 95, 205, 228;
   --c-cyan: rgb(var(--rgb-cyan));
+
+  --rgb-pink: 246, 42, 245;
+  --c-pink: rgb(var(--rgb-pink));
 
   --rgb-gray: 117, 126, 138;
   --c-gray: rgb(var(--rgb-gray));
