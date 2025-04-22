@@ -5,10 +5,7 @@ export const canvas = document.createElement("canvas");
 export const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
 const container = document.createElement("div");
-container.style.display = "flex";
-container.style.justifyContent = "center";
-container.style.alignItems = "center";
-container.style.background = "#161616"; // FIXME
+container.classList.add("canvas-container");
 container.appendChild(canvas);
 
 export type Viewport = {
