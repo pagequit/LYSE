@@ -1,17 +1,30 @@
 import { render } from "solid-js/web";
+import { createEffect, createSignal } from "solid-js";
 import RangeSlider from "./RangeSlider.tsx";
-
-type MountableElement =
-  | Element
-  | Document
-  | ShadowRoot
-  | DocumentFragment
-  | Node;
+import {
+  changeScene,
+  game,
+  scaleViewport,
+} from "../../../engine/stateful/Game.ts";
+import {
+  connectAudioPlayer,
+  enqueueAudioFromUrl,
+  setGain,
+  togglePausePlay,
+} from "../../../engine/lib/AudioPlayer.ts";
 
 export default function SettingsMenu() {
   return (
     <div class="settings-menu">
-      <button class="icon-button">
+      <button
+        class="icon-button"
+        onclick={() => {
+          if (document.fullscreenElement && document.exitFullscreen) {
+            return document.exitFullscreen();
+          }
+          document.body.requestFullscreen();
+        }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -58,6 +71,7 @@ export default function SettingsMenu() {
         step={0.1}
         value={1}
         onChange={console.log}
+        onInput={setVolume}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -83,6 +97,7 @@ export default function SettingsMenu() {
         step={0.1}
         value={1}
         onChange={console.log}
+        onInput={setScale}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -104,6 +119,29 @@ export default function SettingsMenu() {
   );
 }
 
+export type MountableElement =
+  | Element
+  | Document
+  | ShadowRoot
+  | DocumentFragment
+  | Node;
+
+const [scale, setScale] = createSignal(1);
+const [volume, setVolume] = createSignal(1);
+
 export function mount(element: MountableElement): void {
+  createEffect(() => {
+    scaleViewport(scale());
+  });
+
+  createEffect(() => {
+    setGain(game.BGMPlayer, volume());
+  });
+
+  enqueueAudioFromUrl(game.BGMPlayer, "/bgm.wav").then(() => {
+    connectAudioPlayer(game.BGMPlayer, game.BGMPlayer.queue[0]);
+    game.BGMPlayer.source.loop = true;
+  });
+
   render(() => <SettingsMenu />, element);
 }
