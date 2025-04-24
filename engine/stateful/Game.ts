@@ -1,7 +1,6 @@
 import { adoptCanvas, ctx, resetViewport, resizeCanvas } from "./View.ts";
 import { applyInputs, processInputs } from "./Input.ts";
 import { createScene, type Scene } from "../lib/Scene.ts";
-import { fpsMonitor } from "../../game/gui/menu/menu.ts";
 import { type AudioPlayer, createAudioPlayer } from "../lib/AudioPlayer.ts";
 
 export type Game = {
@@ -41,8 +40,6 @@ function animate(timestamp: number): void {
   then = now;
   now = timestamp;
   delta = now - then;
-
-  fpsMonitor.innerText = `${Math.round(1000 / delta)} FPS`;
 }
 
 export function startGame(scene: Scene): void {

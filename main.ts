@@ -3,7 +3,7 @@ import { startGame } from "./engine/stateful/Game.ts";
 // import scene from "./game/scenes/gridScene.ts";
 import scene from "./game/scenes/testScene.ts";
 // import scene from "./game/scenes/nodeScene.ts";
-import { mount } from "./game/gui/menu/SettingsMenu.tsx";
+import { mount } from "./game/gui/SettingsMenu.tsx";
 import "./style.css";
 
 startGame(scene);

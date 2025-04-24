@@ -133,6 +133,11 @@ body {
   padding: 0.5rem;
 }
 
+/* FIXME */
+.range-slider [role="button"] {
+  cursor: pointer;
+}
+
 .range-slider input[type="range"] {
   cursor: pointer;
   appearance: none;
