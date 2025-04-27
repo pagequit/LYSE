@@ -165,7 +165,7 @@ const ySortedObjects: Array<Drawable> = [
 const onIceFriction = 0.98;
 
 function process(ctx: CanvasRenderingContext2D, delta: number): void {
-  // drawSprite(background, ctx);
+  drawSprite(background, ctx);
   drawSprite(iceFloor.animation, ctx);
 
   ySortedObjects.sort((a, b) => a.position.y - b.position.y);

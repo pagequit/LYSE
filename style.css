@@ -95,9 +95,9 @@ body {
   margin: var(--sp-2);
   border-radius: var(--sp-2);
   border: 1px solid var(--c-cyan);
+  background-color: rgba(var(--rgb-black), 0.8);
   background-image:
-    radial-gradient(rgba(var(--rgb-black), 0.1), transparent),
-    radial-gradient(rgba(var(--rgb-fuchsia), 0.1), rgba(var(--rgb-cyan), 0.1)),
+    radial-gradient(rgba(var(--rgb-fuchsia), 0.2), rgba(var(--rgb-cyan), 0.2)),
     url(/hex-grid-menu.svg);
   background-blend-mode: luminosity;
   box-shadow:
