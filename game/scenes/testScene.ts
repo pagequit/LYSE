@@ -19,6 +19,7 @@ import {
   type Rectangle,
   rectangleContainsCircle,
   rectangleContainsRectangle,
+  renderKinematicBodies,
   setActiveKinematicBodies,
   ShapeType,
   type UnionShape,
@@ -63,8 +64,8 @@ const background = createSprite({
 
 const player: Player = createPlayer(
   { x: (scene.width - 64) / 2, y: (scene.height - 64) / 2 + 16 },
-  64,
-  64,
+  128,
+  128,
 );
 setDirection(player, Direction.Right);
 
@@ -202,6 +203,8 @@ function process(ctx: CanvasRenderingContext2D, delta: number): void {
 
     body.update(body, delta, friction);
   }
+
+  // renderKinematicBodies([player.kinematicBody], ctx);
 
   processKinematicBodies(activeKinematicBodies, staticBodies, kinematicBodies);
 

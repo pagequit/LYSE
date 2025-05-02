@@ -21,10 +21,10 @@ export enum State {
 }
 
 export enum Direction {
-  Right,
-  Left,
   Down,
+  Left,
   Up,
+  Right,
 }
 
 export type Player = {
@@ -45,8 +45,8 @@ export function createPlayer(
   height: number,
 ): Player {
   const spriteOffset: Vector = {
-    x: width * 0.5,
-    y: height * 0.625,
+    x: width - 64,
+    y: height - 40,
   };
   const spriteOrigin: Vector = {
     x: position.x - spriteOffset.x,
@@ -55,35 +55,35 @@ export function createPlayer(
 
   const player: Player = {
     state: State.Idle,
-    direction: Direction.Right,
+    direction: Direction.Down,
     accelerationRate: 0.25,
     animations: {
       [State.Idle]: createSprite({
-        imageSrc: "/player-idle.png",
+        imageSrc: "/main-char-idle.png",
         origin: spriteOrigin,
         width,
         height,
-        frameWidth: 16,
-        frameHeight: 16,
-        xFrames: 2,
+        frameWidth: 32,
+        frameHeight: 32,
+        xFrames: 5,
         yFrames: 4,
         animationTime: 1000,
       }),
       [State.Walk]: createSprite({
-        imageSrc: "/player-walk.png",
+        imageSrc: "/main-char-walk.png",
         origin: spriteOrigin,
         width,
         height,
-        frameWidth: 16,
-        frameHeight: 16,
-        xFrames: 4,
+        frameWidth: 32,
+        frameHeight: 32,
+        xFrames: 6,
         yFrames: 4,
         animationTime: 1000,
       }),
     },
     kinematicBody: createKinemeticCircle(
       position,
-      width / 4,
+      width - 108,
       { x: 0, y: 0 },
       (self, delta, friction) => {
         updateKinematicBody(self, delta, friction);
