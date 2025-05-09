@@ -67,7 +67,7 @@ const player: Player = createPlayer(
   128,
   128,
 );
-setDirection(player, Direction.Right);
+setDirection(player, Direction.Down);
 
 const iceFloorPosition = {
   x: 256,

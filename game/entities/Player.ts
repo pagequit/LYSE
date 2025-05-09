@@ -78,7 +78,7 @@ export function createPlayer(
         frameHeight: 32,
         xFrames: 6,
         yFrames: 4,
-        animationTime: 1000,
+        animationTime: 768,
       }),
     },
     kinematicBody: createKinemeticCircle(
