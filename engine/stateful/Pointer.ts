@@ -18,10 +18,14 @@ function adjustPointerPosition(
   eventY: number,
 ): void {
   pointer.position.x =
-    (eventX - canvas.offsetLeft + game.scene.viewport.origin.x) /
+    (eventX -
+      canvas.getBoundingClientRect().left +
+      game.scene.viewport.origin.x) /
     game.settings.scale;
   pointer.position.y =
-    (eventY - canvas.offsetTop + game.scene.viewport.origin.y) /
+    (eventY -
+      canvas.getBoundingClientRect().top +
+      game.scene.viewport.origin.y) /
     game.settings.scale;
 }
 
